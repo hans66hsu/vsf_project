@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Variational Streaming Flow enables probabilistic forecasting directly in physical time with one latent variable per coherent rollout.">
+  <meta name="keywords" content="variational streaming flow, probabilistic forecasting, physical-time flow, dynamical systems, world models">
+  <meta name="theme-color" content="#102a56">
+  <meta property="og:title" content="Variational Streaming Flow">
+  <meta property="og:description" content="One latent. One coherent rollout. Many plausible futures.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/figures/vsf-motivation.png">
+  <title>Variational Streaming Flow — Probabilistic Forecasting in Physical Time</title>
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/site.css">
+  <script src="static/js/site.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header" data-header>
+    <div class="nav-shell">
+      <a class="brand" href="#top" aria-label="Variational Streaming Flow home">
+        <svg class="brand-mark" viewBox="0 0 42 42" role="img" aria-hidden="true">
+          <path d="M5 21h10"/>
+          <path d="M15 21c8 0 7-11 18-11"/>
+          <path d="M15 21c8 0 7 0 18 0"/>
+          <path d="M15 21c8 0 7 11 18 11"/>
+          <circle cx="5" cy="21" r="2.5"/>
+          <circle cx="34" cy="10" r="2.5"/>
+          <circle cx="34" cy="21" r="2.5"/>
+          <circle cx="34" cy="32" r="2.5"/>
+        </svg>
+        <span>VSF</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <span class="sr-only">Toggle navigation</span>
+        <span></span><span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
+        <a href="#overview">Overview</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#world-model">World model</a>
+        <a href="#citation">Citation</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="top">
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+      <div class="container hero-content">
+        <p class="eyebrow">Probabilistic forecasting in physical time</p>
+        <h1>
+          <span>Variational Streaming Flow</span>
+          <small>Probabilistic Forecasting in Physical Time</small>
+        </h1>
+        <p class="hero-deck">One latent. One coherent rollout. Many plausible futures.</p>
+
+        <div class="authors" aria-label="Authors">
+          <span>Hans Hao-Hsun Hsu<sup>1,2</sup></span>
+          <span>Minseon Gwak<sup>1,5</sup></span>
+          <span>Soon Hoe Lim<sup>3,4,*</sup></span>
+          <span>Pan Li<sup>2</sup></span>
+          <span>N. Benjamin Erichson<sup>1,5</sup></span>
+        </div>
+        <p class="affiliations">
+          <span><sup>1</sup>Lawrence Berkeley National Laboratory</span>
+          <span><sup>2</sup>Georgia Institute of Technology</span>
+          <span><sup>3</sup>KTH Royal Institute of Technology</span>
+          <span><sup>4</sup>Nordita</span>
+          <span><sup>5</sup>International Computer Science Institute</span>
+          <span><sup>*</sup>Work done while visiting ICSI/UC Berkeley</span>
+        </p>
+
+        <div class="hero-actions" aria-label="Project links">
+          <a class="button button-primary" href="assets/paper.pdf" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>
+            Paper
+          </a>
+          <a class="button button-dark" href="https://github.com/hans66hsu/VSF-forecasting" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+            Code
+          </a>
+          <a class="button button-ghost" href="#method">
+            Explore the method
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+
+        <figure class="hero-figure paper-figure">
+          <div class="figure-kicker"><span></span>From one observed history to a distribution over futures</div>
+          <img src="assets/figures/vsf-motivation.png" alt="Comparison of deterministic and partially observed stochastic dynamics, showing that Streaming Flow predicts a single future while Variational Streaming Flow predicts multiple plausible futures." width="2434" height="525" fetchpriority="high">
+          <figcaption>Standard non-latent Streaming Flow yields one forecast from a fixed history. VSF uses a rollout-level latent to represent distinct, coherent futures.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section-intro" id="overview">
+      <div class="container narrow">
+        <div class="tldr">
+          <div class="tldr-label">TL;DR</div>
+          <p>VSF adds a variational, trajectory-level latent to a physical-time velocity field. It preserves the direct rollout efficiency of Streaming Flow while turning a single deterministic forecast into a learned distribution over long-horizon futures.</p>
+        </div>
+
+        <div class="stats" aria-label="Headline results">
+          <div class="stat">
+            <strong>17 / 17</strong>
+            <span>lowest forecasting-error metrics across the reported 1,000-step deterministic and stochastic tasks</span>
+          </div>
+          <div class="stat">
+            <strong>up to 7×</strong>
+            <span>faster inference than autoregressive diffusion</span>
+          </div>
+          <div class="stat">
+            <strong>+7.34 pp</strong>
+            <span>average planning-success gain over the autoregressive world-model predictor</span>
+          </div>
+        </div>
+
+        <div class="section-heading centered-heading">
+          <p class="eyebrow">Abstract</p>
+          <h2>Forecast the distribution, not just the path.</h2>
+        </div>
+        <div class="abstract-copy">
+          <p>Probabilistic forecasting is essential when intrinsic randomness or incomplete observations allow the same observed state to evolve into multiple plausible futures. Flow matching can model those distributions, but generation requires integration through an auxiliary flow time in addition to the system’s physical evolution.</p>
+          <p>Streaming Flow avoids that extra generative clock by learning a velocity field directly in physical time. In its standard non-latent form, however, a fixed initial state and history determine only one future. <strong>Variational Streaming Flow (VSF)</strong> conditions the physical-time velocity on a latent variable inferred from dynamics during training and sampled from a prior at inference.</p>
+          <p>Across deterministic and partially observed stochastic systems, VSF improves long-horizon predictive accuracy and distributional fidelity. As a plug-in predictor for a JEPA-based world model, it also improves goal-directed planning while retaining one velocity-field evaluation per imagined transition.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="motivation">
+      <div class="container">
+        <div class="split-heading">
+          <div class="section-heading">
+            <p class="eyebrow">Why a latent?</p>
+            <h2>Branch identity should not hide in tiny state differences.</h2>
+          </div>
+          <p>Near a bifurcation, multiple futures can share the same physical past. A non-latent field must encode the eventual branch in increasingly small differences in the physical state, making accurate rollouts sensitive to perturbations. A trajectory-level latent can carry that branch information explicitly.</p>
+        </div>
+
+        <figure class="paper-figure wide-figure">
+          <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing shared physical history, branch identity represented through state differences in standard Streaming Flow, branch identity represented in a latent code, and the resulting sensitivity tradeoff." width="2235" height="572" loading="lazy">
+          <figcaption>A motivating bifurcation model: as standard SF demands higher tube fidelity, the physical state must become more sensitive; an ideal latent can encode the future branch without that state-space bottleneck.</figcaption>
+        </figure>
+
+        <div class="theory-note">
+          <span class="note-icon" aria-hidden="true">∴</span>
+          <div>
+            <strong>What the theory says.</strong>
+            <p>The analysis proves that an ideal latent construction can remove this particular fidelity–sensitivity bottleneck. It motivates VSF; it is not a blanket guarantee that every learned latent model eliminates rollout sensitivity.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="method">
+      <div class="container">
+        <div class="section-heading centered-heading narrow">
+          <p class="eyebrow">Method</p>
+          <h2>Sample once, then evolve in physical time.</h2>
+          <p>VSF augments the forecast dynamics with a latent <em>z</em>. One draw selects a coherent velocity field for the complete rollout.</p>
+        </div>
+
+        <div class="equation-card" aria-label="Variational Streaming Flow dynamics equation">
+          <div class="equation-label">Latent-conditioned dynamics</div>
+          <div class="equation">
+            <span class="fraction"><span>d&nbsp;x̂<sub>s</sub></span><span>d&nbsp;s</span></span>
+            <span>=</span>
+            <span>v<sub>θ</sub>(x̂<sub>s</sub>, s, h, z)</span>
+            <span class="equation-condition">z ∼ 𝒩(0, I)</span>
+          </div>
+        </div>
+
+        <div class="method-grid">
+          <article class="method-card training-card">
+            <div class="card-number">01</div>
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><path d="M8 13h13M8 24h13M8 35h13"/><circle cx="32" cy="13" r="5"/><circle cx="36" cy="24" r="5"/><circle cx="30" cy="35" r="5"/><path d="m21 13 6 0M21 24h10M21 35h4"/></svg>
+            </div>
+            <h3>Infer dynamics during training</h3>
+            <p>An encoder observes local state, physical velocity, forecast time, and history to infer <span class="math-inline">q<sub>φ</sub>(z | u<sub>s</sub>, x<sub>s</sub>, s, h)</span>. Multiple posterior latents produce a set of candidate velocities.</p>
+            <div class="mini-flow" aria-label="Training flow">
+              <span>local motion</span><i>→</i><span>posterior</span><i>→</i><span>M velocities</span>
+            </div>
+          </article>
+
+          <article class="method-card inference-card">
+            <div class="card-number">02</div>
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 48 48"><path d="M7 25h10"/><path d="M17 25c8 0 7-12 22-12M17 25c8 0 7 0 22 0M17 25c8 0 7 12 22 12"/><circle cx="7" cy="25" r="3"/><circle cx="40" cy="13" r="3"/><circle cx="40" cy="25" r="3"/><circle cx="40" cy="37" r="3"/></svg>
+            </div>
+            <h3>Keep one latent during inference</h3>
+            <p>Draw <span class="math-inline">z ∼ 𝒩(0, I)</span> once, hold it fixed, and advance the state directly in physical time. The rolling history changes with the generated trajectory; the latent remains the same.</p>
+            <div class="mini-flow" aria-label="Inference flow">
+              <span>one latent</span><i>→</i><span>fixed field</span><i>→</i><span>full rollout</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="objective-panel">
+          <div class="objective-copy">
+            <p class="eyebrow">Distributional objective</p>
+            <h3>Fit the observed motion without collapsing the ensemble.</h3>
+            <p>The generalized energy reconstruction balances two forces: match each predicted velocity to the observed velocity, while rewarding meaningful spread across latent-conditioned predictions. KL regularization aligns the inferred posterior with the prior used at test time.</p>
+            <p class="objective-footnote">Under aggregate posterior–prior alignment, the population objective controls the energy distance between the prior-predictive and true conditional velocity distributions.</p>
+          </div>
+          <div class="objective-equation" aria-label="Generalized energy reconstruction objective">
+            <span>ℒ<sub>ES</sub></span>
+            <b>=</b>
+            <div>
+              <span class="term term-fit">1/M&nbsp; ∑<sub>i</sub> ‖û<sub>i</sub> − u‖<sup>α</sup></span>
+              <span class="minus">−</span>
+              <span class="term term-spread">1/2M²&nbsp; ∑<sub>i,j</sub> ‖û<sub>i</sub> − û<sub>j</sub>‖<sup>α</sup></span>
+            </div>
+            <small>fit <span>+</span> diversity, &nbsp;0 &lt; α &lt; 2</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-results" id="results">
+      <div class="container">
+        <div class="split-heading light-heading">
+          <div class="section-heading">
+            <p class="eyebrow">Forecasting results</p>
+            <h2>Lower error, even after 1,000 steps.</h2>
+          </div>
+          <p>VSF is evaluated on fully observed deterministic double-pendulum, Rössler, and Lorenz systems, and on partially observed parameter-mixture Rössler and Lorenz systems.</p>
+        </div>
+
+        <figure class="paper-figure dark-figure result-figure">
+          <img src="assets/figures/rollout-errors.png" alt="Long-horizon error curves showing lower CRPS for VSF on deterministic double pendulum and lower energy distance on stochastic Rössler." width="1053" height="326" loading="lazy">
+          <figcaption>VSF accumulates less error than standard Streaming Flow and diffusion baselines over long rollouts.</figcaption>
+        </figure>
+
+        <div class="results-panel">
+          <div class="tab-list" role="tablist" aria-label="Forecasting results tables">
+            <button type="button" role="tab" aria-selected="true" aria-controls="deterministic-table" id="deterministic-tab" data-tab="deterministic-table">Deterministic</button>
+            <button type="button" role="tab" aria-selected="false" aria-controls="stochastic-table" id="stochastic-tab" data-tab="stochastic-table" tabindex="-1">Stochastic</button>
+          </div>
+
+          <div class="table-pane is-active" id="deterministic-table" role="tabpanel" aria-labelledby="deterministic-tab">
+            <div class="table-scroll">
+              <table>
+                <caption>Selected 1,000-step deterministic results. Lower is better; runtime is averaged across tasks.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Model</th>
+                    <th scope="col">Double pendulum<br><small>CRPS ↓</small></th>
+                    <th scope="col">Rössler<br><small>CRPS ↓</small></th>
+                    <th scope="col">Lorenz<br><small>CRPS ↓</small></th>
+                    <th scope="col">Runtime<br><small>seconds ↓</small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Block diffusion</th><td>0.46</td><td>0.29</td><td>0.31</td><td>30.2</td></tr>
+                  <tr><th scope="row">AR diffusion</th><td>0.43</td><td>0.35</td><td>0.86</td><td>78.2</td></tr>
+                  <tr><th scope="row">Streaming Flow</th><td>2.12</td><td>0.16</td><td>1.42</td><td><strong class="secondary-best">6.4</strong></td></tr>
+                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>0.25</strong></td><td><strong>0.03</strong></td><td><strong>0.16</strong></td><td>7.2</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="table-pane" id="stochastic-table" role="tabpanel" aria-labelledby="stochastic-tab" hidden>
+            <div class="table-scroll">
+              <table>
+                <caption>Selected 1,000-step partially observed stochastic results. Lower is better; runtime is averaged across tasks.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Model</th>
+                    <th scope="col">Rössler<br><small>W₁ ↓</small></th>
+                    <th scope="col">Rössler<br><small>ED ↓</small></th>
+                    <th scope="col">Lorenz<br><small>W₁ ↓</small></th>
+                    <th scope="col">Lorenz<br><small>ED ↓</small></th>
+                    <th scope="col">Runtime<br><small>seconds ↓</small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Block diffusion</th><td>8.88</td><td>12.67</td><td>19.88</td><td>13.73</td><td>21.8</td></tr>
+                  <tr><th scope="row">AR diffusion</th><td>16.21</td><td>11.46</td><td>25.64</td><td>5.60</td><td>42.4</td></tr>
+                  <tr><th scope="row">Streaming Flow</th><td>4.53</td><td>5.00</td><td>58.12</td><td>89.84</td><td>7.5</td></tr>
+                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>2.62</strong></td><td><strong>1.28</strong></td><td><strong>15.95</strong></td><td><strong>5.19</strong></td><td><strong>6.7</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p class="table-note">Selected baselines and metrics are shown for readability. The paper reports eight baselines and the complete CRPS/RMSE/MAE and CME/CSE/W₁/ED evaluation.</p>
+        </div>
+
+        <div class="qualitative-grid">
+          <figure class="paper-figure dark-figure">
+            <img src="assets/figures/stochastic-rossler.png" alt="Ground truth and forecast ensembles for stochastic Rössler, comparing VSF with Streaming Flow, block diffusion, and autoregressive diffusion." width="948" height="197" loading="lazy">
+            <figcaption><strong>Distributional fidelity.</strong> VSF preserves the Rössler geometry while capturing variability across plausible futures.</figcaption>
+          </figure>
+          <figure class="paper-figure dark-figure">
+            <img src="assets/figures/double-pendulum.png" alt="Ground truth and sampled forecasts for the chaotic double pendulum, comparing VSF with Streaming Flow, block diffusion, and autoregressive diffusion." width="932" height="184" loading="lazy">
+            <figcaption><strong>Long-horizon concentration.</strong> VSF samples remain concentrated around the double-pendulum reference trajectory.</figcaption>
+          </figure>
+        </div>
+
+        <p class="benchmark-note"><strong>Benchmark note.</strong> The “stochastic” systems are partially observed trajectory-level parameter mixtures: each rollout becomes deterministic once its hidden parameter is sampled. The forecasting task is stochastic from the model’s observed history. Over 2,500-step stochastic Lorenz forecasts, VSF is best on CME, CSE, and ED; block diffusion attains the lower W₁.</p>
+      </div>
+    </section>
+
+    <section class="section section-soft" id="world-model">
+      <div class="container">
+        <div class="split-heading">
+          <div class="section-heading">
+            <p class="eyebrow">World-model predictor</p>
+            <h2>Forecast better to plan better.</h2>
+          </div>
+          <p>VSF can replace the deterministic autoregressive predictor inside a frozen JEPA world model. For each candidate action sequence, it imagines latent trajectories in physical time; CEM selects the plan whose terminal state best matches the encoded goal.</p>
+        </div>
+
+        <figure class="paper-figure wide-figure world-model-figure">
+          <img src="assets/figures/vsf-world-model.png" alt="Action-conditioned VSF world-model pipeline, from CEM candidate actions and encoded observations through the VSF predictor to a latent goal cost." width="1592" height="549" loading="lazy">
+          <figcaption>Action-conditioned VSF plugs into the existing JEPA encoder and CEM planner while retaining one velocity-field evaluation per imagined transition.</figcaption>
+        </figure>
+
+        <div class="planning-layout">
+          <div class="planning-results">
+            <p class="eyebrow">Planning success (%)</p>
+            <h3>Highest on all four tasks.</h3>
+            <div class="table-scroll compact-table">
+              <table>
+                <thead>
+                  <tr><th scope="col">Predictor</th><th scope="col">PushT</th><th scope="col">Cube</th><th scope="col">TwoRoom</th><th scope="col">Reacher</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">AR</th><td>84.7</td><td>69.3</td><td>78.7</td><td>61.3</td></tr>
+                  <tr><th scope="row">SF</th><td>88.0</td><td>76.7</td><td>76.7</td><td>49.3</td></tr>
+                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>92.7</strong></td><td><strong>80.0</strong></td><td><strong>82.7</strong></td><td><strong>68.0</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>VSF also reduces latent-trajectory RMSE relative to the AR predictor on every task and achieves the lowest RMSE on three of four tasks.</p>
+          </div>
+
+          <figure class="paper-figure cube-figure">
+            <img src="assets/figures/cube-rollout.png" alt="Successful Cube manipulation rollout with frames from steps 0 through 25 and the VSF latent prediction tracking the ground-truth trajectory." width="2006" height="729" loading="lazy">
+            <figcaption>A successful Cube plan: VSF’s predicted latent path closely follows the ground-truth representation trajectory.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section citation-section" id="citation">
+      <div class="container narrow">
+        <div class="section-heading centered-heading">
+          <p class="eyebrow">Citation</p>
+          <h2>Build on Variational Streaming Flow.</h2>
+          <p>If this work is useful in your research, please cite the manuscript.</p>
+        </div>
+
+        <div class="citation-card">
+          <div class="citation-toolbar">
+            <span>BibTeX</span>
+            <button type="button" data-copy-citation aria-label="Copy BibTeX citation">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copy</span>
+            </button>
+            <span class="sr-only" aria-live="polite" data-copy-status></span>
+          </div>
+          <pre><code id="bibtex">@misc{hsu2026variational,
+  title  = {Variational Streaming Flow: Probabilistic Forecasting
+            in Physical Time},
+  author = {Hsu, Hans Hao-Hsun and Gwak, Minseon and Lim, Soon Hoe
+            and Li, Pan and Erichson, N. Benjamin},
+  year   = {2026}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <a class="brand footer-brand" href="#top">
+          <svg class="brand-mark" viewBox="0 0 42 42" aria-hidden="true">
+            <path d="M5 21h10"/><path d="M15 21c8 0 7-11 18-11"/><path d="M15 21c8 0 7 0 18 0"/><path d="M15 21c8 0 7 11 18 11"/><circle cx="5" cy="21" r="2.5"/><circle cx="34" cy="10" r="2.5"/><circle cx="34" cy="21" r="2.5"/><circle cx="34" cy="32" r="2.5"/>
+          </svg>
+          <span>Variational Streaming Flow</span>
+        </a>
+        <p>Probabilistic forecasting that evolves directly in physical time.</p>
+      </div>
+      <div class="footer-links">
+        <a href="assets/paper.pdf" target="_blank" rel="noopener">Paper</a>
+        <a href="https://github.com/hans66hsu/VSF-forecasting" target="_blank" rel="noopener">Code</a>
+        <a href="#citation">Citation</a>
+      </div>
+    </div>
+    <div class="container footer-credit">
+      <span>Academic project-page structure inspired by <a href="https://one-step-lm.github.io/" target="_blank" rel="noopener">Flow Map Language Models</a>.</span>
+      <span>© 2026 VSF authors</span>
+    </div>
+  </footer>
+</body>
+</html>
