@@ -1,0 +1,220 @@
+\begin{table}[t]
+\centering
+\caption{Long-horizon forecasting on deterministic and stochastic dynamical systems over a 1,000-step rollout. Bold: best. Runtime is averaged across tasks.}
+\label{tab:forecasting_results}
+\begingroup
+\normalsize
+\setlength{\tabcolsep}{2pt}
+
+% ==================== Deterministic ====================
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}l*{3}{>{\columncolor{resultDPBg}}c}*{3}{>{\columncolor{resultRosslerBg}}c}*{3}{>{\columncolor{resultLorenzBg}}c}>{}r@{}}
+\toprule
+% \rowcolor{gray!20}
+\multicolumn{11}{c}{\cellcolor{gray!10}{Deterministic dynamics}}\\
+& \multicolumn{3}{c}{\cellcolor{resultDPBg}{Double pendulum}}
+& \multicolumn{3}{c}{\cellcolor{resultRosslerBg}{R\"ossler}}
+& \multicolumn{3}{c}{\cellcolor{resultLorenzBg}{Lorenz}}
+& \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+Model
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+& Runtime (s) \\
+\midrule
+Block diffusion
+& \resultpm{0.456}{0.07} & \resultpm{0.913}{0.14} & \resultpm{0.467}{0.07}
+& \resultpm{0.286}{0.13} & \resultpm{0.541}{0.26} & \resultpm{0.290}{0.13}
+& \resultpm{0.314}{0.12} & \resultpm{0.420}{0.18} & \resultpm{0.328}{0.12}
+& 30.2 \\
+
+AR diffusion
+& \resultpm{0.434}{0.00} & \resultpm{0.958}{0.01} & \resultpm{0.588}{0.01}
+& \resultpm{0.349}{0.06} & \resultpm{0.995}{0.13} & \resultpm{0.533}{0.08}
+& \resultpm{0.856}{0.04} & \resultpm{1.955}{0.06} & \resultpm{1.500}{0.06}
+& 78.2 \\
+
+DeepAR
+& \resultpm{0.584}{0.00} & \resultpm{1.065}{0.00} & \resultpm{0.678}{0.00}
+& \resultpm{0.168}{0.04} & \resultpm{0.536}{0.05} & \resultpm{0.209}{0.05}
+& \resultpm{10.303}{0.22} & \resultpm{12.424}{0.13} & \resultpm{10.879}{0.13}
+& 3.9 \\
+
+SF
+& \resultpm{2.116}{0.87} & \resultpm{9.176}{5.17} & \resultpm{2.116}{0.87}
+& \resultpm{0.158}{0.07} & \resultpm{0.339}{0.18} & \resultpm{0.158}{0.07}
+& \resultpm{1.422}{0.14} & \resultpm{2.752}{0.31} & \resultpm{1.422}{0.14}
+& 6.4 \\
+
+SF (perturb.)
+& \resultpm{1.829}{0.86} & \resultpm{8.380}{5.18} & \resultpm{1.961}{0.89}
+& \resultpm{0.112}{0.05} & \resultpm{0.342}{0.18} & \resultpm{0.160}{0.07}
+& \resultpm{1.392}{0.14} & \resultpm{2.746}{0.31} & \resultpm{1.420}{0.14}
+& 6.4 \\
+
+Chronos-2
+& \resultpm{0.781}{0.00} & \resultpm{1.498}{0.02} & \resultpm{0.964}{0.01}
+& \resultpm{1.981}{0.00} & \resultpm{4.107}{0.02} & \resultpm{2.616}{0.01}
+& \resultpm{13.500}{0.06} & \resultpm{28.186}{1.14} & \resultpm{25.221}{0.85}
+& 0.8 \\
+
+Chronos-2 (calib.)
+& \resultpm{0.622}{0.00} & \resultpm{1.157}{0.00} & \resultpm{0.743}{0.00}
+& \resultpm{1.909}{0.00} & \resultpm{3.906}{0.02} & \resultpm{2.520}{0.01}
+& \resultpm{2.388}{0.02} & \resultpm{6.011}{0.27} & \resultpm{4.544}{0.27}
+& 0.4 \\
+\midrule
+VSF
+& \fullbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.332}{0.08}
+& \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.051}{0.00}
+& \fullbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \fullbestresultpm{0.190}{0.01}
+& 7.2 \\
+\bottomrule
+\end{tabular}%
+}
+
+\vspace{-1.3pt}
+
+% ===================== Stochastic =====================
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}l*{4}{>{\columncolor{resultRosslerBg}}c}*{4}{>{\columncolor{resultLorenzBg}}c}>{}r@{}}
+\toprule
+% \rowcolor{gray!20}
+\multicolumn{10}{c}{\cellcolor{gray!10}{Stochastic dynamics}}\\
+% \midrule
+& \multicolumn{4}{c}{\cellcolor{resultRosslerBg}{R\"ossler}}
+& \multicolumn{4}{c}{\cellcolor{resultLorenzBg}{Lorenz}}
+& \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Model
+& CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$
+& CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$
+& Runtime (s) \\
+\midrule
+Block diffusion
+& \resultpm{0.158}{0.02} & \resultpm{0.717}{0.08} & \resultpm{8.876}{1.05} & \resultpm{12.665}{1.71}
+& \resultpm{0.197}{0.01} & \resultpm{0.933}{0.01} & \resultpm{19.878}{0.28} & \resultpm{13.726}{0.45}
+& 21.8 \\
+
+AR diffusion
+& \resultpm{0.200}{0.03} & \resultpm{4.625}{0.40} & \resultpm{16.213}{1.12} & \resultpm{11.464}{2.06}
+& \resultpm{0.220}{0.05} & \resultpm{0.952}{0.14} & \resultpm{25.644}{3.10} & \resultpm{5.601}{1.54}
+& 42.4 \\
+
+DeepAR
+& \resultpm{0.203}{0.02} & \resultpm{0.609}{0.02} & \resultpm{11.810}{0.80} & \resultpm{15.618}{1.57}
+& \resultpm{2.140}{0.49} & \resultpm{2.606}{0.27} & \resultpm{131.837}{15.99} & \resultpm{138.302}{45.71}
+& 1.2 \\
+
+SF
+& \resultpm{0.063}{0.02} & \resultpm{1.000}{0.00} & \resultpm{4.534}{0.67} & \resultpm{4.996}{1.34}
+& \resultpm{1.041}{0.56} & \resultpm{1.000}{0.00} & \resultpm{58.115}{24.23} & \resultpm{89.842}{48.45}
+& 7.5 \\
+
+SF (perturb.)
+& \resultpm{0.060}{0.02} & \resultpm{1.123}{0.23} & \resultpm{4.915}{0.84} & \resultpm{2.284}{0.82}
+& \resultpm{0.682}{0.33} & \resultpm{1.330}{0.75} & \resultpm{53.622}{25.69} & \resultpm{35.778}{19.55}
+& 6.6 \\
+
+Chronos-2
+& \resultpm{1.277}{0.06} & \resultpm{47.871}{1.63} & \resultpm{90.543}{3.86} & \resultpm{94.836}{0.79}
+& \resultpm{6.843}{0.17} & \resultpm{37.490}{1.66} & \resultpm{411.321}{9.43} & \resultpm{342.980}{1.87}
+& 0.3 \\
+
+Chronos-2 (calib.)
+& \resultpm{1.195}{0.06} & \resultpm{61.826}{2.09} & \resultpm{101.688}{4.61} & \resultpm{93.230}{0.20}
+& \resultpm{1.440}{0.06} & \resultpm{10.526}{0.49} & \resultpm{111.806}{3.11} & \resultpm{64.968}{0.79}
+& 0.1 \\
+\midrule
+VSF
+& \fullbestresultpm{0.043}{0.01} & \fullbestresultpm{0.359}{0.14} & \fullbestresultpm{2.617}{0.38} & \fullbestresultpm{1.282}{0.42}
+& \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93}
+& 6.7 \\
+\bottomrule
+\end{tabular}%
+}
+
+\endgroup
+\end{table}
+% \begin{table}[t]
+% \centering
+% \caption{Long-horizon forecasting on deterministic Double pendulum,
+% R\"ossler, and Lorenz systems over a 1,000-step rollout. Bold: best. Runtime is averaged across tasks.}
+% \label{tab:determinitic_results}
+% \begingroup
+% \normalsize
+% \setlength{\tabcolsep}{2pt}
+% \resizebox{\linewidth}{!}{%
+% \begin{tabular}{@{}l*{3}{>{\columncolor{resultDPBg}}c}*{3}{>{\columncolor{resultRosslerBg}}c}*{3}{>{\columncolor{resultLorenzBg}}c}>{\columncolor{resultRuntimeBg}}r@{}}
+% \toprule
+% & \multicolumn{3}{c}{\cellcolor{resultDPBg}\textbf{Double pendulum}}
+% & \multicolumn{3}{c}{\cellcolor{resultRosslerBg}\textbf{R\"ossler}}
+% & \multicolumn{3}{c}{\cellcolor{resultLorenzBg}\textbf{Lorenz}}
+% & 
+% % \multicolumn{1}{c}{\cellcolor{resultRuntimeBg}Average} 
+% \\
+% \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+% \resultRuntimeHeaderFill{11}
+% Model
+% & CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+% & CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+% & CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$ & Runtime \\
+% \midrule
+% Block diffusion & \resultpm{0.456}{0.07} & \resultpm{0.913}{0.14} & \resultpm{0.467}{0.07} & \resultpm{0.286}{0.13} & \resultpm{0.541}{0.26} & \resultpm{0.290}{0.13} & \resultpm{0.314}{0.12} & \resultpm{0.420}{0.18} & \resultpm{0.328}{0.12} & 30.246 \\
+% AR diffusion & \resultpm{0.434}{0.00} & \resultpm{0.958}{0.01} & \resultpm{0.588}{0.01} & \resultpm{0.349}{0.06} & \resultpm{0.995}{0.13} & \resultpm{0.533}{0.08} & \resultpm{0.856}{0.04} & \resultpm{1.955}{0.06} & \resultpm{1.500}{0.06} & 78.228 \\
+% DeepAR & \resultpm{0.584}{0.00} & \resultpm{1.065}{0.00} & \resultpm{0.678}{0.00} & \resultpm{0.168}{0.04} & \resultpm{0.536}{0.05} & \resultpm{0.209}{0.05} & \resultpm{10.303}{0.22} & \resultpm{12.424}{0.13} & \resultpm{10.879}{0.13} & 3.894 \\
+% Streaming flow & \resultpm{2.116}{0.87} & \resultpm{9.176}{5.17} & \resultpm{2.116}{0.87} & \resultpm{0.158}{0.07} & \resultpm{0.339}{0.18} & \resultpm{0.158}{0.07} & \resultpm{1.422}{0.14} & \resultpm{2.752}{0.31} & \resultpm{1.422}{0.14} & 6.400 \\
+% Streaming flow (pertub.) & \resultpm{1.829}{0.86} & \resultpm{8.380}{5.18} & \resultpm{1.961}{0.89} & \resultpm{0.112}{0.05} & \resultpm{0.342}{0.18} & \resultpm{0.160}{0.07} & \resultpm{1.392}{0.14} & \resultpm{2.746}{0.31} & \resultpm{1.420}{0.14} & 6.437 \\
+% Chronos-2 & \resultpm{0.781}{0.00} & \resultpm{1.498}{0.02} & \resultpm{0.964}{0.01} & \resultpm{1.981}{0.00} & \resultpm{4.107}{0.02} & \resultpm{2.616}{0.01} & \resultpm{13.500}{0.06} & \resultpm{28.186}{1.14} & \resultpm{25.221}{0.85} & 0.801 \\
+% Chronos-2 (calib.) & \resultpm{0.622}{0.00} & \resultpm{1.157}{0.00} & \resultpm{0.743}{0.00} & \resultpm{1.909}{0.00} & \resultpm{3.906}{0.02} & \resultpm{2.520}{0.01} & \resultpm{2.388}{0.02} & \resultpm{6.011}{0.27} & \resultpm{4.544}{0.27} & 0.403 \\
+% \midrule
+% Variational streaming flow & \fullbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.332}{0.08} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.051}{0.00} & \fullbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \fullbestresultpm{0.190}{0.01} & 7.154 \\
+% % Local velocity + bottleneck & \secondbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.332}{0.08} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.051}{0.00} & \secondbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \fullbestresultpm{0.190}{0.01} & \resultpm{7.154}{0.40} \\
+% % Trajectory + bottleneck & \fullbestresultpm{0.245}{0.08} & \resultpm{1.102}{0.49} & \secondbestresultpm{0.358}{0.09} & \secondbestresultpm{0.038}{0.00} & \secondbestresultpm{0.136}{0.01} & \secondbestresultpm{0.055}{0.00} & \fullbestresultpm{0.155}{0.02} & \secondbestresultpm{0.324}{0.07} & \secondbestresultpm{0.226}{0.03} & \resultpm{6.954}{0.21} \\
+% \bottomrule
+% \end{tabular}%
+% }
+% \endgroup
+% \end{table}
+
+
+
+
+% \begin{table}[t]
+% \centering
+% \begingroup
+% \caption{Long-horizon forecasting on stochastic R\"ossler and Lorenz systems over a 1,000-step rollout. Bold: best. Runtime is averaged across tasks.}
+% \label{tab:stochastic_results}
+% \normalsize
+% \setlength{\tabcolsep}{2pt}
+% \resizebox{\linewidth}{!}{%
+% \begin{tabular}{@{}l*{4}{>{\columncolor{resultRosslerBg}}c}*{4}{>{\columncolor{resultLorenzBg}}c}>{\columncolor{resultRuntimeBg}}r@{}}
+% \toprule
+% & \multicolumn{4}{c}{\cellcolor{resultRosslerBg}\textbf{R\"ossler}}
+% & \multicolumn{4}{c}{\cellcolor{resultLorenzBg}\textbf{Lorenz}}
+% & 
+% % \multicolumn{1}{c}{\cellcolor{resultRuntimeBg}Average} 
+% \\
+% \cmidrule(lr){2-5}\cmidrule(lr){6-9}
+% \resultRuntimeHeaderFill{10}
+% Model
+% & CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$
+% & CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$ & Runtime \\
+% \midrule
+% Block diffusion & \resultpm{0.158}{0.02} & \resultpm{0.717}{0.08} & \resultpm{8.876}{1.05} & \resultpm{12.665}{1.71} & \resultpm{0.197}{0.01} & \resultpm{0.933}{0.01} & \resultpm{19.878}{0.28} & \resultpm{13.726}{0.45} & 21.818 \\
+% AR diffusion & \resultpm{0.200}{0.03} & \resultpm{4.625}{0.40} & \resultpm{16.213}{1.12} & \resultpm{11.464}{2.06} & \resultpm{0.220}{0.05} & \resultpm{0.952}{0.14} & \resultpm{25.644}{3.10} & \resultpm{5.601}{1.54} & 42.350 \\
+% DeepAR & \resultpm{0.203}{0.02} & \resultpm{0.609}{0.02} & \resultpm{11.810}{0.80} & \resultpm{15.618}{1.57} & \resultpm{2.140}{0.49} & \resultpm{2.606}{0.27} & \resultpm{131.837}{15.99} & \resultpm{138.302}{45.71} & 1.207 \\
+% Streaming flow & \resultpm{0.063}{0.02} & \resultpm{1.000}{0.00} & \resultpm{4.534}{0.67} & \resultpm{4.996}{1.34} & \resultpm{1.041}{0.56} & \resultpm{1.000}{0.00} & \resultpm{58.115}{24.23} & \resultpm{89.842}{48.45} & 7.542 \\
+% Streaming flow (perturb.) & \resultpm{0.060}{0.02} & \resultpm{1.123}{0.23} & \resultpm{4.915}{0.84} & \resultpm{2.284}{0.82} & \resultpm{0.682}{0.33} & \resultpm{1.330}{0.75} & \resultpm{53.622}{25.69} & \resultpm{35.778}{19.55} & 6.569 \\
+% Chronos-2 & \resultpm{1.277}{0.06} & \resultpm{47.871}{1.63} & \resultpm{90.543}{3.86} & \resultpm{94.836}{0.79} & \resultpm{6.843}{0.17} & \resultpm{37.490}{1.66} & \resultpm{411.321}{9.43} & \resultpm{342.980}{1.87} & 0.336 \\
+% Chronos-2 (calib.) & \resultpm{1.195}{0.06} & \resultpm{61.826}{2.09} & \resultpm{101.688}{4.61} & \resultpm{93.230}{0.20} & \resultpm{1.440}{0.06} & \resultpm{10.526}{0.49} & \resultpm{111.806}{3.11} & \resultpm{64.968}{0.79} & 0.087 \\
+% \midrule
+% Variational streaming flow & \fullbestresultpm{0.043}{0.01} & \fullbestresultpm{0.359}{0.14} & \fullbestresultpm{2.617}{0.38} & \fullbestresultpm{1.282}{0.42} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & 6.706 \\
+% % Local velocity + bottleneck & \fullbestresultpm{0.043}{0.01} & \secondbestresultpm{0.359}{0.14} & \fullbestresultpm{2.617}{0.38} & \fullbestresultpm{1.282}{0.42} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & \resultpm{6.706}{0.11} \\
+% % Trajectory + bottleneck & \secondbestresultpm{0.045}{0.01} & \fullbestresultpm{0.341}{0.08} & \secondbestresultpm{2.739}{0.25} & \secondbestresultpm{1.383}{0.25} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & \resultpm{6.415}{0.22} \\
+% \bottomrule
+% \end{tabular}%
+% }
+% \endgroup
+% \end{table}

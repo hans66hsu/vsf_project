@@ -16,7 +16,7 @@ Then open <http://localhost:8090/>. There is no build step.
 
 - `index.html` — page content and metadata
 - `static/css/site.css` — responsive visual design
-- `static/js/site.js` — mobile navigation, result tabs, and citation copying
+- `static/js/site.js` — mobile navigation, the linked bifurcation explainer, result tabs, and citation copying
 - `assets/paper.pdf` — linked manuscript
 - `assets/figures/` — web-ready figures converted from the LaTeX project
 

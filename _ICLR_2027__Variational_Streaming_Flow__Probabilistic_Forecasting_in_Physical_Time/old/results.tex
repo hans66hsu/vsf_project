@@ -1,0 +1,274 @@
+\section{Results}
+% Generated from outputs/iclr/reproduce_table20--25.
+% Metric statistics use NumPy's population standard deviation (ddof=0).
+
+  
+The deterministic tables report continuous ranked
+probability score (CRPS), root mean squared error (RMSE), and mean absolute
+error (MAE).  The stochastic tables report relative conditional mean error
+(CME), relative conditional standard-deviation error (CSE), maximum mean
+discrepancy (MMD), first-order Wasserstein distance ($W_1$), and energy
+distance (ED).  Runtime is the synchronized rollout-generation time, reported
+as mean $\pm$ population standard deviation across seeds; timings are similar
+across datasets at a fixed rollout length.  For stochastic Lorenz, the
+Streaming flow (perturbation) row uses normalized Gaussian initial-state
+perturbations with standard deviation $0.01$.
+
+% Tables 1--6 are archived in backup_results.tex.
+% Preserve their table numbers so the retained numbered tables remain Tables 7--9.
+\setcounter{table}{6}
+
+\clearpage
+\begin{figure}[t]
+\centering
+\fbox{%
+  \parbox[c][0.20\textheight][c]{0.94\linewidth}{%
+    \centering\Large Figure placeholder
+  }%
+}
+\caption{Method overview. Replace this placeholder with the final figure.}
+\label{fig:method-overview-placeholder}
+\end{figure}
+
+\begin{wraptable}{r}{0.66\textwidth}
+\centering
+\begingroup
+\scriptsize
+\textbf{Compact stochastic Lorenz results (2500-step rollout)}\\[-0.15em]
+\textit{Diffusion baselines use 15 inference steps; MMD is omitted.}
+\par\vspace{0.35em}
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$
+& ED $\downarrow$ & Runtime (s) $\downarrow$ \\
+\midrule
+Block diffusion
+& \resultpm{0.786}{0.09} & \resultpm{0.664}{0.11}
+& \fullbestresultpm{76.482}{3.20} & \resultpm{34.790}{11.90}
+& \resultpm{51.635}{0.95} \\
+AR diffusion
+& \resultpm{0.622}{0.03} & \resultpm{0.529}{0.03}
+& \resultpm{96.596}{2.48} & \resultpm{12.428}{0.52}
+& \resultpm{100.103}{1.92} \\
+Streaming flow (perturbation)
+& \resultpm{1.130}{0.33} & \resultpm{0.699}{0.21}
+& \resultpm{111.946}{22.66} & \resultpm{39.812}{14.86}
+& \resultpm{15.451}{0.49} \\
+\midrule
+Variational ODE flow
+& \fullbestresultpm{0.555}{0.07} & \fullbestresultpm{0.390}{0.12}
+& \resultpm{85.671}{7.29} & \fullbestresultpm{12.004}{2.67}
+& \resultpm{16.251}{0.38} \\
+% Local velocity + bottleneck
+% & \fullbestresultpm{0.555}{0.07} & \fullbestresultpm{0.390}{0.12}
+% & \secondbestresultpm{85.671}{7.29} & \fullbestresultpm{12.004}{2.67}
+% & \resultpm{16.251}{0.38} \\
+% Trajectory + bottleneck
+% & \fullbestresultpm{0.555}{0.07} & \fullbestresultpm{0.390}{0.12}
+% & \secondbestresultpm{85.671}{7.29} & \fullbestresultpm{12.004}{2.67}
+% & \resultpm{15.645}{0.27} \\
+\bottomrule
+\end{tabular}%
+}
+\par\vspace{0.25em}
+\scriptsize Bold entries denote the best predictive results; runtime is
+unranked.
+\endgroup
+\end{wraptable}
+
+\begingroup
+\raggedright
+\noindent
+The compact view at right summarizes the long-horizon Lorenz results.
+Variational ODE flow gives the lowest CME, CSE, and ED, and the second-lowest
+$W_1$.  Block diffusion gives the lowest $W_1$,
+while AR diffusion is second-best on CME, CSE, and ED.  Runtime is averaged
+across seeds and reported without rank styling.
+\par
+\endgroup
+
+\WFclear
+% Alternative merged layouts for the three deterministic result tables.
+\definecolor{resultDPBg}{RGB}{242,247,255}
+\definecolor{resultRosslerBg}{RGB}{242,250,244}
+\definecolor{resultLorenzBg}{RGB}{255,247,235}
+\definecolor{resultRuntimeBg}{RGB}{245,240,252}
+\newlength{\resultHeaderGap}
+\setlength{\resultHeaderGap}{\dimexpr\aboverulesep+\cmidrulewidth+\belowrulesep\relax}
+\newcommand{\resultRuntimeHeaderFill}[1]{%
+  \noalign{\vskip-\dimexpr 2\aboverulesep+\cmidrulewidth+2\belowrulesep\relax}%
+  \arrayrulecolor{resultRuntimeBg}%
+  \cmidrule[\resultHeaderGap]{#1-#1}%
+  \arrayrulecolor{black}%
+}
+
+\begin{table}[htbp]
+\centering
+\begingroup
+\small
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}l*{3}{>{\columncolor{resultDPBg}}r}*{3}{>{\columncolor{resultRosslerBg}}r}*{3}{>{\columncolor{resultLorenzBg}}r}>{\columncolor{resultRuntimeBg}}r@{}}
+\toprule
+& \multicolumn{3}{c}{\cellcolor{resultDPBg}\textbf{Double pendulum}}
+& \multicolumn{3}{c}{\cellcolor{resultRosslerBg}\textbf{R\"ossler}}
+& \multicolumn{3}{c}{\cellcolor{resultLorenzBg}\textbf{Lorenz}}
+& \multicolumn{1}{c}{\cellcolor{resultRuntimeBg}Average} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+\resultRuntimeHeaderFill{11}
+Model
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$ & MAE $\downarrow$ & Runtime (s) $\downarrow$ \\
+\midrule
+Block diffusion & \resultpm{0.456}{0.07} & \resultpm{0.913}{0.14} & \resultpm{0.467}{0.07} & \resultpm{0.286}{0.13} & \resultpm{0.541}{0.26} & \resultpm{0.290}{0.13} & \resultpm{0.314}{0.12} & \resultpm{0.420}{0.18} & \resultpm{0.328}{0.12} & \resultpm{30.246}{0.21} \\
+AR diffusion & \resultpm{0.434}{0.00} & \resultpm{0.958}{0.01} & \resultpm{0.588}{0.01} & \resultpm{0.349}{0.06} & \resultpm{0.995}{0.13} & \resultpm{0.533}{0.08} & \resultpm{0.856}{0.04} & \resultpm{1.955}{0.06} & \resultpm{1.500}{0.06} & \resultpm{78.228}{0.39} \\
+DeepAR & \resultpm{0.584}{0.00} & \resultpm{1.065}{0.00} & \resultpm{0.678}{0.00} & \resultpm{0.168}{0.04} & \resultpm{0.536}{0.05} & \resultpm{0.209}{0.05} & \resultpm{10.303}{0.22} & \resultpm{12.424}{0.13} & \resultpm{10.879}{0.13} & \resultpm{3.894}{0.08} \\
+Streaming flow & \resultpm{2.116}{0.87} & \resultpm{9.176}{5.17} & \resultpm{2.116}{0.87} & \resultpm{0.158}{0.07} & \resultpm{0.339}{0.18} & \resultpm{0.158}{0.07} & \resultpm{1.422}{0.14} & \resultpm{2.752}{0.31} & \resultpm{1.422}{0.14} & \resultpm{6.400}{0.11} \\
+Streaming flow (perturbation) & \resultpm{1.829}{0.86} & \resultpm{8.380}{5.18} & \resultpm{1.961}{0.89} & \resultpm{0.112}{0.05} & \resultpm{0.342}{0.18} & \resultpm{0.160}{0.07} & \resultpm{1.392}{0.14} & \resultpm{2.746}{0.31} & \resultpm{1.420}{0.14} & \resultpm{6.437}{0.34} \\
+Chronos-2 & \resultpm{0.781}{0.00} & \resultpm{1.498}{0.02} & \resultpm{0.964}{0.01} & \resultpm{1.981}{0.00} & \resultpm{4.107}{0.02} & \resultpm{2.616}{0.01} & \resultpm{13.500}{0.06} & \resultpm{28.186}{1.14} & \resultpm{25.221}{0.85} & \resultpm{0.801}{0.51} \\
+Chronos-2 with calibration & \resultpm{0.622}{0.00} & \resultpm{1.157}{0.00} & \resultpm{0.743}{0.00} & \resultpm{1.909}{0.00} & \resultpm{3.906}{0.02} & \resultpm{2.520}{0.01} & \resultpm{2.388}{0.02} & \resultpm{6.011}{0.27} & \resultpm{4.544}{0.27} & \resultpm{0.403}{0.02} \\
+\midrule
+Variational ODE flow & \fullbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.332}{0.08} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.051}{0.00} & \fullbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \fullbestresultpm{0.190}{0.01} & \resultpm{7.154}{0.40} \\
+% Local velocity + bottleneck & \secondbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.332}{0.08} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.051}{0.00} & \secondbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \fullbestresultpm{0.190}{0.01} & \resultpm{7.154}{0.40} \\
+% Trajectory + bottleneck & \fullbestresultpm{0.245}{0.08} & \resultpm{1.102}{0.49} & \secondbestresultpm{0.358}{0.09} & \secondbestresultpm{0.038}{0.00} & \secondbestresultpm{0.136}{0.01} & \secondbestresultpm{0.055}{0.00} & \fullbestresultpm{0.155}{0.02} & \secondbestresultpm{0.324}{0.07} & \secondbestresultpm{0.226}{0.03} & \resultpm{6.954}{0.21} \\
+\bottomrule
+\end{tabular}%
+}
+\endgroup
+\caption{Merged deterministic results across Double pendulum, R\"ossler, and
+  Lorenz (version 1: CRPS, RMSE, and MAE). The best predictive entry in each
+  metric column is bold. Runtime is unranked and reported as mean $\pm$
+  population standard deviation across seeds; the background colors distinguish
+  datasets and the runtime column.}
+\label{tab:merged-deterministic-crps-rmse-mae}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begingroup
+\small
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}l*{2}{>{\columncolor{resultDPBg}}r}*{2}{>{\columncolor{resultRosslerBg}}r}*{2}{>{\columncolor{resultLorenzBg}}r}>{\columncolor{resultRuntimeBg}}r@{}}
+\toprule
+& \multicolumn{2}{c}{\cellcolor{resultDPBg}\textbf{Double pendulum}}
+& \multicolumn{2}{c}{\cellcolor{resultRosslerBg}\textbf{R\"ossler}}
+& \multicolumn{2}{c}{\cellcolor{resultLorenzBg}\textbf{Lorenz}}
+& \multicolumn{1}{c}{\cellcolor{resultRuntimeBg}Average} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\resultRuntimeHeaderFill{8}
+Model
+& CRPS $\downarrow$ & RMSE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$
+& CRPS $\downarrow$ & RMSE $\downarrow$ & Runtime (s) $\downarrow$ \\
+\midrule
+Block diffusion & \resultpm{0.456}{0.07} & \resultpm{0.913}{0.14} & \resultpm{0.286}{0.13} & \resultpm{0.541}{0.26} & \resultpm{0.314}{0.12} & \resultpm{0.420}{0.18} & \resultpm{30.246}{0.21} \\
+AR diffusion & \resultpm{0.434}{0.00} & \resultpm{0.958}{0.01} & \resultpm{0.349}{0.06} & \resultpm{0.995}{0.13} & \resultpm{0.856}{0.04} & \resultpm{1.955}{0.06} & \resultpm{78.228}{0.39} \\
+DeepAR & \resultpm{0.584}{0.00} & \resultpm{1.065}{0.00} & \resultpm{0.168}{0.04} & \resultpm{0.536}{0.05} & \resultpm{10.303}{0.22} & \resultpm{12.424}{0.13} & \resultpm{3.894}{0.08} \\
+Streaming flow & \resultpm{2.116}{0.87} & \resultpm{9.176}{5.17} & \resultpm{0.158}{0.07} & \resultpm{0.339}{0.18} & \resultpm{1.422}{0.14} & \resultpm{2.752}{0.31} & \resultpm{6.400}{0.11} \\
+Streaming flow (perturbation) & \resultpm{1.829}{0.86} & \resultpm{8.380}{5.18} & \resultpm{0.112}{0.05} & \resultpm{0.342}{0.18} & \resultpm{1.392}{0.14} & \resultpm{2.746}{0.31} & \resultpm{6.437}{0.34} \\
+Chronos-2 & \resultpm{0.781}{0.00} & \resultpm{1.498}{0.02} & \resultpm{1.981}{0.00} & \resultpm{4.107}{0.02} & \resultpm{13.500}{0.06} & \resultpm{28.186}{1.14} & \resultpm{0.801}{0.51} \\
+Chronos-2 with calibration & \resultpm{0.622}{0.00} & \resultpm{1.157}{0.00} & \resultpm{1.909}{0.00} & \resultpm{3.906}{0.02} & \resultpm{2.388}{0.02} & \resultpm{6.011}{0.27} & \resultpm{0.403}{0.02} \\
+\midrule
+Variational ODE flow & \fullbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \fullbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \resultpm{7.154}{0.40} \\
+% Local velocity + bottleneck & \secondbestresultpm{0.254}{0.07} & \fullbestresultpm{0.712}{0.11} & \fullbestresultpm{0.034}{0.00} & \fullbestresultpm{0.127}{0.01} & \secondbestresultpm{0.161}{0.02} & \fullbestresultpm{0.252}{0.02} & \resultpm{7.154}{0.40} \\
+% Trajectory + bottleneck & \fullbestresultpm{0.245}{0.08} & \resultpm{1.102}{0.49} & \secondbestresultpm{0.038}{0.00} & \secondbestresultpm{0.136}{0.01} & \fullbestresultpm{0.155}{0.02} & \secondbestresultpm{0.324}{0.07} & \resultpm{6.954}{0.21} \\
+\bottomrule
+\end{tabular}%
+}
+\endgroup
+\caption{Merged deterministic results across Double pendulum, R\"ossler, and
+  Lorenz (version 2: CRPS and RMSE only). The best predictive entry in each
+  metric column is bold. Runtime is unranked and reported as mean $\pm$
+  population standard deviation across seeds; the background colors distinguish
+  datasets and the runtime column.}
+\label{tab:merged-deterministic-crps-rmse}
+\end{table}
+
+\clearpage
+% Alternative merged layouts for the stochastic result tables.  MMD is omitted.
+\begin{table}[htbp]
+\centering
+\begingroup
+\small
+\setlength{\tabcolsep}{2pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}l*{4}{>{\columncolor{resultRosslerBg}}r}*{4}{>{\columncolor{resultLorenzBg}}r}>{\columncolor{resultRuntimeBg}}r@{}}
+\toprule
+& \multicolumn{4}{c}{\cellcolor{resultRosslerBg}\textbf{R\"ossler}}
+& \multicolumn{4}{c}{\cellcolor{resultLorenzBg}\textbf{Lorenz}}
+& \multicolumn{1}{c}{\cellcolor{resultRuntimeBg}Average} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+\resultRuntimeHeaderFill{10}
+Model
+& CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$
+& CME $\downarrow$ & CSE $\downarrow$ & $W_1$ $\downarrow$ & ED $\downarrow$ & Runtime (s) $\downarrow$ \\
+\midrule
+Block diffusion & \resultpm{0.158}{0.02} & \resultpm{0.717}{0.08} & \resultpm{8.876}{1.05} & \resultpm{12.665}{1.71} & \resultpm{0.197}{0.01} & \resultpm{0.933}{0.01} & \resultpm{19.878}{0.28} & \resultpm{13.726}{0.45} & \resultpm{21.818}{0.35} \\
+AR diffusion & \resultpm{0.200}{0.03} & \resultpm{4.625}{0.40} & \resultpm{16.213}{1.12} & \resultpm{11.464}{2.06} & \resultpm{0.220}{0.05} & \resultpm{0.952}{0.14} & \resultpm{25.644}{3.10} & \resultpm{5.601}{1.54} & \resultpm{42.350}{0.41} \\
+DeepAR & \resultpm{0.203}{0.02} & \resultpm{0.609}{0.02} & \resultpm{11.810}{0.80} & \resultpm{15.618}{1.57} & \resultpm{2.140}{0.49} & \resultpm{2.606}{0.27} & \resultpm{131.837}{15.99} & \resultpm{138.302}{45.71} & \resultpm{1.207}{0.09} \\
+Streaming flow & \resultpm{0.063}{0.02} & \resultpm{1.000}{0.00} & \resultpm{4.534}{0.67} & \resultpm{4.996}{1.34} & \resultpm{1.041}{0.56} & \resultpm{1.000}{0.00} & \resultpm{58.115}{24.23} & \resultpm{89.842}{48.45} & \resultpm{7.542}{0.15} \\
+Streaming flow (perturbation) & \resultpm{0.060}{0.02} & \resultpm{1.123}{0.23} & \resultpm{4.915}{0.84} & \resultpm{2.284}{0.82} & \resultpm{0.682}{0.33} & \resultpm{1.330}{0.75} & \resultpm{53.622}{25.69} & \resultpm{35.778}{19.55} & \resultpm{6.569}{0.26} \\
+Chronos-2 & \resultpm{1.277}{0.06} & \resultpm{47.871}{1.63} & \resultpm{90.543}{3.86} & \resultpm{94.836}{0.79} & \resultpm{6.843}{0.17} & \resultpm{37.490}{1.66} & \resultpm{411.321}{9.43} & \resultpm{342.980}{1.87} & \resultpm{0.336}{0.34} \\
+Chronos-2 with calibration & \resultpm{1.195}{0.06} & \resultpm{61.826}{2.09} & \resultpm{101.688}{4.61} & \resultpm{93.230}{0.20} & \resultpm{1.440}{0.06} & \resultpm{10.526}{0.49} & \resultpm{111.806}{3.11} & \resultpm{64.968}{0.79} & \resultpm{0.087}{0.01} \\
+\midrule
+Variational ODE flow & \fullbestresultpm{0.043}{0.01} & \fullbestresultpm{0.359}{0.14} & \fullbestresultpm{2.617}{0.38} & \fullbestresultpm{1.282}{0.42} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & \resultpm{6.706}{0.11} \\
+% Local velocity + bottleneck & \fullbestresultpm{0.043}{0.01} & \secondbestresultpm{0.359}{0.14} & \fullbestresultpm{2.617}{0.38} & \fullbestresultpm{1.282}{0.42} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & \resultpm{6.706}{0.11} \\
+% Trajectory + bottleneck & \secondbestresultpm{0.045}{0.01} & \fullbestresultpm{0.341}{0.08} & \secondbestresultpm{2.739}{0.25} & \secondbestresultpm{1.383}{0.25} & \fullbestresultpm{0.187}{0.03} & \fullbestresultpm{0.495}{0.21} & \fullbestresultpm{15.950}{5.64} & \fullbestresultpm{5.187}{0.93} & \resultpm{6.415}{0.22} \\
+\bottomrule
+\end{tabular}%
+}
+\endgroup
+\caption{Stochastic R\"ossler and Stochastic Lorenz at a rollout of 1000 future
+  time steps. MMD is omitted. The best predictive entry in each metric column
+  is bold. Runtime is unranked and reported as mean $\pm$ population standard
+  deviation across seeds.}
+\label{tab:merged-stochastic-without-lorenz-2500}
+\end{table}
+
+
+\begin{table}[htbp]
+\centering
+\begingroup
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Dataset & AR predictor & SFPredictor & VSFPredictor
+& Gain over LeWM predictor (pp) \\
+\midrule
+Push-T & \resultpm{84.67}{4.11}
+& \resultpm{88.00}{2.83}
+& \fullbestresultpm{92.67}{2.49} & \textbf{+8.00} \\
+Cube & \resultpm{69.33}{2.49}
+& \resultpm{76.67}{0.94}
+& \fullbestresultpm{80.00}{1.63} & \textbf{+10.67} \\
+Equal-dataset average & 77.00 & 82.33
+& \textbf{86.33} & \textbf{+9.33} \\
+\bottomrule
+\end{tabular}
+\endgroup
+\caption{World-model planning success (\%) on Push-T and Cube. Per-dataset
+  values are mean $\pm$ population standard deviation over three seeds; bold
+  entries denote the best results.
+  The gain is the absolute percentage-point improvement of the selected VSF
+  over the LeWM predictor. The final row is the unweighted
+  average of the two dataset means and is therefore reported without an
+  across-seed deviation. The selected VSF configuration uses bottleneck latent
+  conditioning, $\beta_{\mathrm{KL}}=1.0$, generalized CRPS exponent
+  $\beta=1.999$, and the epoch-60 checkpoint. The AR predictor and selected VSF
+  use the same factorized Gaussian action distribution.}
+\label{tab:pusht-cube-mean-action-success}
+\end{table}
+
+
+\section{Ablation Studies}
+different beta experiments
+
+compare mse vs crps loss
+
+limitation:
+if have time give results for sparser dt=0.05 and dt=0.1 and simulate the same physical time

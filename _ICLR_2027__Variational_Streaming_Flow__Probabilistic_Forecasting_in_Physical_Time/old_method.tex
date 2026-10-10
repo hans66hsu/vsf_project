@@ -1,0 +1,541 @@
+\section{Variational Streaming Flow: Method and Derivation}
+\label{sec:method}
+
+
+
+
+
+%\paragraph{Continuous-time Variational Streaming Flow (VSF).} 
+
+
+Motivated to address this limitation, we augment the physical-time velocity field
+with a latent variable. 
+Let $ \mathbf{Z}
+    \sim
+    p(\vz)
+    :=
+    \mathcal N
+    \bigl(
+        \vz;
+        \mathbf{0},
+        \mathbf{I}_{d_z}
+    \bigr)$  be a latent variable.  Conditional on $(\vh,\mathbf{Z})$, VSF evolves according to
+\begin{tcolorbox}[
+  colback=parchment,
+  colframe=sandborder,
+  boxrule=0.3pt,
+  left=8pt,
+  right=8pt,
+  top=3pt,
+  bottom=3pt
+]
+\begin{equation}
+\frac{d\widehat{\vx}_s}{ds}
+=
+\vv_{\vtheta}\!\left(
+    \widehat{\vx}_s,s,\vh,\vz
+\right), \qquad \widehat{\vx}_0=\vx_m, 
+\qquad s\in[0,1].
+\label{eq:vsf_dynamics}
+\end{equation}
+\end{tcolorbox}
+
+
+During training, a realized future trajectory $\boldsymbol{\xi}$ is available.
+For a sampled physical time $s$, define the local state and velocity as
+$\vx_s:=\boldsymbol{\xi}(s),$ $\vu_s:=\dot{\boldsymbol{\xi}}(s).$
+We infer the latent locally using:
+\begin{equation}
+q_{\boldsymbol{\phi}}
+\bigl(
+\vz
+\mid
+\vu_s,
+\vx_s,
+s,
+\vh
+\bigr)
+=
+\mathcal N
+\left(
+\vz;
+\boldsymbol{\mu}_{\boldsymbol{\phi}}
+(\vu_s,\vx_s,s,\vh),
+\operatorname{diag}
+\left[
+\boldsymbol{\sigma}_{\boldsymbol{\phi}}^2
+(\vu_s,\vx_s,s,\vh)
+\right]
+\right).
+\label{eq:vsf_variational_posterior}
+\end{equation}
+The variational posterior $q_{\boldsymbol{\phi}}$, parameterized by the
+recognition network, provides a  
+local latent posterior induced by the conditional velocity model.
+At inference, the future state and
+its target velocity are unavailable, so the recognition network is discarded.
+Instead, $\mathbf{Z}\sim p(\vz)$ is sampled once and held fixed throughout
+the rollout. In \cref{sec:ablation-studies}, we empirically show that fixing
+$\mathbf{Z}$ throughout the rollout improves long-horizon predictive accuracy
+relative to resampling it at every step.
+
+
+
+
+
+
+
+\paragraph{Discrete observations as a realization of the continuous model.} 
+The preceding formulation treats physical time continuously.  In applications,
+however, the future is observed only at discrete times.  For simplicity, we
+assume equally spaced observation times (for irregular sampling, the
+same construction applies with normalized timestamps and interval-dependent
+scaling). 
+ 
+Consider a training window $\vx_{a:T}$ with forecast origin
+$m$, and let $P := T-m$ denote the number of future transitions. For $k = 0, \cdots, P$, define the grid $s_k := k/P$, and, for $k=0, \cdots, P-1$, $ I_k:=[s_k,s_{k+1}), \alpha_s:=P(s-s_k)$ for $s\in I_k$. Since the continuous path between two observations is unavailable, we
+construct the piecewise-linear surrogate
+$\boldsymbol{\xi}^{\Delta}:[0,1]\to\mathcal X$,
+\begin{equation}
+    \boldsymbol{\xi}^{\Delta}(s)
+    :=
+    (1-\alpha_s)\vx_{m+k}
+    +
+    \alpha_s\vx_{m+k+1},
+    \qquad
+    s\in I_k,
+    \label{eq:physical_time_interpolation}
+\end{equation}
+with
+$\boldsymbol{\xi}^{\Delta}(0):=\vx_m$
+and
+$\boldsymbol{\xi}^{\Delta}(1):=\vx_T$. Its derivative is a local velocity which  is constant on each interval: 
+\begin{equation}
+    \dot{\boldsymbol{\xi}}^{\Delta}(s)
+    =
+    P
+    \bigl(
+        \vx_{m+k+1}-\vx_{m+k}
+    \bigr)
+    =:
+    \vu_k,
+    \qquad
+    s\in I_k.
+    \label{eq:physical_time_velocity}
+\end{equation}
+
+
+We next relate the continuous and discrete formulations. Let $K \sim\operatorname{Unif}\{0,\ldots,P-1\}$, $A\sim\operatorname{Unif}[0,1]$ be independent and set $S := (K+A)/P$. Then $S \sim \operatorname{Unif}[0,1]$ and 
+\begin{equation}
+    \boldsymbol{\xi}^{\Delta}(S)
+    =
+    (1-A)\vx_{m+K}
+    +
+    A\vx_{m+K+1},
+ \qquad 
+    \dot{\boldsymbol{\xi}}^{\Delta}(S)
+    =
+    P
+    \bigl(
+        \vx_{m+K+1}-\vx_{m+K}
+    \bigr).
+    \label{eq:sampled_velocity}
+\end{equation}
+Thus,  sampling a transition index $K$ and a within-transition interpolation coordinate $A$ is equivalent to sampling a uniformly distributed
+physical time $S$ along the surrogate path. For concrete method instantiation, we adopt the discrete-time formulation from now on.
+
+
+
+\paragraph{Variational approach of VSF.} Given the local state and velocity target obtained from the discrete surrogate,
+we next formulate the training objective.
+%The generative dynamics use a single latent variable that is held fixed throughout the rollout, while during training the latent is inferred locally from the sampled physical-time transition.  
+We first consider a Gaussian likelihood for the local velocity, which yields a
+variational MSE reconstruction. 
+Although the latent variable allows this model to
+represent multiple velocity modes, the reconstruction term acts on individual
+latent--target pairs. We therefore replace it with a distributional objective
+that compares velocities generated from multiple latent samples with the
+target conditional velocity distribution.
+
+
+
+%The generative dynamics use a single latent variable that is held fixed throughout the rollout.  During training, however, the latent is inferred locally from the sampled physical-time transition.
+
+
+For a sampled physical time $S\sim\operatorname{Unif}[0,1]$, we evaluate
+the piecewise-linear interpolation of the discrete observations to define
+the local context and velocity target:
+% The discrete surrogate provides the local state and velocity used by the
+% variational encoder.  For a sampled physical time
+% $S\sim\operatorname{Unif}[0,1]$, define
+\begin{equation}
+\vc_S
+:=
+\bigl(
+\boldsymbol{\xi}^{\Delta}(S),
+S,
+\vh
+\bigr),
+\qquad
+\vu_S
+:=
+\dot{\boldsymbol{\xi}}^{\Delta}(S).
+\label{eq:clean_context_target}
+\end{equation}
+Thus the continuous-time recognition model specializes to
+\begin{equation}
+q_{\boldsymbol{\phi}}
+\bigl(
+\vz
+\mid
+\vu_S,
+\vc_S
+\bigr)
+=
+q_{\boldsymbol{\phi}}
+\bigl(
+\vz
+\mid
+\dot{\boldsymbol{\xi}}^{\Delta}(S),
+\boldsymbol{\xi}^{\Delta}(S),
+S,
+\vh
+\bigr).
+\label{eq:discrete_local_posterior}
+\end{equation}
+The latent is therefore inferred locally during training, while at inference a
+single draw $\mathbf{Z}\sim p(\vz)$ is retained throughout the
+rollout.
+
+
+A convenient variational starting point is the auxiliary Gaussian conditional likelihood
+\begin{equation}
+p_{\vtheta}
+\bigl(
+\vu_S
+\mid
+\vc_S,
+\vz
+\bigr)
+=
+\mathcal N
+\left(
+\vu_S;
+\vv_{\vtheta}
+\bigl(
+\boldsymbol{\xi}^{\Delta}(S),
+S,
+\vh,
+\vz
+\bigr),
+\sigma_u^2\mathbf{I}_d
+\right),
+\qquad
+\sigma_u>0.
+\label{eq:gaussian_velocity_likelihood}
+\end{equation}
+This likelihood models the local physical-time velocity rather than the full
+trajectory law induced by the VSF ODE.  Marginalizing $\vz$ gives
+\begin{equation}
+p_{\vtheta}
+(\vu_S\mid\vc_S)
+=
+\int
+p_{\vtheta}
+(\vu_S\mid\vc_S,\vz)
+p(\vz)\,d\vz,
+\label{eq:vsf_velocity_evidence}
+\end{equation}
+and the corresponding local ELBO is
+\begin{align}
+\log
+p_{\vtheta}
+(\vu_S\mid\vc_S)
+\geq{}&
+\mathbb E_{
+\mathbf{Z}\sim
+q_{\boldsymbol{\phi}}
+(\cdot\mid\vu_S,\vc_S)
+}
+\left[
+\log
+p_{\vtheta}
+(\vu_S\mid\vc_S,\mathbf{Z})
+\right]
+-
+\operatorname{KL}
+\left(
+q_{\boldsymbol{\phi}}
+(\vz\mid\vu_S,\vc_S)
+\ \Vert \ 
+p(\vz)
+\right).
+\label{eq:vsf_elbo}
+\end{align}
+For the Gaussian likelihood, the negative reconstruction term reduces, up to
+an additive constant, to
+\begin{align}
+&-
+\mathbb E_{
+\mathbf{Z}\sim
+q_{\boldsymbol{\phi}}
+(\cdot\mid\vu_S,\vc_S)
+}
+\left[
+\log
+p_{\vtheta}
+(\vu_S\mid\vc_S,\mathbf{Z})
+\right]
+\notag\\
+&\qquad=
+\frac{1}{2\sigma_u^2}
+\mathbb E_{
+\mathbf{Z}\sim
+q_{\boldsymbol{\phi}}
+(\cdot\mid\vu_S,\vc_S)
+}
+\left[
+\left\lVert
+\vv_{\vtheta}
+\bigl(
+\boldsymbol{\xi}^{\Delta}(S),
+S,
+\vh,
+\mathbf{Z}
+\bigr)
+-
+\vu_S
+\right\rVert_2^2
+\right]
++
+\mathrm{const}.
+\label{eq:vsf_variational_mse}
+\end{align}
+Thus the ELBO gives a latent-conditioned MSE reconstruction together
+with prior regularization; see App.~\ref{sec:clean_velocity_elbo} for derivation of the corresponding  ELBO.
+
+Let $(\mathbf{C},\mathbf{U})$ denote a generic random pair distributed as
+$(\vc_S,\vu_S)$ under the training data and physical-time
+sampling procedure, and let
+\begin{equation}
+\vz\mid(\mathbf{U},\mathbf{C})
+\sim
+q_{\boldsymbol{\phi}}(\cdot\mid\mathbf{U},\mathbf{C}).
+\label{eq:generic_posterior_pair}
+\end{equation}
+For a fixed variational posterior $q_{\boldsymbol{\phi}}$, the population
+minimizer of the MSE reconstruction  is
+\begin{equation}
+\vv^*(\vc,\vz)
+=
+\mathbb{E}
+\left[
+\mathbf{U}
+\,\middle|\,
+\mathbf{C}=\vc,
+\mathbf{Z}=\vz
+\right].
+\label{eq:generic_mse_conditional_mean}
+\end{equation}
+Hence, when the latent representation does not fully distinguish different
+future continuations, their residual local velocity ambiguity is averaged.
+During training, such incomplete separation may arise from
+overlapping branch-specific posteriors, imperfect  inference, or
+posterior collapse.
+
+To retain information about the distribution of plausible latent-conditioned
+velocities, draw
+\begin{equation}
+\mathbf{Z}^{(i)}
+\stackrel{\mathrm{iid}}{\sim}
+q_{\boldsymbol{\phi}}
+\bigl(
+\vz
+\mid
+\vu_S,
+\vc_S
+\bigr),
+\qquad
+i=1,\ldots,M,
+\label{eq:posterior_latent_samples}
+\end{equation}
+and define
+\begin{equation}
+\widehat{\vu}_S^{(i)}
+:=
+\vv_{\vtheta}
+\bigl(
+\boldsymbol{\xi}^{\Delta}(S),
+S,
+\vh,
+\mathbf{Z}^{(i)}
+\bigr).
+\label{eq:posterior_velocity_samples}
+\end{equation}
+We use the generalized energy reconstruction
+\begin{equation}
+\mathcal L_{\mathrm{ES}}(S)
+:=
+\frac{1}{M}
+\sum_{i=1}^M
+\left\lVert
+\widehat{\vu}_S^{(i)}
+-
+\vu_S
+\right\rVert_2^\alpha
+-
+\frac{1}{2M^2}
+\sum_{i,j=1}^M
+\left\lVert
+\widehat{\vu}_S^{(i)}
+-
+\widehat{\vu}_S^{(j)}
+\right\rVert_2^\alpha,
+\qquad
+0<\alpha<2.
+\label{eq:vsf_energy_score}
+\end{equation}
+For $\alpha=1$, this has the usual energy score form and reduces to the
+CRPS in 1D~\citep{gneiting2007strictly}.
+The first term penalizes discrepancy from the observed physical-time velocity,
+while the second discourages unnecessary contraction of the  posterior
+ensemble. Under aggregate posterior--prior alignment,
+App.~\ref{sec:population_energy_control} shows that the expected
+population energy reconstruction upper-bounds half the energy distance
+between the prior-predictive and true conditional velocity laws.
+
+
+The above discussions motivate the practical VSF objective:
+\begin{tcolorbox}[
+  colback=parchment,
+  colframe=sandborder,
+  boxrule=0.3pt,
+  left=8pt,
+  right=8pt,
+  top=3pt,
+  bottom=3pt
+]
+\begin{equation}
+\mathcal L_{\mathrm{VSF}}
+=
+\mathbb E
+\left[
+\mathcal L_{\mathrm{ES}}(S)
++
+\beta_{\mathrm{KL}}
+\operatorname{KL}
+\left(
+q_{\boldsymbol{\phi}}
+(\vz\mid\vu_S,\vc_S)
+\,\Vert\,
+p(\vz)
+\right)
+\right],
+\label{eq:vsf_training_objective}
+\end{equation}
+\end{tcolorbox}
+where the expectation is over training trajectories and sampled physical times. Note that once the Gaussian reconstruction is replaced by
+\eqref{eq:vsf_energy_score}, this objective is no longer an ELBO; rather, it
+is a KL-regularized distributional reconstruction motivated by the same local
+latent model.
+The complete batched training procedure and inference procedure are summarized in
+\cref{alg:vsf-training}-\cref{alg:vsf-inference}.
+%
+
+
+
+
+\paragraph{Numerical rollout and the forecast.}
+At inference, we draw one
+$\mathbf{Z}\sim p(\vz)$
+for each forecast member and retain it throughout the rollout.  Let
+$\Psi_{\vtheta,k}^{\mathbf{Z},\vh}$ denote the numerical
+flow map obtained by integrating \eqref{eq:vsf_dynamics} over
+$I_k$.  The resulting discrete forecast satisfies
+\begin{equation}
+\widehat{\vx}_{m+k+1}
+=
+\Psi_{\vtheta,k}^{\mathbf{Z},\vh}
+\bigl(
+\widehat{\vx}_{m+k}
+\bigr),
+\qquad
+k=0,\ldots,P-1,
+\label{eq:vsf_discrete_flow_map}
+\end{equation}
+with $\widehat{\vx}_m=\vx_m$.  Thus the discrete forecast is
+obtained by sampling the continuous physical-time trajectory on the
+observation grid.
+For a single Euler step over $I_k$,
+\begin{equation}
+\widehat{\vx}_{m+k+1}
+=
+\widehat{\vx}_{m+k}
++
+\frac{1}{P}
+\vv_{\vtheta}
+\bigl(
+\widehat{\vx}_{m+k},
+s_k,
+\vh,
+\vz
+\bigr).
+\label{eq:vsf_euler_realization}
+\end{equation}
+%The factor $P$ in \eqref{eq:physical_time_velocity} is therefore precisely the normalization required when each observation interval has width $1/P$ in normalized physical time.  The physical observation grid differs from  the numerical integration grid: an ODE solver may use multiple internal function evaluations within each $I_k$ without changing the physical forecast horizon.
+
+\paragraph{Action-conditioned forecasting.} The same construction extends directly to controlled dynamics by conditioning the velocity field on the action active at physical time. To make this precise, let $\va_{m+k}$ denote the action applied
+during the transition from $\vx_{m+k}$ to
+$\vx_{m+k+1}$.  Define the zero-order-hold control
+$\va(s)
+:=
+\va_{m+k},$
+$s\in I_k.$
+The controlled VSF dynamics are
+
+\begin{equation}
+\frac{d\widehat{\vx}_s}{ds}
+=
+\vv_{{\theta}}
+\bigl(
+\widehat{\vx}_s,
+s,
+\vh,
+\va(s),
+\vz
+\bigr).
+\label{eq:vsf_action_conditioned_dynamics}
+\end{equation}
+
+During training, the aligned action is supplied to both the velocity field
+and the local variational encoder.  In particular, the posterior becomes $q_{\boldsymbol{\phi}}
+\bigl(
+\vz
+\mid
+\vu_S,
+\vc_S,
+\va(S)
+\bigr).$
+The autonomous model is recovered by omitting the action argument.
+
+
+
+For model-based planning, let $\va_{m:T-1}^{(i)}$ denote a candidate
+action sequence.  For each candidate, draw $N_{\mathrm{ens}}$ independent
+latents from $p(\vz)$ and generate terminal states
+$\widehat{\vx}_{T}^{(i,j)}$.  The expected terminal cost is estimated by
+\begin{equation}
+\widehat{J}_{\vtheta}^{(i)}
+:=
+\frac{1}{N_{\mathrm{ens}}}
+\sum_{j=1}^{N_{\mathrm{ens}}}
+d_g
+\bigl(
+\widehat{\vx}_T^{(i,j)},
+\vx_g
+\bigr).
+\label{eq:vsf_world_model_cost}
+\end{equation}
+Candidate sequences can then be optimized using CEM~\citep{rubinstein1999cross} or other planners.
+
+

@@ -1,0 +1,102 @@
+\section{Introduction}
+
+Forecasting complex dynamical systems requires predicting how a state evolves over long horizons from a finite observation history~\citep{zhang2025zero}. In fully observed deterministic systems, the history determines a single future, and the main challenge is to propagate the dynamics accurately as prediction errors accumulate over time. Under partial observability or stochastic dynamics, the same observed history may instead admit multiple futures, so the forecasting problem becomes distributional rather than point-valued~\citep{pfister2026stocbench}. This is particularly important when initially similar trajectories can evolve toward qualitatively different future regimes. A point forecast can then miss the distinct modes that define the predictive distribution. Probabilistic dynamics models have long been used in model-based control precisely because planning depends on the distribution of possible outcomes under a candidate action sequence~\citep{chua2018deep}. The same issue arises in modern learned world models, where predicted futures are used to evaluate and select candidate behaviors~\citep{zhou2025dinowm,maes2026leworldmodel}. Recent stochastic world models therefore explicitly model multimodal future evolution rather than relying on a single predicted endpoint~\citep{porcher2026flow}.
+
+Flow matching has recently emerged as a promising approach for generative forecasting of complex dynamical systems~\citep{lim2026flow,porcher2026flow}. Standard flow models generate samples by evolving along an auxiliary flow-time coordinate. Streaming Flow Policy instead identifies the flow trajectory with the temporal action evolution itself, avoiding a separate generative trajectory over complete action sequences~\citep{jiang2025streaming}. Related physical-time formulations have since been explored for sequential prediction and world modeling~\citep{lim2026flow,liu2026odeworld}. These approaches learn how the state changes locally and construct the forecast by integrating these learned dynamics through physical time. However, when the observed initial state and history are fixed, a deterministic velocity field defines only a single rollout. Stochasticity can be introduced through perturbations of the initial state or history, but the resulting predictive distribution then depends on an externally chosen perturbation mechanism and its scale.
+
+We address this limitation with \emph{Variational Streaming Flow} (VSF).
+Given an observed history $\vx_{a:m}$, let $\vh=H(\vx_{a:m})$ denote its
+representation and let $s\in[0,1]$ denote normalized physical forecast time.
+A standard physical-time flow learns a deterministic velocity field
+$\vv_{\vtheta}(\vx,s,\vh)$, where $\vtheta$ denotes the model parameters.
+For a fixed history and initial state $\vx_m$, this velocity field determines a
+single future evolution. VSF instead introduces a latent vector $\vz\sim p(\vz)$ that indexes different
+physical-time dynamics. Starting from the observed state $\widehat{\vx}_0=\vx_m$,
+the forecast evolves as
+%
+\begin{tcolorbox}[
+  colback=parchment,
+  colframe=sandborder,
+  boxrule=0.3pt,
+  left=8pt,
+  right=8pt,
+  top=3pt,
+  bottom=3pt
+]
+\begin{equation}
+\frac{d\widehat{\vx}_s}{ds}
+=
+\vv_{\vtheta}\!\left(
+    \widehat{\vx}_s,s,\vh,\vz
+\right),
+\qquad s\in[0,1].
+\label{eq:intro_vsf}
+\end{equation}
+\end{tcolorbox}
+%
+%
+Different latent draws therefore induce different velocity fields from the same
+observed history without perturbing the observed initial state. We sample one
+latent vector for each forecast and keep it fixed throughout the rollout,
+coupling the generated evolution through a shared latent variable. During
+training, a variational posterior infers the latent dynamics associated with an
+observed transition and is regularized toward a simple prior, following the
+variational latent-variable principle used in recent flow-matching
+models~\citep{guo2025variational,eijkelboom2024variational}. To learn a
+distribution of plausible velocities rather than a single reconstruction, we
+use a generalized energy-score objective over multiple latent
+samples~\citep{gneiting2007strictly,bouchacourt2016disco}. Its accuracy term
+encourages agreement with the observed velocity, while its pairwise-dispersion
+term discourages the latent-conditioned predictions from collapsing to the
+same velocity.
+
+Our VSF formulation provides a flexible model for deterministic and probabilistic forecasting. When the observed history determines the future, the predictive distribution can concentrate around a single evolution. When several continuations are possible, the latent-conditioned dynamics can instead represent distinct modes of future evolution. We evaluate VSF on deterministic
+and stochastic dynamical systems, including long-horizon chaotic dynamics and
+settings with branching future trajectories. On deterministic Double Pendulum,
+R\"ossler, and Lorenz, VSF achieves lower predictive error than autoregressive
+and diffusion-based forecasters, as well as Streaming Flow~\citep{jiang2025streaming}
+and Chronos-2~\citep{ansari2025chronos}, while retaining near-streaming inference
+cost. On stochastic R\"ossler and Lorenz, VSF more accurately recovers the
+conditional distribution of long-horizon futures. We further use VSF as the predictor in a world model to generate action-conditioned future trajectories. On Push-T and Cube, VSF improves goal-directed planning success by
+$8.0$ and $10.7$ percentage points, respectively, over the autoregressive
+predictor used by the corresponding world-model baseline. These results show
+that probabilistic physical-time forecasting can improve both standalone
+prediction and downstream decision making without giving up the efficiency of
+streaming generation.
+
+Our main contributions are:
+%
+\begin{itemize}[leftmargin=*]
+    \item We introduce \emph{Variational Streaming Flow} (VSF), extending streaming flow to probabilistic forecasting by modeling a distribution over physical-time dynamics. VSF supports both deterministic and stochastic forecasting while retaining direct generation in physical time.
+
+    \item We develop a variational learning objective for the latent-conditioned
+    velocity field and combine it with a generalized energy-score objective over
+    multiple latent samples. We characterize its population form and show that it
+    is strictly proper for $\lambda=1/2$ and $0<\beta<2$.
+
+    \item We evaluate VSF on deterministic and stochastic dynamical systems and
+    as the predictor in a world model. VSF improves long-horizon predictive
+    accuracy and distributional fidelity over autoregressive, diffusion, and
+    streaming-flow baselines, while its action-conditioned forecasts improve
+    goal-directed planning on Push-T and Cube and retain streaming-flow inference
+    efficiency.
+\end{itemize}
+
+
+
+
+
+% \section{Introduction}
+
+% Modeling complex temporal dynamics is a fundamental challenge in many scientific and engineering domains. Given a sequence of observations, the goal is to forecast the future evolution of a system while faithfully reflecting its underlying dynamics. Reliable forecasts support applications ranging from weather prediction and chemical-reaction modeling to physical simulation for robotic planning.
+
+% This requirement is particularly consequential in world modeling, where a learned surrogate predicts action-conditioned futures that are used to evaluate candidate behaviors. Errors accumulated over imagined rollouts can distort predicted outcomes and cause the planner to rank action sequences incorrectly; effective planning therefore requires an accurate representation of the temporal dynamics over the planning horizon \citep{zhou2025dinowm,maes2026leworldmodel}. The appropriate notion of predictive accuracy, however, depends on the information available to the model. In a fully observed deterministic setting, the current state and applied inputs uniquely determine the future, and a calibrated predictive distribution should concentrate on a single trajectory. In a partially observed or stochastic setting, unobserved forcing and latent factors may produce multiple plausible futures from the same observed history and action sequence. The model must then represent the corresponding conditional distribution rather than only a point estimate \citep{chua2018deep,porcher2026flow,pfister2026stocbench}. These complementary regimes motivate a unified generative forecasting framework that can recover precise deterministic transitions while retaining the capacity to represent stochastic future evolution.
+
+% Conditional generative models, particularly diffusion and flow-matching models, provide a flexible framework for forecasting complex sequential dynamics. In fully observed deterministic systems, the observed context uniquely determines the future trajectory; a well-calibrated generated ensembles provide two complementary benefits: for a correctly learned model, their ensemble mean converges to the ground-truth trajectory, while their dispersion reflects predictive uncertainty from imperfect model knowledge. The value of distributional modeling becomes even more pronounced under partial observability or stochastic dynamics, where the ensemble must additionally capture the intrinsic variability and multimodality of plausible futures (bifurcation). By learning the conditional distribution of future trajectories, these models can represent non-Gaussian uncertainty, multimodality, and temporal dependencies that point predictors may collapse into an averaged and potentially unrealistic forecast. They thus provide a unified framework for producing accurate point-valued forecasts in deterministic systems and diverse, dynamically coherent trajectory ensembles in stochastic systems \citep{pfister2026stocbench,porcher2026flow,ruhling2023dyffusion}.
+
+% Despite their expressive power, diffusion and flow-matching models generally require multiple number of function evaluations (NFEs) to integrate the learned ordinary differential equation which can be expensive at inference time. Recent approaches, including consistency models, MeanFlow, and Recursive Flow Matching, accelerate generation through direct endpoint prediction, interval-averaged velocities, or cross-scale consistency. However, these methods primarily reduce integration along the artificial generative-time axis. Sequential forecasting provides an additional opportunity for acceleration: successive states along physical time are strongly coupled, yet conventional samplers may repeatedly construct each forecast from a generic reference distribution without using the preceding physical state as an informative transport source. This observation motivates learning frame-to-frame transports from \(x_k\) to \(x_{k+1}\), thereby exploiting temporal continuity directly during sequential generation \citep{jiang2025streaming,huang2026recursive,huang2026accelerated,lim2026flow}. 
+
+% However, a frame-to-frame ODE conditioned on a fixed observed history remains deterministic and therefore produces only a single rollout from a given state. One can induce stochasticity by perturbing the history context or the anchor state at inference time, but forecast quality can depend sensitively on both where noise is injected and its scale, requiring substantial task-specific hyperparameter tuning. To learn this uncertainty directly from data, we propose Variational ODE Flow, which augments the history-conditioned local-velocity model with a latent variable. Given the same state, flow timestep, and observed history---and the aligned action in world model settings---different latent draws can induce different local-velocity directions, allowing the model to represent multimodal transitions and stochastic bifurcations. Drawing one latent for each ensemble member and holding it fixed throughout the rollout produces coherent alternative futures. We train the model in a VAE-style variational-inference framework that combines KL regularization with a generalized energy-score reconstruction objective, whose population form is strictly proper for the conditional velocity distribution. Its accuracy and pairwise-dispersion terms can be evaluated over parallel latent samples, discouraging mode collapse while promoting diverse yet dynamically plausible velocity predictions without manually tuned inference-time perturbations.
+
+
+% We demonstrate Variational ODE Flow as a unified forecasting framework across deterministic and stochastic chaotic dynamics and action-conditioned world modeling. On fully observed deterministic dynamical systems it achieves the lowest CRPS, RMSE, and MAE among the evaluated baselines while providing ensemble-based estimates of predictive uncertainty \hans{not sure if predictive uncertainty is necessary} . On partially observed stochastic chaotic systems, it captures the variability and multimodality of plausible futures and achieves the strongest overall agreement with conditional moments and trajectory distributions. For world modeling, we instantiate Variational ODE Flow as the action-conditioned predictor within the JEPA-based LeWM architecture \citep{assran2023self,maes2026leworldmodel}, modeling transitions directly in its compact latent space. The resulting latent rollouts improve downstream planning success over the LeWM predictor by 8.00 and 10.67 percentage points on Push-T and Cube, respectively. Overall, Variational ODE Flow provides an expressive and efficient framework for deterministic and distributional forecasting, transition predictor in world model.

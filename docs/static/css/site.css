@@ -623,6 +623,980 @@ a {
 }
 
 /* Motivation */
+.bifurcation-demo {
+  margin: 0;
+}
+
+.bifurcation-fallback p {
+  max-width: 860px;
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.bifurcation-demo__interactive {
+  padding: clamp(20px, 3vw, 36px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(16, 33, 61, 0.11);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.bifurcation-demo__interactive[hidden] {
+  display: none;
+}
+
+.bifurcation-demo__guide {
+  display: grid;
+  margin-bottom: 23px;
+  padding: 0 2px 22px;
+  border-bottom: 1px solid var(--line);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 26px;
+  align-items: end;
+}
+
+.bifurcation-demo__guide strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.bifurcation-demo__guide p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.bifurcation-demo__label {
+  color: var(--blue-deep);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.bifurcation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bifurcation-panel {
+  display: flex;
+  min-width: 0;
+  padding: clamp(18px, 2.5vw, 27px);
+  background: #f8fafc;
+  border: 1px solid #dbe4ef;
+  border-radius: 16px;
+  flex-direction: column;
+}
+
+.bifurcation-panel--interactive {
+  background:
+    linear-gradient(145deg, rgba(39, 120, 246, 0.045), transparent 42%),
+    #f8fafc;
+}
+
+.bifurcation-panel__header {
+  min-height: 68px;
+  margin-bottom: 10px;
+}
+
+.bifurcation-panel__header > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--blue-deep);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.bifurcation-panel__header h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.35rem, 2.2vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.16;
+}
+
+.bifurcation-plot {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  background: #fff;
+  border: 1px solid #e0e7f0;
+  border-radius: 12px;
+}
+
+.bifurcation-plot text {
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.bifurcation-plot .plot-grid {
+  stroke: #e9eef5;
+  stroke-width: 1;
+}
+
+.bifurcation-plot .plot-axis {
+  stroke: #7a879a;
+  stroke-width: 1.2;
+}
+
+.bifurcation-plot .plot-guide {
+  fill: none;
+  stroke: #93a4b9;
+  stroke-dasharray: 4 4;
+  stroke-width: 1.25;
+}
+
+.bifurcation-plot .plot-guide--tau {
+  stroke: #1f77b4;
+  stroke-dasharray: 1.5 2;
+  stroke-width: 1.05;
+}
+
+.bifurcation-plot .plot-tick {
+  fill: #64738a;
+  font-size: 10px;
+}
+
+.bifurcation-plot .plot-label {
+  fill: #43526a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bifurcation-plot .plot-note {
+  fill: #5f6f85;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-note--positive {
+  fill: #1f77b4;
+}
+
+.bifurcation-plot .plot-note--negative {
+  fill: #ff7f0e;
+}
+
+.bifurcation-plot .plot-note--latent-positive {
+  fill: #d62728;
+}
+
+.bifurcation-plot .plot-note--latent-negative {
+  fill: #2ca02c;
+}
+
+.bifurcation-plot .plot-stem {
+  fill: none;
+  stroke: #34455f;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.1;
+}
+
+.bifurcation-plot .plot-branch--positive,
+.bifurcation-plot .plot-branch--negative {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bifurcation-plot .plot-branch--positive {
+  stroke: #1f77b4;
+  stroke-width: 3;
+}
+
+.bifurcation-plot .plot-branch--negative {
+  stroke: #ff7f0e;
+  stroke-width: 3;
+}
+
+.bifurcation-plot .plot-latent-branch {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.bifurcation-plot .plot-latent-branch--negative {
+  stroke: #2ca02c;
+}
+
+.bifurcation-plot .plot-latent-branch--positive {
+  stroke: #d62728;
+}
+
+.bifurcation-plot .plot-paper-target,
+.bifurcation-plot .plot-sf-characteristic {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bifurcation-plot .plot-paper-target {
+  stroke-dasharray: 5 4;
+  stroke-width: 1.65;
+}
+
+.bifurcation-plot .plot-paper-target--negative {
+  stroke: #1f77b4;
+}
+
+.bifurcation-plot .plot-paper-target--positive {
+  stroke: #ff7f0e;
+}
+
+.bifurcation-plot .plot-sf-characteristic {
+  stroke-width: 2.55;
+}
+
+.bifurcation-plot .plot-sf-characteristic--negative {
+  stroke: #2ca02c;
+}
+
+.bifurcation-plot .plot-sf-characteristic--positive {
+  stroke: #d62728;
+}
+
+.bifurcation-plot .plot-tube--positive {
+  fill: rgba(255, 127, 14, 0.075);
+  stroke: rgba(255, 127, 14, 0.3);
+  stroke-width: 0.55;
+}
+
+.bifurcation-plot .plot-tube--negative {
+  fill: rgba(31, 119, 180, 0.075);
+  stroke: rgba(31, 119, 180, 0.3);
+  stroke-width: 0.55;
+}
+
+.bifurcation-plot .plot-tube--shared {
+  fill: rgba(84, 105, 134, 0.065);
+  stroke: rgba(84, 105, 134, 0.26);
+  stroke-width: 0.55;
+}
+
+.bifurcation-plot .plot-split {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.bifurcation-plot .plot-paper-callout,
+.bifurcation-plot .plot-paper-annotation,
+.bifurcation-plot .plot-tube-label {
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+}
+
+.bifurcation-plot .plot-paper-callout {
+  fill: #39475b;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-paper-annotation {
+  fill: #28364b;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 9.3px;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-tube-label {
+  fill: #65758b;
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.bifurcation-plot .plot-inset-frame {
+  fill: rgba(255, 255, 255, 0.97);
+  stroke: #202735;
+  stroke-width: 1.05;
+}
+
+.bifurcation-plot .plot-inset-axis {
+  stroke: #202735;
+  stroke-width: 0.9;
+}
+
+.bifurcation-plot .plot-inset-guide {
+  stroke: #1f77b4;
+  stroke-dasharray: 1.5 1.5;
+  stroke-width: 0.75;
+}
+
+.bifurcation-plot .plot-inset-posterior {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.bifurcation-plot .plot-inset-title {
+  fill: #273449;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 9px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-inset-tick {
+  fill: #202735;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 7.5px;
+}
+
+.bifurcation-plot .plot-curve {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.bifurcation-plot .plot-ideal {
+  fill: none;
+  stroke: #ff7f0e;
+  stroke-dasharray: 6 4;
+  stroke-width: 2;
+}
+
+.bifurcation-plot .plot-marker-halo {
+  fill: rgba(39, 120, 246, 0.18);
+}
+
+.bifurcation-plot .plot-marker {
+  fill: var(--blue);
+  stroke: white;
+  stroke-width: 2.5;
+}
+
+.bifurcation-plot .plot-marker--overflow {
+  stroke: #10213d;
+  stroke-width: 1.5;
+}
+
+.bifurcation-plot .plot-sensitivity-overflow-label {
+  fill: #64738a;
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.bifurcation-plot .plot-sensitivity-overflow-label.is-active {
+  fill: #10213d;
+}
+
+.bifurcation-plot .plot-sensitivity-legend,
+.bifurcation-plot .plot-sensitivity-formula,
+.bifurcation-plot .plot-sensitivity-arrow-label {
+  fill: #202735;
+  font-family: "Source Serif 4", Georgia, serif;
+}
+
+.bifurcation-plot .plot-sensitivity-legend {
+  font-size: 8.5px;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-sensitivity-key-line {
+  stroke-width: 2.2;
+}
+
+.bifurcation-plot .plot-sensitivity-formula {
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-sensitivity-arrow-label {
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.bifurcation-plot .plot-sensitivity-arrow {
+  stroke: #202735;
+  stroke-width: 1.1;
+}
+
+.bifurcation-plot .plot-sensitivity-arrowhead {
+  fill: #202735;
+}
+
+.bifurcation-plot .plot-sensitivity-guide {
+  stroke: #2778f6;
+  stroke-dasharray: 2 3;
+  stroke-width: 0.9;
+  opacity: 0.52;
+}
+
+.bifurcation-plot .is-muted {
+  opacity: 0.16;
+}
+
+.bifurcation-panel__copy {
+  margin: 17px 2px 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.58;
+}
+
+.bifurcation-live-model {
+  margin: 9px 2px 0;
+  padding: 8px 10px;
+  color: #586981;
+  background: #f1edff;
+  border: 0;
+  border-left: 3px solid var(--violet);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  line-height: 1.48;
+}
+
+.bifurcation-live-model > strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #49379a;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bifurcation-live-model p {
+  margin: 0;
+}
+
+.bifurcation-live-model strong {
+  color: #49379a;
+}
+
+.bifurcation-live-model__readout {
+  display: flex;
+  margin-top: 7px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(115, 87, 232, 0.2);
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bifurcation-live-model__readout > strong {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.bifurcation-plot-key {
+  display: flex;
+  margin: 9px 2px -2px;
+  padding: 0;
+  color: #59697e;
+  font-size: 0.61rem;
+  font-weight: 700;
+  line-height: 1.35;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  list-style: none;
+}
+
+.bifurcation-plot-key > li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bifurcation-plot-key i {
+  position: relative;
+  display: inline-block;
+  width: 21px;
+  height: 8px;
+}
+
+.bifurcation-plot-key__mean::before,
+.bifurcation-plot-key__mean::after,
+.bifurcation-plot-key__particle::before,
+.bifurcation-plot-key__particle::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  content: "";
+}
+
+.bifurcation-plot-key__mean::before,
+.bifurcation-plot-key__mean::after {
+  border-top: 1.5px dashed;
+}
+
+.bifurcation-plot-key__mean::before {
+  top: 1px;
+  border-color: #1f77b4;
+}
+
+.bifurcation-plot-key__mean::after {
+  bottom: 1px;
+  border-color: #ff7f0e;
+}
+
+.bifurcation-plot-key__particle::before,
+.bifurcation-plot-key__particle::after {
+  border-top: 2px solid;
+}
+
+.bifurcation-plot-key__particle::before {
+  top: 1px;
+  border-color: #2ca02c;
+}
+
+.bifurcation-plot-key__particle::after {
+  bottom: 1px;
+  border-color: #d62728;
+}
+
+.bifurcation-plot-key i.bifurcation-plot-key__tube {
+  height: 8px;
+  background: linear-gradient(90deg, rgba(31, 119, 180, 0.12), rgba(255, 127, 14, 0.12));
+  border: 1px solid rgba(84, 105, 134, 0.38);
+  border-radius: 2px;
+}
+
+.bifurcation-mechanism {
+  padding: clamp(18px, 2.5vw, 27px);
+  background:
+    radial-gradient(circle at 88% 10%, rgba(115, 87, 232, 0.1), transparent 34%),
+    #edf5ff;
+  border: 1px solid #cbdcf2;
+  border-radius: 16px;
+  grid-column: 1 / -1;
+}
+
+.bifurcation-mechanism__header {
+  display: grid;
+  margin-bottom: 17px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 28px;
+  align-items: end;
+}
+
+.bifurcation-mechanism__header > div > span,
+.bifurcation-mechanism__title > span {
+  display: block;
+  color: var(--blue-deep);
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.bifurcation-mechanism__header h3 {
+  margin: 5px 0 0;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.35rem, 2.2vw, 1.72rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+}
+
+.bifurcation-mechanism__header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.bifurcation-mechanism__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.bifurcation-mechanism__card {
+  display: grid;
+  min-width: 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #d7e3f2;
+  border-radius: 12px;
+  grid-template-columns: minmax(190px, 1.05fr) minmax(150px, 0.82fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.bifurcation-mechanism__title {
+  grid-column: 1 / -1;
+}
+
+.bifurcation-mechanism__title strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.bifurcation-mechanism__card > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.73rem;
+  line-height: 1.58;
+}
+
+.bifurcation-mechanism__card output {
+  color: var(--ink);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.bifurcation-mini-plot {
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid #dfe7f1;
+  border-radius: 9px;
+}
+
+.bifurcation-mini-plot text {
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.bifurcation-mini-plot .plot-axis {
+  stroke: #7a879a;
+  stroke-width: 1;
+}
+
+.bifurcation-mini-plot .plot-guide {
+  stroke: #a2afc0;
+  stroke-dasharray: 3 3;
+  stroke-width: 1;
+}
+
+.bifurcation-mini-plot .plot-tick {
+  fill: #65758b;
+  font-size: 9.5px;
+}
+
+.bifurcation-mini-plot .plot-label {
+  fill: #43526a;
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.bifurcation-mini-plot .plot-gap-line {
+  stroke: var(--violet);
+  stroke-width: 1.7;
+}
+
+.bifurcation-mini-plot .plot-gap--negative {
+  fill: #2ca02c;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.bifurcation-mini-plot .plot-gap--positive {
+  fill: #d62728;
+  stroke: white;
+  stroke-width: 2;
+}
+
+.bifurcation-mini-plot .plot-posterior-band {
+  fill: rgba(115, 87, 232, 0.12);
+}
+
+.bifurcation-mini-plot .plot-posterior {
+  fill: none;
+  stroke: var(--blue);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+}
+
+.bifurcation-control {
+  margin-top: 17px;
+  padding-top: 17px;
+  border-top: 1px solid #dde5ef;
+}
+
+.bifurcation-control__label-row {
+  display: flex;
+  margin-bottom: 10px;
+  color: #4d5d73;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.bifurcation-control__label-row label {
+  font-weight: 700;
+}
+
+.bifurcation-control__label-row strong {
+  flex: 0 0 auto;
+  color: var(--ink);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.bifurcation-control input[type="range"] {
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.bifurcation-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  background:
+    linear-gradient(to right, var(--blue) 0 var(--range-progress, 40%), #74869e var(--range-progress, 40%) 100%);
+  border-radius: 999px;
+}
+
+.bifurcation-control input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: #74869e;
+  border-radius: 999px;
+}
+
+.bifurcation-control input[type="range"]::-moz-range-progress {
+  height: 6px;
+  background: var(--blue);
+  border-radius: 999px;
+}
+
+.bifurcation-control input[type="range"]::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  appearance: none;
+  background: #fff;
+  border: 5px solid var(--blue);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 33, 61, 0.22);
+}
+
+.bifurcation-control input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 5px solid var(--blue);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(16, 33, 61, 0.22);
+}
+
+.bifurcation-control input[type="range"]:focus-visible {
+  outline: 3px solid rgba(39, 120, 246, 0.25);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.bifurcation-control__endpoints {
+  position: relative;
+  height: 15px;
+  margin-top: -2px;
+  color: #5d6d82;
+  font-size: 0.61rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bifurcation-control__endpoints span {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.bifurcation-control__endpoints span:nth-child(1) {
+  left: 0;
+  transform: none;
+}
+
+.bifurcation-control__endpoints span:nth-child(2) {
+  left: 14.14%;
+}
+
+.bifurcation-control__endpoints span:nth-child(3) {
+  left: 39.39%;
+}
+
+.bifurcation-control__endpoints span:nth-child(4) {
+  left: 69.70%;
+}
+
+.bifurcation-control__endpoints span:nth-child(5) {
+  right: 0;
+  transform: none;
+}
+
+.bifurcation-control p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.52;
+}
+
+.bifurcation-control--segments {
+  min-width: 0;
+  padding-right: 0;
+  padding-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.bifurcation-control--segments legend {
+  margin-bottom: 10px;
+  padding: 0;
+  color: #4d5d73;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.bifurcation-segments {
+  display: grid;
+  padding: 3px;
+  background: #e8eef6;
+  border-radius: 9px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.bifurcation-segments input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.bifurcation-segments label {
+  min-width: 0;
+  padding: 7px 8px;
+  color: #5a6a80;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.bifurcation-segments input:checked + label {
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(16, 33, 61, 0.1);
+}
+
+.bifurcation-segments input:focus-visible + label {
+  outline: 3px solid rgba(39, 120, 246, 0.3);
+  outline-offset: 1px;
+}
+
+.bifurcation-readout {
+  display: flex;
+  min-height: 47px;
+  margin-top: 17px;
+  padding: 11px 14px;
+  color: #596a80;
+  background: #edf3fa;
+  border-radius: 9px;
+  font-size: 0.73rem;
+  line-height: 1.4;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.bifurcation-readout i {
+  color: #8b99ab;
+  font-style: normal;
+}
+
+.bifurcation-readout strong {
+  color: var(--ink);
+}
+
+.bifurcation-equations {
+  display: grid;
+  margin-top: 18px;
+  overflow: hidden;
+  background: var(--navy);
+  border-radius: 13px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.bifurcation-equations > div {
+  min-width: 0;
+  padding: 17px 18px;
+}
+
+.bifurcation-equations > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bifurcation-equations span {
+  display: block;
+  margin-bottom: 5px;
+  color: #9fb4cf;
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.bifurcation-equations strong {
+  display: block;
+  color: white;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  white-space: nowrap;
+}
+
+.bifurcation-equations small {
+  display: block;
+  margin-top: 3px;
+  color: #b8c9df;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.bifurcation-demo__caption {
+  max-width: 910px;
+  margin: 18px auto 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.58;
+  text-align: center;
+}
+
 .wide-figure {
   margin-top: 0;
 }
@@ -1361,6 +2335,50 @@ tbody tr:last-child td {
     max-width: 720px;
   }
 
+  .bifurcation-demo__guide {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .bifurcation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bifurcation-mechanism__header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .bifurcation-mechanism__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bifurcation-panel__header {
+    min-height: 0;
+  }
+
+  .bifurcation-plot {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+
+  .bifurcation-equations {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bifurcation-equations > div + div {
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .bifurcation-equations > div:nth-child(3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 0;
+  }
+
+  .bifurcation-equations > div:nth-child(4) {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
   .objective-panel {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -1620,6 +2638,81 @@ tbody tr:last-child td {
     grid-template-columns: 1fr;
   }
 
+  .bifurcation-demo__interactive {
+    margin-right: -16px;
+    margin-left: -16px;
+    padding: 8px;
+    border-radius: 14px;
+  }
+
+  .bifurcation-panel {
+    padding: 10px;
+  }
+
+  .bifurcation-mechanism {
+    padding: 12px;
+  }
+
+  .bifurcation-mechanism__card {
+    grid-template-columns: 1fr;
+  }
+
+  .bifurcation-mini-plot {
+    max-width: 360px;
+    margin-inline: auto;
+  }
+
+  .bifurcation-plot .plot-tick {
+    font-size: 12px;
+  }
+
+  .bifurcation-plot .plot-label {
+    font-size: 14px;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-tick {
+    font-size: 8px;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-axis-label {
+    font-size: 9px;
+  }
+
+  .bifurcation-plot .plot-note {
+    font-size: 11.5px;
+  }
+
+  .bifurcation-control__label-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .bifurcation-readout {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .bifurcation-readout i {
+    display: none;
+  }
+
+  .bifurcation-equations {
+    grid-template-columns: 1fr;
+  }
+
+  .bifurcation-equations > div + div,
+  .bifurcation-equations > div:nth-child(3),
+  .bifurcation-equations > div:nth-child(4) {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-left: 0;
+  }
+
+  .bifurcation-equations strong {
+    white-space: normal;
+  }
+
   .equation {
     font-size: 1.48rem;
   }
@@ -1696,6 +2789,39 @@ tbody tr:last-child td {
 
   .footer-links {
     gap: 19px;
+  }
+}
+
+@media (max-width: 420px) {
+  .bifurcation-plot .plot-posterior-inset,
+  .bifurcation-plot .plot-paper-explanation,
+  .bifurcation-plot .plot-tube-label {
+    display: none;
+  }
+
+  .bifurcation-plot .plot-paper-callout {
+    font-size: 12.5px;
+  }
+
+  .bifurcation-plot .plot-paper-gap {
+    font-size: 12px;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-formula {
+    display: none;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-tick {
+    font-size: 10.5px;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-axis-label,
+  .bifurcation-panel--sensitivity .plot-sensitivity-legend {
+    font-size: 11px;
+  }
+
+  .bifurcation-panel--sensitivity .plot-sensitivity-arrow-label {
+    font-size: 11.5px;
   }
 }
 

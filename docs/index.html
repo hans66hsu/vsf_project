@@ -144,14 +144,164 @@
         <div class="split-heading">
           <div class="section-heading">
             <p class="eyebrow">Why a latent?</p>
-            <h2>Branch identity should not hide in tiny state differences.</h2>
+            <h2>A tighter physical tube makes standard SF more fragile.</h2>
           </div>
-          <p>Near a bifurcation, multiple futures can share the same physical past. A non-latent field must encode the eventual branch in increasingly small differences in the physical state, making accurate rollouts sensitive to perturbations. A trajectory-level latent can carry that branch information explicitly.</p>
+          <p>Two futures can share exactly the same physical past. Drag the 1σ tube-scale control from an extreme low-noise stress test through the paper-comparable regime: standard SF must hide the branch in physical-state differences, while an ideal latent carries that decision outside the physical state.</p>
         </div>
 
-        <figure class="paper-figure wide-figure">
-          <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing shared physical history, branch identity represented through state differences in standard Streaming Flow, branch identity represented in a latent code, and the resulting sensitivity tradeoff." width="2235" height="572" loading="lazy">
-          <figcaption>A motivating bifurcation model: as standard SF demands higher tube fidelity, the physical state must become more sensitive; an ideal latent can encode the future branch without that state-space bottleneck.</figcaption>
+        <figure class="bifurcation-demo" data-bifurcation-demo>
+          <div class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
+            <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing shared physical history, branch identity represented through state differences in standard Streaming Flow, branch identity represented in a latent code, and the resulting sensitivity tradeoff." width="2235" height="572" loading="lazy">
+            <p>A motivating bifurcation model: as standard SF demands higher tube fidelity, the physical state must become more sensitive; an ideal latent can encode the future branch without that state-space bottleneck.</p>
+          </div>
+
+          <div class="bifurcation-demo__interactive" data-bifurcation-interactive hidden>
+            <div class="bifurcation-demo__guide">
+              <div>
+                <span class="bifurcation-demo__label">Interactive theorem sketch</span>
+                <strong>One 1σ tube-scale control changes the generated flow, never the target.</strong>
+              </div>
+              <p>Move <span class="math-inline">ε<sub>τ</sub></span> in step 2. The SF characteristics, posterior branch mean, tube, and step-4 marker update together.</p>
+            </div>
+
+            <div class="bifurcation-grid">
+              <article class="bifurcation-panel">
+                <header class="bifurcation-panel__header">
+                  <span>1 · Ground truth</span>
+                  <h3>One past, two futures</h3>
+                </header>
+                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-truth-title bifurcation-truth-desc" data-bifurcation-plot="truth"></svg>
+                <p class="bifurcation-panel__copy">Both futures remain at <span class="math-inline">x = 0</span> until the bifurcation time <span class="math-inline">τ</span>. Before that point, the future branch is genuinely unresolved.</p>
+              </article>
+
+              <article class="bifurcation-panel bifurcation-panel--interactive">
+                <header class="bifurcation-panel__header">
+                  <span>2 · Standard SF</span>
+                  <h3>The branch has to live in <em>x</em></h3>
+                </header>
+                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sf-title bifurcation-sf-desc" data-bifurcation-plot="sf"></svg>
+                <div class="bifurcation-live-model" role="note">
+                  <strong>Paper panel (b), with live ε<sub>τ</sub>.</strong>
+                  <p>The dashed blue/orange curves are the fixed data paths <span class="math-inline">ξ<sub>±</sub>(t) = ±m(t)</span>. The solid green/red curves are exact marginal-SF characteristics <span class="math-inline">Φ<sup>SF</sup><sub>τ,t</sub>(±δ<sub>p</sub>)</span>. On wider screens, the inset is the paper’s posterior branch mean <span class="math-inline">E[B | X<sub>t</sub> = x]</span> at <span class="math-inline">t = 0.60</span>; the microscope below enlarges it on every screen.</p>
+                  <div class="bifurcation-live-model__readout">
+                    <span>At <span class="math-inline">t* = 0.72</span>, solid-to-dashed gap</span>
+                    <strong><output data-bifurcation-lag-output>0.214</output></strong>
+                  </div>
+                </div>
+                <ul class="bifurcation-plot-key" aria-label="Standard Streaming Flow plot legend">
+                  <li><i class="bifurcation-plot-key__mean" aria-hidden="true"></i>dashed targets: blue <span class="math-inline">ξ<sub>−</sub></span>, orange <span class="math-inline">ξ<sub>+</sub></span></li>
+                  <li><i class="bifurcation-plot-key__particle" aria-hidden="true"></i>solid probes: green negative, red positive</li>
+                  <li><i class="bifurcation-plot-key__tube" aria-hidden="true"></i>component ±<span class="math-inline">σ<sub>t</sub></span> tubes</li>
+                </ul>
+
+                <div class="bifurcation-control bifurcation-control--range">
+                  <div class="bifurcation-control__label-row">
+                    <label for="sf-tube-width">Split-time 1σ tube scale / fidelity error</label>
+                    <strong><span class="math-inline">ε<sub>τ</sub></span> = <output for="sf-tube-width" data-bifurcation-epsilon-output>0.189</output></strong>
+                  </div>
+                  <input id="sf-tube-width" type="range" min="0.01" max="1" step="0.001" value="0.189" aria-describedby="sf-tube-help" data-bifurcation-epsilon>
+                  <div class="bifurcation-control__endpoints" aria-hidden="true">
+                    <span>0.01</span>
+                    <span>0.15</span>
+                    <span>0.40</span>
+                    <span>0.70</span>
+                    <span>1.00</span>
+                  </div>
+                  <p id="sf-tube-help">Here <span class="math-inline">P<sub>τ</sub><sup>SF</sup> = 𝒩(0, ε<sub>τ</sub><sup>2</sup>)</span> and <span class="math-inline">ε<sub>τ</sub> = σ<sub>τ</sub> = W<sub>2</sub>(P<sub>τ</sub><sup>SF</sup>, δ<sub>0</sub>)</span>. For <span class="math-inline">t &gt; τ</span>, the faint ribbons are the two component tubes around fixed means <span class="math-inline">±m(t)</span>, not the standard deviation of the full mixture. Slide left for better fidelity and higher sensitivity; slide right for a wider tube and lower physical-state sensitivity. The direct <span class="math-inline">0.01–1.00</span> control includes an extreme-fidelity extension below the paper panel’s visible range; its exact sensitivity is still computed and reported.</p>
+                </div>
+              </article>
+
+              <section class="bifurcation-mechanism" aria-labelledby="bifurcation-mechanism-title">
+                <header class="bifurcation-mechanism__header">
+                  <div>
+                    <span>Standard-SF microscope</span>
+                    <h3 id="bifurcation-mechanism-title">Inspect how the flow stores branch identity</h3>
+                  </div>
+                  <p>The left view exposes the matched probe convention used by this interaction. The right view enlarges the same posterior branch mean shown inside the paper-style panel.</p>
+                </header>
+
+                <div class="bifurcation-mechanism__grid">
+                  <div class="bifurcation-mechanism__card">
+                    <div class="bifurcation-mechanism__title">
+                      <span>Magnified at <span class="math-inline">τ</span></span>
+                      <strong>Matched probe separation</strong>
+                    </div>
+                    <svg class="bifurcation-mini-plot" viewBox="0 0 260 118" role="img" aria-labelledby="bifurcation-gap-title bifurcation-gap-desc" data-bifurcation-plot="gap"></svg>
+                    <p>The interaction uses <span class="math-inline">δ<sub>p</sub>/ε<sub>τ</sub> = 0.01/0.18885 ≈ 0.05295</span>, calibrated from the paper’s <span class="math-inline">ε<sub>τ</sub> = 0.18885</span> reference, and follows one fixed CDF rank as noise changes. Thus <span class="math-inline">2δ<sub>p</sub> = </span><output data-bifurcation-gap-output>0.0200</output>. This coupling is a visualization convention; the theorem’s perturbation <span class="math-inline">δ</span> is independent at fixed <span class="math-inline">ε<sub>τ</sub></span>.</p>
+                  </div>
+
+                  <div class="bifurcation-mechanism__card">
+                    <div class="bifurcation-mechanism__title">
+                      <span>Posterior mean at <span class="math-inline">t = 0.60 &gt; τ</span></span>
+                      <strong>Branch posterior sharpness</strong>
+                    </div>
+                    <svg class="bifurcation-mini-plot" viewBox="0 0 260 118" role="img" aria-labelledby="bifurcation-posterior-title bifurcation-posterior-desc" data-bifurcation-plot="posterior"></svg>
+                    <p><span class="math-inline">E[B | X<sub>t</sub> = x] = tanh(xm(t)/σ<sub>t</sub><sup>2</sup>)</span>. At <span class="math-inline">t = 0.60</span>, its transition scale is <span class="math-inline">ℓ = σ<sub>t</sub><sup>2</sup>/m(t) = </span><output data-bifurcation-transition-output>0.0375</output>. Exactly at <span class="math-inline">τ</span>, it is flat because <span class="math-inline">m(τ) = 0</span>.</p>
+                  </div>
+                </div>
+              </section>
+
+              <article class="bifurcation-panel bifurcation-panel--interactive">
+                <header class="bifurcation-panel__header">
+                  <span>3 · Ideal latent</span>
+                  <h3>Put the branch in <em>z</em></h3>
+                </header>
+                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-latent-title bifurcation-latent-desc" data-bifurcation-plot="latent"></svg>
+
+                <fieldset class="bifurcation-control bifurcation-control--segments">
+                  <legend>Highlight a latent code</legend>
+                  <div class="bifurcation-segments">
+                    <input type="radio" name="latent-branch" id="latent-both" value="both" data-bifurcation-latent checked>
+                    <label for="latent-both">Both</label>
+                    <input type="radio" name="latent-branch" id="latent-negative" value="negative" data-bifurcation-latent>
+                    <label for="latent-negative"><span class="math-inline">z &lt; 0</span></label>
+                    <input type="radio" name="latent-branch" id="latent-positive" value="positive" data-bifurcation-latent>
+                    <label for="latent-positive"><span class="math-inline">z ≥ 0</span></label>
+                  </div>
+                  <p>A velocity slider is not needed: the sign of <span class="math-inline">z</span> selects <span class="math-inline">b(z)</span>, and the ideal field determines the motion.</p>
+                </fieldset>
+              </article>
+
+              <article class="bifurcation-panel bifurcation-panel--sensitivity">
+                <header class="bifurcation-panel__header">
+                  <span>4 · Linked sensitivity</span>
+                  <h3>Sensitivity required by standard SF</h3>
+                </header>
+                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sensitivity-title bifurcation-sensitivity-desc" data-bifurcation-plot="sensitivity"></svg>
+                <div class="bifurcation-readout">
+                  <span><span class="math-inline">ε<sub>τ</sub></span> = <output for="sf-tube-width" data-bifurcation-epsilon-output>0.189</output></span>
+                  <i aria-hidden="true">→</i>
+                  <strong>log <span class="math-inline">J<sup>SF</sup><sub>τ,t*</sub></span> = <output data-bifurcation-sensitivity-output>29.46</output></strong>
+                </div>
+                <p class="bifurcation-panel__copy">The blue marker follows the same slider along the appendix curve <span class="math-inline">−kΔt + C/ε<sub>τ</sub><sup>2</sup></span>; the dashed ideal-latent baseline stays at <span class="math-inline">−kΔt</span>. Both axes remain raw and linear. The paper-scale vertical window stays at <span class="math-inline">−2–50</span>; when log sensitivity exceeds 50, the marker pins to the ceiling while the readout reports its exact off-scale value. Across <span class="math-inline">ε<sub>τ</sub> = 0.01–1.00</span>, log sensitivity falls from <span class="math-inline">10,673.40</span> to <span class="math-inline">0.65</span>.</p>
+              </article>
+            </div>
+
+            <div class="bifurcation-equations" role="group" aria-label="Equations used by the interactive bifurcation model">
+              <div>
+                <span>Ground truth</span>
+                <strong>ξ<sub>B</sub>(t) = Bm(t)</strong>
+              </div>
+              <div>
+                <span>Population-optimal SF</span>
+                <strong>v*<sub>SF</sub> = −kx + q(t)tanh(xm/σ<sub>t</sub><sup>2</sup>)</strong>
+                <small>σ<sub>t</sub> = ε<sub>τ</sub>e<sup>−k(t−τ)</sup></small>
+              </div>
+              <div>
+                <span>Ideal latent field</span>
+                <strong>v<sup>ideal</sup> = −kx + q(t)b(z)</strong>
+                <small>b(z) = 2𝟙[z ≥ 0] − 1</small>
+              </div>
+              <div>
+                <span>Local sensitivity</span>
+                <strong>log J<sup>SF</sup> = −kΔt + C / ε<sub>τ</sub><sup>2</sup></strong>
+                <small>C = ½m(t*)<sup>2</sup>e<sup>2kΔt</sup></small>
+              </div>
+            </div>
+
+            <p class="bifurcation-demo__caption">Figure-matched linear bifurcation with <span class="math-inline">τ = 0.42</span>, <span class="math-inline">k = 1.4</span>, and <span class="math-inline">m(t) = 3.2(t − τ)<sub>+</sub></span>. As in the source figure, the posterior inset uses <span class="math-inline">t = 0.60</span> and sensitivity uses <span class="math-inline">t* = 0.72</span> (<span class="math-inline">Δt = 0.30</span>). The exact central state <span class="math-inline">x<sub>τ</sub> = 0</span> remains a separator for every finite <span class="math-inline">ε<sub>τ</sub></span>; the paired off-center probes and marginal law converge to the target as <span class="math-inline">ε<sub>τ</sub> ↓ 0</span>.</p>
+            <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
+          </div>
         </figure>
 
         <div class="theory-note">

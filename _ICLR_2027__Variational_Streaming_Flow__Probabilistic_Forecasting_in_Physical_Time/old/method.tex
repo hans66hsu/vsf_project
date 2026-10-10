@@ -1,0 +1,304 @@
+\section{Method}
+\label{sec:method}
+\hans{Logic:
+subsection 1
+first introduce frame to frame ode flow
+however, in forecasting, we always start from a history so in a ode flow we do not have any stochasticity to model uncertainty.
+second introduce the vae with elbo
+third, objective the crps loss also is a proper scoring rule.
+subsection 2: training
+subsection 3: inference
+}
+
+\subsection{Frame-to-frame ODE Flow}
+\label{sec:frame-to-frame-method}
+\hans{highlight learning on the physical-time flow instead of the}
+From $N_{\mathrm{traj}}$ offline trajectories of lengths $T_n$, we form the
+autonomous and controlled adjacent-frame datasets
+\begin{align}
+  \mathcal D_{\mathrm{ff}}
+  &:={\left\{
+      \bigl(x_k^{(n)},x_{k+1}^{(n)}\bigr)
+      : n=1,\ldots,N_{\mathrm{traj}},\;
+        k=1,\ldots,T_n-1
+    \right\}},
+  \label{eq:problem_uncontrolled_pairs}\\
+  \mathcal D_{\mathrm{ff}}^{\mathrm{act}}
+  &:={\left\{
+      \bigl(x_k^{(n)},a_k^{(n)},x_{k+1}^{(n)}\bigr)
+      : n=1,\ldots,N_{\mathrm{traj}},\;
+        k=1,\ldots,T_n-1
+    \right\}}.
+  \label{eq:problem_controlled_pairs}
+\end{align}
+The trajectory identity and temporal order are retained when sampling local
+transitions.  Following \citet{lim2026flow}, we construct the rollout from
+these adjacent frames.
+The discrete index $k$ denotes physical time, whereas
+$\tau\in[0,1]$ parameterizes a single frame transition.  Each observed pair
+defines the local interpolation
+\begin{align}
+  x_{k,\tau}
+  &:=(1-\tau)x_k+\tau x_{k+1},
+  \label{eq:method_frame_interpolation}\\
+  u_{k,\tau}^{\mathrm{loc}}
+  &:=\frac{\partial x_{k,\tau}}{\partial\tau}
+   =x_{k+1}-x_k.
+  \label{eq:method_frame_velocity}
+\end{align}
+This is a flow-matching path in the chosen state representation; it does not
+assume that the unresolved physical motion between sampled frames is linear.
+
+For consistency with Appendix~\ref{sec:clean_velocity_elbo}, consider a
+training window $x_{a:T}$ with forecast origin $m$ and set $P:=T-m$.  Write
+$k=m+r$ for $r=0,\ldots,P-1$, and define the global normalized coordinate
+\begin{equation}
+  s:=\frac{r+\tau}{P},
+  \qquad
+  s\in I_r:=\left[\frac rP,\frac{r+1}{P}\right).
+  \label{eq:method_local_global_time}
+\end{equation}
+Then $x_s=x_{m+r,\tau}$, and the change of variables yields
+\begin{equation}
+  u_s:=\frac{dx_s}{ds}
+  =P\frac{\partial x_{m+r,\tau}}{\partial\tau}
+  =P(x_{m+r+1}-x_{m+r}).
+  \label{eq:method_global_velocity}
+\end{equation}
+Equations~\ref{eq:method_local_global_time} and
+\ref{eq:method_global_velocity} are exactly the construction used in
+Eqs.~\ref{eq:clean_interpolation}--\ref{eq:clean_velocity}.  Thus $s$ is the
+normalized trajectory coordinate and is never used as a system-state symbol.
+
+Let $h_k:=H(x_{a:k})$ be a deterministic representation of the available
+$x$-history.  It is model context, not another physical state or a Bayesian
+belief.  Conditional on the trajectory-level generative variable $z$
+introduced below, the autonomous velocity defines the frame update
+\begin{equation}
+  \frac{d\widehat x_s}{ds}
+  =v_\theta(\widehat x_s,s,h_m,z),
+  \qquad
+  s\in I_r,
+  \qquad
+  \left.\widehat x_s\right|_{s=r/P}=\widehat x_{m+r},
+  \label{eq:method_frame_flow_ode}
+\end{equation}
+and emits
+\begin{equation}
+  \widehat x_{m+r+1}
+  :=\left.\widehat x_s\right|_{s=(r+1)/P}
+  =\widehat x_{m+r}
+   +\int_{r/P}^{(r+1)/P}
+      v_\theta(\widehat x_s,s,h_m,z)\,ds.
+  \label{eq:method_frame_flow_map}
+\end{equation}
+Following the action-conditioned format of \citet{maes2026leworldmodel}, the
+controlled model supplies the aligned action explicitly to the transition.
+Accordingly, its right-hand side is
+$v_\theta(\widehat x_s,s,h_m,a_{m+r},z)$; the action is not
+absorbed into the history encoder $H$.
+The observed context $h_m=H(x_{a:m})$ is fixed throughout the forecast, in
+agreement with Appendix~\ref{sec:clean_velocity_elbo}; generated frames enter
+the ODE through $\widehat x_s$ rather than through a refreshed context
+encoding.  Repeating Eq.~\ref{eq:method_frame_flow_map} for
+$r=0,\ldots,P-1$ produces one trajectory sample.
+
+\subsection{Variational ODE Flow}
+\hans{While learning from a frame to frame flow matching allow to }
+Let $d=\dim(u_s)$ and $p(z)=\mathcal N(0,I_{d_z})$.  The training posterior is
+\begin{equation}
+  q_\phi(z\mid u_s,x_s,s,h)
+  =\mathcal N\!\left(
+    z;
+    \mu_\phi(u_s,x_s,s,h),
+    \operatorname{diag}\!\bigl(\sigma_\phi^2(u_s,x_s,s,h)\bigr)
+  \right).
+  \label{eq:method-variational-posterior}
+\end{equation}
+
+The nonlinear decoder parameterizes the mean of the fixed-variance conditional
+velocity likelihood
+\begin{equation}
+  p_\theta(u_s\mid x_s,s,h,z)
+  =\mathcal N\!\left(
+    u_s;
+    v_\theta(x_s,s,h,z),
+    \sigma_u^2 I_d
+  \right),
+  \label{eq:method-velocity-likelihood}
+\end{equation}
+where $\sigma_u^2>0$ is fixed.  Thus, conditional on $z$, $v_\theta$
+deterministically predicts the likelihood mean.  Marginalizing the random
+latent gives a Gaussian location mixture, which can be non-Gaussian and
+multimodal.
+For controlled trajectories, the aligned $a_{m+r}$ is an additional,
+observed conditioning variable in both networks:
+\begin{equation}
+  q_\phi(z\mid u_s,x_s,s,h,a_{m+r}),
+  \qquad
+  p_\theta(u_s\mid x_s,s,h,a_{m+r},z),
+  \qquad s\in I_r.
+  \label{eq:method-controlled-conditionals}
+\end{equation}
+All autonomous equations are recovered by omitting this action argument; the
+ELBO proof applies conditionally on the supplied action.
+
+
+\paragraph{Generalized Energy Loss}
+\hans{Motivation: }
+\begin{equation}
+  \widehat{\mathcal L}_{\beta,M}^{q}
+  :=\frac1M\sum_{i=1}^M
+       \left|\widehat U_s^{(i)}-u_s\right|^\beta
+    -\frac{\lambda}{M^2}\sum_{i,j=1}^M
+       \left|\widehat U_s^{(i)}-\widehat U_s^{(j)}\right|^\beta.
+  \label{eq:generalized_crps_training_loss}
+\end{equation}
+
+
+Algorithms~\ref{alg:vsf-training} and~\ref{alg:vsf-inference} summarize
+training and a $P$-step parallel forecast, respectively.  Here $P$ is the
+number of future sampling steps, $P=T-m$,
+and ensemble members are indexed by $j$ because $m$ denotes the forecast
+origin.  The inference panel shows the knot-aligned Euler specialization that
+corresponds directly to the proof; additional numerical substeps may be used
+without inserting them into the observation history.
+
+% Lightweight ruled pseudocode, kept local to this section so that no
+% additional algorithm package is required.
+\newcounter{vsfalgorithm}
+\newcommand{\vsfalgorithmheader}[2]{%
+  \refstepcounter{vsfalgorithm}\label{#1}%
+  \par\noindent\textbf{Algorithm \thevsfalgorithm: #2}\par
+}
+\newenvironment{vsfalgorithmsteps}{%
+  \begin{list}{}{
+    \setlength{\leftmargin}{1.0em}%
+    \setlength{\rightmargin}{0pt}%
+    \setlength{\labelwidth}{0pt}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\itemsep}{0.15em}%
+    \setlength{\parsep}{0pt}%
+    \setlength{\topsep}{0.15em}%
+    \setlength{\partopsep}{0pt}%
+  }%
+}{\end{list}}
+
+\begin{figure}[t]
+  \centering
+  \begin{minipage}[t]{0.485\linewidth}
+    \vspace{0pt}
+    \footnotesize
+    \hrule height 0.8pt
+    \vspace{0.25em}
+    \vsfalgorithmheader{alg:vsf-training}{Training}
+    \vspace{0.15em}\hrule height 0.4pt\vspace{0.3em}
+    \noindent\textbf{Input:} Windows $x_{a:T}\sim p_{\mathrm{data}}$ (paired
+    with $a_{a:T-1}$ for controlled data), prior $p(z)$, and
+    $\beta_{\mathrm{KL}}$.
+
+    \noindent\textbf{Output:} Trained $q_\phi$ and $v_\theta$.
+
+    \noindent\textbf{while} not converged \textbf{do}
+    \begin{vsfalgorithmsteps}
+      \item[] Sample $x_{a:T}$ and $s\sim\mathrm{Unif}[0,1]$; set
+      $h\leftarrow H(x_{a:m})$.
+
+      \item[] Evaluate $(x_s,u_s)$ on the clean trajectory, where
+      $u_s=\mathrm{d}x_s/\mathrm{d}s$.
+
+      \item[] Set the conditioning tuple
+      \[
+        c_s\leftarrow
+        \begin{cases}
+          h, & \text{autonomous},\\
+          (h,a_{m+r}), & \text{controlled, with }s\in I_r.
+        \end{cases}
+      \]
+
+      \item[] $(\mu_\phi,\sigma_\phi)\leftarrow
+      \operatorname{Enc}_\phi(u_s,x_s,s,c_s)$ and set
+      $q_{\phi,s}:=q_\phi(\,\cdot\mid u_s,x_s,s,c_s)$.
+
+      \item[] Sample $\eta\sim\mathcal N(0,I_{d_z})$ and set
+      $z\leftarrow\mu_\phi+\sigma_\phi\odot\eta$.
+
+      \item[] Predict
+      $\widehat u_s\leftarrow v_\theta(x_s,s,c_s,z)$.
+
+      \item[] Compute
+      \[
+        \mathcal L\leftarrow
+        \frac{1}{d}\|\widehat u_s-u_s\|_2^2
+        +\beta_{\mathrm{KL}}\KL(q_{\phi,s}\|p).
+      \]
+
+      \item[] Update $(\theta,\phi)$ using $\nabla_{\theta,\phi}\mathcal L$.
+    \end{vsfalgorithmsteps}
+    \noindent\textbf{end while}
+    \vspace{0.3em}\hrule height 0.8pt
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.485\linewidth}
+    \vspace{0pt}
+    \footnotesize
+    \hrule height 0.8pt
+    \vspace{0.25em}
+    \vsfalgorithmheader{alg:vsf-inference}{Inference}
+    \vspace{0.15em}\hrule height 0.4pt\vspace{0.3em}
+    \noindent\textbf{Input:} Trained $v_\theta$, observed context
+    $x_{a:m}$, prior $p(z)$, horizon $P=T-m$, ensemble size $M$, and supplied
+    $a_{m:T-1}$ for controlled inference.
+
+    \noindent\textbf{Output:} Forecast ensemble
+    $\{\widehat x_{m+1:T}^{(j)}\}_{j=1}^{M}$.
+
+    \begin{vsfalgorithmsteps}
+      \item[] Set $h\leftarrow H(x_{a:m})$.
+
+      \item[] For $j=1,\ldots,M$, sample $z^{(j)}\sim p(z)$ once and set
+      \[
+        \widehat x_m^{(j)}\leftarrow x_m.
+      \]
+
+      \item[] \textbf{for} $k=0,\ldots,P-1$ \textbf{do}
+      \begin{vsfalgorithmsteps}
+        \item[] Set $s_k\leftarrow k/P$ and $\Delta s\leftarrow1/P$.
+
+        \item[] In parallel for $j=1,\ldots,M$, evaluate
+        \[
+          \widehat u_{s_k}^{(j)}\leftarrow
+          v_\theta\!\left(
+            \widehat x_{m+k}^{(j)},s_k,
+            h,z^{(j)}
+          \right).
+        \]
+
+        \item[] For controlled inference, instead set
+        $\widehat u_{s_k}^{(j)}\leftarrow
+         v_\theta(\widehat x_{m+k}^{(j)},s_k,h,a_{m+k},z^{(j)})$.
+
+        \item[] Advance and emit
+        \[
+          \widehat x_{m+k+1}^{(j)}\leftarrow
+          \widehat x_{m+k}^{(j)}
+          +\Delta s\,\widehat u_{s_k}^{(j)}.
+        \]
+
+      \end{vsfalgorithmsteps}
+      \item[] \textbf{end for}
+    \end{vsfalgorithmsteps}
+    \noindent Return the $M$ trajectories; keep each $z^{(j)}$ fixed over
+    its complete trajectory.
+    \vspace{0.3em}\hrule height 0.8pt
+  \end{minipage}
+\end{figure}
+
+\hans{add crps loss}
+
+
+\
+% The fixed context h_m matches Appendix~\ref{sec:clean_velocity_elbo}.  For an
+% open-ended stream, advance the forecast origin and recompute h_m from the newly
+% observed window; a new latent is drawn when a new ensemble forecast is
+% initialized.
