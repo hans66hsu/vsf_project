@@ -7,7 +7,7 @@
   <meta name="keywords" content="variational streaming flow, probabilistic forecasting, physical-time flow, dynamical systems, world models">
   <meta name="theme-color" content="#102a56">
   <meta property="og:title" content="Variational Streaming Flow">
-  <meta property="og:description" content="One latent. One coherent rollout. Many plausible futures.">
+  <meta property="og:description" content="A latent-variable extension of Streaming Flow for probabilistic forecasting directly in physical time.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/figures/vsf-motivation.png">
   <title>Variational Streaming Flow — Probabilistic Forecasting in Physical Time</title>
@@ -15,9 +15,11 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="static/css/site.css">
-  <script src="static/js/site.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
+  <link rel="stylesheet" href="static/css/site.css?v=academic-layout-6">
+  <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
+  <script src="static/js/site.js?v=academic-layout-3" defer></script>
 </head>
 
 <body>
@@ -36,7 +38,7 @@
           <circle cx="34" cy="21" r="2.5"/>
           <circle cx="34" cy="32" r="2.5"/>
         </svg>
-        <span>VSF</span>
+        <span>Variational Streaming Flow</span>
       </a>
 
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
@@ -46,6 +48,7 @@
 
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
         <a href="#overview">Overview</a>
+        <a href="#motivation">Motivation</a>
         <a href="#method">Method</a>
         <a href="#results">Results</a>
         <a href="#world-model">World model</a>
@@ -56,15 +59,10 @@
 
   <main id="main-content">
     <section class="hero" id="top">
-      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
-      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
       <div class="container hero-content">
-        <p class="eyebrow">Probabilistic forecasting in physical time</p>
-        <h1>
-          <span>Variational Streaming Flow</span>
-          <small>Probabilistic Forecasting in Physical Time</small>
-        </h1>
-        <p class="hero-deck">One latent. One coherent rollout. Many plausible futures.</p>
+        <p class="eyebrow">Research project · Probabilistic forecasting</p>
+        <h1>Variational Streaming Flow</h1>
+        <p class="hero-deck">Probabilistic Forecasting in Physical Time</p>
 
         <div class="authors" aria-label="Authors">
           <span>Hans Hao-Hsun Hsu<sup>1,2</sup></span>
@@ -91,27 +89,37 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.87c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.35 1.09 2.92.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82a9.6 9.6 0 0 1 2.5.34c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
             Code
           </a>
-          <a class="button button-ghost" href="#method">
-            Explore the method
+          <a class="button button-ghost" href="#citation">
+            BibTeX
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
           </a>
         </div>
 
         <figure class="hero-figure paper-figure">
-          <div class="figure-kicker"><span></span>From one observed history to a distribution over futures</div>
           <img src="assets/figures/vsf-motivation.png" alt="Comparison of deterministic and partially observed stochastic dynamics, showing that Streaming Flow predicts a single future while Variational Streaming Flow predicts multiple plausible futures." width="2434" height="525" fetchpriority="high">
-          <figcaption>Standard non-latent Streaming Flow yields one forecast from a fixed history. VSF uses a rollout-level latent to represent distinct, coherent futures.</figcaption>
+          <figcaption><strong>Overview.</strong> Standard non-latent Streaming Flow yields one forecast from a fixed history. VSF uses a rollout-level latent to represent distinct, coherent futures.</figcaption>
         </figure>
       </div>
     </section>
 
     <section class="section section-intro" id="overview">
       <div class="container narrow">
-        <div class="tldr">
-          <div class="tldr-label">TL;DR</div>
+        <div class="tldr" role="note" aria-label="Key idea">
+          <div class="tldr-label">Key idea</div>
           <p>VSF adds a variational, trajectory-level latent to a physical-time velocity field. It preserves the direct rollout efficiency of Streaming Flow while turning a single deterministic forecast into a learned distribution over long-horizon futures.</p>
         </div>
 
+        <div class="section-heading article-heading">
+          <p class="section-number">Abstract</p>
+          <h2>Variational Streaming Flow</h2>
+        </div>
+        <div class="abstract-copy">
+          <p>Probabilistic forecasting is essential when intrinsic randomness or incomplete observations allow the same observed state to evolve into multiple plausible futures. Flow matching can model those distributions, but generation requires integration through an auxiliary flow time in addition to the system’s physical evolution.</p>
+          <p>Streaming Flow avoids that extra generative clock by learning a velocity field directly in physical time. In its standard non-latent form, however, a fixed initial state and history determine only one future. <strong>Variational Streaming Flow (VSF)</strong> conditions the physical-time velocity on a latent variable inferred from dynamics during training and sampled from a prior at inference.</p>
+          <p>Across deterministic and partially observed stochastic systems, VSF improves long-horizon predictive accuracy and distributional fidelity. As a plug-in predictor for a JEPA-based world model, it also improves goal-directed planning while retaining one velocity-field evaluation per imagined transition.</p>
+        </div>
+
+        <p class="results-kicker">Main results</p>
         <div class="stats" aria-label="Headline results">
           <div class="stat">
             <strong>17 / 17</strong>
@@ -126,189 +134,163 @@
             <span>average planning-success gain over the autoregressive world-model predictor</span>
           </div>
         </div>
-
-        <div class="section-heading centered-heading">
-          <p class="eyebrow">Abstract</p>
-          <h2>Forecast the distribution, not just the path.</h2>
-        </div>
-        <div class="abstract-copy">
-          <p>Probabilistic forecasting is essential when intrinsic randomness or incomplete observations allow the same observed state to evolve into multiple plausible futures. Flow matching can model those distributions, but generation requires integration through an auxiliary flow time in addition to the system’s physical evolution.</p>
-          <p>Streaming Flow avoids that extra generative clock by learning a velocity field directly in physical time. In its standard non-latent form, however, a fixed initial state and history determine only one future. <strong>Variational Streaming Flow (VSF)</strong> conditions the physical-time velocity on a latent variable inferred from dynamics during training and sampled from a prior at inference.</p>
-          <p>Across deterministic and partially observed stochastic systems, VSF improves long-horizon predictive accuracy and distributional fidelity. As a plug-in predictor for a JEPA-based world model, it also improves goal-directed planning while retaining one velocity-field evaluation per imagined transition.</p>
-        </div>
       </div>
     </section>
 
-    <section class="section section-soft" id="motivation">
-      <div class="container">
-        <div class="split-heading">
-          <div class="section-heading">
-            <p class="eyebrow">Why a latent?</p>
-            <h2>A tighter physical tube makes standard SF more fragile.</h2>
-          </div>
-          <p>Two futures can share exactly the same physical past. Drag the 1σ tube-scale control from an extreme low-noise stress test through the paper-comparable regime: standard SF must hide the branch in physical-state differences, while an ideal latent carries that decision outside the physical state.</p>
-        </div>
+    <section class="section section-motivation" id="motivation">
+      <div class="container article-container">
+        <header class="section-heading article-heading motivation-heading">
+          <p class="section-number">1 · Motivation</p>
+          <h2>Why standard Streaming Flow becomes sensitive</h2>
+          <p>A symmetric two-branch example isolates the difficulty: both futures occupy the same physical state until a split, yet a non-latent field must decide which branch to follow from the physical state alone.</p>
+        </header>
 
-        <figure class="bifurcation-demo" data-bifurcation-demo>
-          <div class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
-            <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing shared physical history, branch identity represented through state differences in standard Streaming Flow, branch identity represented in a latent code, and the resulting sensitivity tradeoff." width="2235" height="572" loading="lazy">
-            <p>A motivating bifurcation model: as standard SF demands higher tube fidelity, the physical state must become more sensitive; an ideal latent can encode the future branch without that state-space bottleneck.</p>
-          </div>
+        <div class="bifurcation-demo" data-bifurcation-demo>
+          <figure class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
+            <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing the ground truth, standard Streaming Flow, an ideal latent construction, and the fidelity-sensitivity tradeoff." width="2235" height="572" loading="lazy">
+            <figcaption><strong>Bifurcation example.</strong> Better physical-state fidelity makes standard SF increasingly sensitive near the separator; a latent branch code removes this particular bottleneck.</figcaption>
+          </figure>
 
           <div class="bifurcation-demo__interactive" data-bifurcation-interactive hidden>
-            <div class="bifurcation-demo__guide">
-              <div>
-                <span class="bifurcation-demo__label">Interactive theorem sketch</span>
-                <strong>One 1σ tube-scale control changes the generated flow, never the target.</strong>
+            <section class="motivation-block motivation-block--ground" aria-labelledby="ground-truth-heading">
+              <header class="motivation-block__header">
+                <span aria-hidden="true">1</span>
+                <div>
+                  <p>Ground truth and proposition</p>
+                  <h3 id="ground-truth-heading">One observed past, two possible futures</h3>
+                </div>
+              </header>
+
+              <div class="ground-truth-layout">
+                <div class="ground-truth-copy">
+                  <p>A branch label <span class="math-inline" data-tex="B\in\{-1,+1\}">B ∈ {−1,+1}</span> selects one of two trajectories that coincide through the bifurcation time <span class="math-inline" data-tex="\tau">τ</span>:</p>
+                  <div class="motivation-equation math-display" data-tex-display data-tex="\xi_B(t)=B\,m(t),\qquad m(t)=0\ \text{for}\ t\le\tau,\qquad m(t)&gt;0\ \text{for}\ t&gt;\tau">ξB(t) = Bm(t), with m(t) = 0 before τ and positive after τ</div>
+
+                  <dl class="notation-list" aria-label="Bifurcation notation">
+                    <div><dt><span class="math-inline" data-tex="B">B</span></dt><dd>future branch label</dd></div>
+                    <div><dt><span class="math-inline" data-tex="m(t)">m(t)</span></dt><dd>branch displacement</dd></div>
+                    <div><dt><span class="math-inline" data-tex="\tau">τ</span></dt><dd>bifurcation time</dd></div>
+                    <div><dt><span class="math-inline" data-tex="\sigma_0">σ₀</span></dt><dd>initial tube scale; the slider control</dd></div>
+                    <div><dt><span class="math-inline" data-tex="k">k</span></dt><dd>tube contraction rate, with <span class="math-inline" data-tex="\sigma_t=\sigma_0e^{-kt}">σt = σ₀e−kt</span></dd></div>
+                    <div><dt><span class="math-inline" data-tex="J_{\tau,t}^{\mathrm{SF}}">JSFτ,t</span></dt><dd>flow-map sensitivity at the separator</dd></div>
+                  </dl>
+                </div>
+
+                <figure class="research-figure ground-truth-figure">
+                  <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-truth-title bifurcation-truth-desc" data-bifurcation-plot="truth"></svg>
+                  <figcaption><strong>Ground truth.</strong> The branches share <span class="math-inline" data-tex="x=0">x = 0</span> through <span class="math-inline" data-tex="\tau">τ</span> and separate only afterward.</figcaption>
+                </figure>
               </div>
-              <p>Move <span class="math-inline">ε<sub>τ</sub></span> in step 2. The SF characteristics, posterior branch mean, tube, and step-4 marker update together.</p>
-            </div>
 
-            <div class="bifurcation-grid">
-              <article class="bifurcation-panel">
-                <header class="bifurcation-panel__header">
-                  <span>1 · Ground truth</span>
-                  <h3>One past, two futures</h3>
-                </header>
-                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-truth-title bifurcation-truth-desc" data-bifurcation-plot="truth"></svg>
-                <p class="bifurcation-panel__copy">Both futures remain at <span class="math-inline">x = 0</span> until the bifurcation time <span class="math-inline">τ</span>. Before that point, the future branch is genuinely unresolved.</p>
-              </article>
+              <aside class="proposition" aria-labelledby="proposition-title">
+                <div class="proposition__label">Proposition B.1</div>
+                <h4 id="proposition-title">Fidelity–sensitivity tradeoff</h4>
+                <p>Assume the population optimum of the standard-SF objective is attained. The split-time fidelity error is the 2-Wasserstein distance between the standard-SF and data marginals:</p>
+                <div class="proposition__equation math-display" data-tex-display data-tex="\varepsilon_\tau:=W_2\!\left(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}}\right)=\sigma_\tau=\sigma_0e^{-k\tau}">ετ := W₂(PτSF, Pτdata) = στ = σ₀e−kτ</div>
+                <p>For every fixed <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span> with <span class="math-inline" data-tex="m(t)&gt;0">m(t) &gt; 0</span>, let <span class="math-inline" data-tex="J_{\tau,t}^{\mathrm{SF}}">JSFτ,t</span> denote the derivative of the standard-SF flow map with respect to its split-time initial state, evaluated at <span class="math-inline" data-tex="x=0">x = 0</span>. Then</p>
+                <div class="proposition__equation proposition__equation--wide math-display" data-tex-display data-tex="J_{\tau,t}^{\mathrm{SF}}=\exp\!\left[-k(t-\tau)+\frac{m(t)^2e^{2k(t-\tau)}}{2\varepsilon_\tau^2}\right]">JSFτ,t = exp[−k(t−τ) + m(t)²e2k(t−τ)/(2ετ²)]</div>
+                <div class="proposition__conclusion math-display" data-tex-display data-tex="\varepsilon_\tau\downarrow0\quad\Longrightarrow\quad J_{\tau,t}^{\mathrm{SF}}\to\infty">ετ ↓ 0 implies JSFτ,t → ∞</div>
+              </aside>
+            </section>
 
-              <article class="bifurcation-panel bifurcation-panel--interactive">
-                <header class="bifurcation-panel__header">
-                  <span>2 · Standard SF</span>
-                  <h3>The branch has to live in <em>x</em></h3>
-                </header>
-                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sf-title bifurcation-sf-desc" data-bifurcation-plot="sf"></svg>
-                <div class="bifurcation-live-model" role="note">
-                  <strong>Paper panel (b), with live ε<sub>τ</sub>.</strong>
-                  <p>The dashed blue/orange curves are the fixed data paths <span class="math-inline">ξ<sub>±</sub>(t) = ±m(t)</span>. The solid green/red curves are exact marginal-SF characteristics <span class="math-inline">Φ<sup>SF</sup><sub>τ,t</sub>(±δ<sub>p</sub>)</span>. On wider screens, the inset is the paper’s posterior branch mean <span class="math-inline">E[B | X<sub>t</sub> = x]</span> at <span class="math-inline">t = 0.60</span>; the microscope below enlarges it on every screen.</p>
-                  <div class="bifurcation-live-model__readout">
-                    <span>At <span class="math-inline">t* = 0.72</span>, solid-to-dashed gap</span>
-                    <strong><output data-bifurcation-lag-output>0.214</output></strong>
-                  </div>
+            <section class="motivation-block" aria-labelledby="standard-sf-heading">
+              <header class="motivation-block__header">
+                <span aria-hidden="true">2</span>
+                <div>
+                  <p>Standard Streaming Flow</p>
+                  <h3 id="standard-sf-heading">Fidelity and sensitivity are linked</h3>
                 </div>
-                <ul class="bifurcation-plot-key" aria-label="Standard Streaming Flow plot legend">
-                  <li><i class="bifurcation-plot-key__mean" aria-hidden="true"></i>dashed targets: blue <span class="math-inline">ξ<sub>−</sub></span>, orange <span class="math-inline">ξ<sub>+</sub></span></li>
-                  <li><i class="bifurcation-plot-key__particle" aria-hidden="true"></i>solid probes: green negative, red positive</li>
-                  <li><i class="bifurcation-plot-key__tube" aria-hidden="true"></i>component ±<span class="math-inline">σ<sub>t</sub></span> tubes</li>
-                </ul>
+              </header>
 
-                <div class="bifurcation-control bifurcation-control--range">
-                  <div class="bifurcation-control__label-row">
-                    <label for="sf-tube-width">Split-time 1σ tube scale / fidelity error</label>
-                    <strong><span class="math-inline">ε<sub>τ</sub></span> = <output for="sf-tube-width" data-bifurcation-epsilon-output>0.189</output></strong>
+              <p class="motivation-lead">The population-optimal marginal field must infer branch identity from <span class="math-inline" data-tex="x">x</span>:</p>
+              <div class="motivation-equation motivation-equation--field math-display" data-tex-display data-tex="v_{\mathrm{SF}}^\star(x,t)=-kx+q(t)\tanh\!\left(\frac{x\,m(t)e^{2kt}}{\sigma_0^2}\right),\qquad q(t)=\dot m(t)+km(t)">v⋆SF(x,t) = −kx + q(t)tanh(xm(t)e2kt/σ₀²)</div>
+
+              <div class="sf-evidence-grid">
+                <figure class="research-figure">
+                  <h4>Standard-SF characteristics</h4>
+                  <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sf-title bifurcation-sf-desc" data-bifurcation-plot="sf"></svg>
+                  <ul class="bifurcation-plot-key" aria-label="Standard Streaming Flow plot legend">
+                    <li><i class="bifurcation-plot-key__mean" aria-hidden="true"></i>dashed data paths</li>
+                    <li><i class="bifurcation-plot-key__particle" aria-hidden="true"></i>solid SF probes</li>
+                    <li><i class="bifurcation-plot-key__tube" aria-hidden="true"></i>shaded component <span class="math-inline" data-tex="1\sigma">1σ</span> tubes</li>
+                  </ul>
+                  <figcaption><strong>Posterior inset.</strong> At <span class="math-inline" data-tex="t=0.60">t = 0.60</span>, <span class="math-inline" data-tex="\mathbb E[B\mid X_t=x]">E[B | Xt = x]</span> is the probability of the positive branch minus the probability of the negative branch. Values near <span class="math-inline" data-tex="-1">−1</span> or <span class="math-inline" data-tex="+1">+1</span> identify a branch; <span class="math-inline" data-tex="0">0</span> means the two branches are equally likely.</figcaption>
+                </figure>
+
+                <figure class="research-figure">
+                  <h4>Required physical-state sensitivity</h4>
+                  <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sensitivity-title bifurcation-sensitivity-desc" data-bifurcation-plot="sensitivity"></svg>
+                  <div class="bifurcation-readout" aria-live="off">
+                    <span><span class="math-inline" data-tex="\sigma_0">σ₀</span> = <output for="sf-tube-width" data-bifurcation-sigma0-output>0.340</output></span>
+                    <i aria-hidden="true">→</i>
+                    <span><span class="math-inline" data-tex="\varepsilon_\tau">ετ</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.189</output></span>
+                    <i aria-hidden="true">→</i>
+                    <strong><span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> = <output data-bifurcation-sensitivity-output>29.51</output></strong>
                   </div>
-                  <input id="sf-tube-width" type="range" min="0.01" max="1" step="0.001" value="0.189" aria-describedby="sf-tube-help" data-bifurcation-epsilon>
-                  <div class="bifurcation-control__endpoints" aria-hidden="true">
-                    <span>0.01</span>
-                    <span>0.15</span>
-                    <span>0.40</span>
-                    <span>0.70</span>
-                    <span>1.00</span>
-                  </div>
-                  <p id="sf-tube-help">Here <span class="math-inline">P<sub>τ</sub><sup>SF</sup> = 𝒩(0, ε<sub>τ</sub><sup>2</sup>)</span> and <span class="math-inline">ε<sub>τ</sub> = σ<sub>τ</sub> = W<sub>2</sub>(P<sub>τ</sub><sup>SF</sup>, δ<sub>0</sub>)</span>. For <span class="math-inline">t &gt; τ</span>, the faint ribbons are the two component tubes around fixed means <span class="math-inline">±m(t)</span>, not the standard deviation of the full mixture. Slide left for better fidelity and higher sensitivity; slide right for a wider tube and lower physical-state sensitivity. The direct <span class="math-inline">0.01–1.00</span> control includes an extreme-fidelity extension below the paper panel’s visible range; its exact sensitivity is still computed and reported.</p>
+                  <figcaption><strong>Linked sensitivity.</strong> The blue marker reports standard SF at <span class="math-inline" data-tex="t^\star=0.72">t* = 0.72</span>; the dashed orange line is the ideal-latent sensitivity <span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{ideal}}=-k(t^\star-\tau)">log Jidealτ,t* = −k(t*−τ)</span>.</figcaption>
+                </figure>
+              </div>
+
+              <div class="bifurcation-control bifurcation-control--range bifurcation-control--shared">
+                <div class="bifurcation-control__label-row">
+                  <label for="sf-tube-width">Initial component-tube scale <span class="math-inline" data-tex="\sigma_0">σ₀</span></label>
+                  <strong><span class="math-inline" data-tex="\sigma_0">σ₀</span> = <output for="sf-tube-width" data-bifurcation-sigma0-output>0.340</output></strong>
                 </div>
-              </article>
+                <input id="sf-tube-width" type="range" min="0.27" max="1.8" step="0.01" value="0.34" aria-describedby="sf-tube-help" data-bifurcation-sigma0>
+                <div class="bifurcation-control__endpoints" aria-hidden="true">
+                  <span>0.27</span>
+                  <span>0.60</span>
+                  <span>1.00</span>
+                  <span>1.40</span>
+                  <span>1.80</span>
+                </div>
+                <div class="bifurcation-control__derived" aria-live="off">
+                  <span>Split-time fidelity error</span>
+                  <strong><span class="math-inline" data-tex="\varepsilon_\tau=W_2(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}})">ετ = W₂(PτSF, Pτdata)</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.189</output></strong>
+                </div>
+                <p id="sf-tube-help">The probes remain fixed at <span class="math-inline" data-tex="x_\tau=\pm0.01">xτ = ±0.01</span>. Decreasing <span class="math-inline" data-tex="\sigma_0">σ₀</span> narrows the displayed tubes and lowers <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span>, while the sensitivity rises.</p>
+              </div>
+            </section>
 
-              <section class="bifurcation-mechanism" aria-labelledby="bifurcation-mechanism-title">
-                <header class="bifurcation-mechanism__header">
-                  <div>
-                    <span>Standard-SF microscope</span>
-                    <h3 id="bifurcation-mechanism-title">Inspect how the flow stores branch identity</h3>
-                  </div>
-                  <p>The left view exposes the matched probe convention used by this interaction. The right view enlarges the same posterior branch mean shown inside the paper-style panel.</p>
-                </header>
+            <section class="motivation-block motivation-block--latent" aria-labelledby="latent-resolution-heading">
+              <header class="motivation-block__header">
+                <span aria-hidden="true">3</span>
+                <div>
+                  <p>Ideal construction to learned VSF</p>
+                  <h3 id="latent-resolution-heading">A rollout-level latent carries branch identity</h3>
+                </div>
+              </header>
 
-                <div class="bifurcation-mechanism__grid">
-                  <div class="bifurcation-mechanism__card">
-                    <div class="bifurcation-mechanism__title">
-                      <span>Magnified at <span class="math-inline">τ</span></span>
-                      <strong>Matched probe separation</strong>
+              <div class="latent-layout">
+                <div class="latent-copy">
+                  <p>Sample <span class="math-inline" data-tex="Z\sim\mathcal N(0,1)">Z ∼ N(0,1)</span> once and use its sign as a branch code <span class="math-inline" data-tex="b(Z)\in\{-1,+1\}">b(Z) ∈ {−1,+1}</span>. The ideal latent-conditioned field is</p>
+                  <div class="motivation-equation math-display" data-tex-display data-tex="v_{\mathrm{ideal}}(x,t,Z)=-kx+b(Z)q(t)">videal(x,t,Z) = −kx + b(Z)q(t)</div>
+                  <p>It realizes either future from the same state at the split and has</p>
+                  <div class="latent-result math-display" data-tex-display data-tex="W_2\!\left(P_\tau^{\mathrm{ideal}},P_\tau^{\mathrm{data}}\right)=0,\qquad J_{\tau,t}^{\mathrm{ideal}}=e^{-k(t-\tau)}">W₂(Pτideal, Pτdata) = 0, Jidealτ,t = e−k(t−τ)</div>
+                  <p class="academic-note">This construction shows that a latent variable can remove this specific fidelity–sensitivity bottleneck; it is motivation for VSF, not a guarantee that every learned latent model attains the ideal field.</p>
+                  <p class="vsf-bridge">VSF learns the latent-conditioned field <span class="math-inline" data-tex="v_\theta(\widehat{x}_s,s,h,z)">vθ(x̂s,s,h,z)</span> from data, infers <span class="math-inline" data-tex="z">z</span> from local motion during training, and samples it once per rollout at inference.</p>
+
+                  <fieldset class="bifurcation-control bifurcation-control--segments">
+                    <legend>Highlight a latent branch code</legend>
+                    <div class="bifurcation-segments">
+                      <input type="radio" name="latent-branch" id="latent-both" value="both" data-bifurcation-latent checked>
+                      <label for="latent-both">Both</label>
+                      <input type="radio" name="latent-branch" id="latent-negative" value="negative" data-bifurcation-latent>
+                      <label for="latent-negative"><span class="math-inline" data-tex="Z&lt;0">Z &lt; 0</span></label>
+                      <input type="radio" name="latent-branch" id="latent-positive" value="positive" data-bifurcation-latent>
+                      <label for="latent-positive"><span class="math-inline" data-tex="Z\ge0">Z ≥ 0</span></label>
                     </div>
-                    <svg class="bifurcation-mini-plot" viewBox="0 0 260 118" role="img" aria-labelledby="bifurcation-gap-title bifurcation-gap-desc" data-bifurcation-plot="gap"></svg>
-                    <p>The interaction uses <span class="math-inline">δ<sub>p</sub>/ε<sub>τ</sub> = 0.01/0.18885 ≈ 0.05295</span>, calibrated from the paper’s <span class="math-inline">ε<sub>τ</sub> = 0.18885</span> reference, and follows one fixed CDF rank as noise changes. Thus <span class="math-inline">2δ<sub>p</sub> = </span><output data-bifurcation-gap-output>0.0200</output>. This coupling is a visualization convention; the theorem’s perturbation <span class="math-inline">δ</span> is independent at fixed <span class="math-inline">ε<sub>τ</sub></span>.</p>
-                  </div>
-
-                  <div class="bifurcation-mechanism__card">
-                    <div class="bifurcation-mechanism__title">
-                      <span>Posterior mean at <span class="math-inline">t = 0.60 &gt; τ</span></span>
-                      <strong>Branch posterior sharpness</strong>
-                    </div>
-                    <svg class="bifurcation-mini-plot" viewBox="0 0 260 118" role="img" aria-labelledby="bifurcation-posterior-title bifurcation-posterior-desc" data-bifurcation-plot="posterior"></svg>
-                    <p><span class="math-inline">E[B | X<sub>t</sub> = x] = tanh(xm(t)/σ<sub>t</sub><sup>2</sup>)</span>. At <span class="math-inline">t = 0.60</span>, its transition scale is <span class="math-inline">ℓ = σ<sub>t</sub><sup>2</sup>/m(t) = </span><output data-bifurcation-transition-output>0.0375</output>. Exactly at <span class="math-inline">τ</span>, it is flat because <span class="math-inline">m(τ) = 0</span>.</p>
-                  </div>
+                  </fieldset>
                 </div>
-              </section>
 
-              <article class="bifurcation-panel bifurcation-panel--interactive">
-                <header class="bifurcation-panel__header">
-                  <span>3 · Ideal latent</span>
-                  <h3>Put the branch in <em>z</em></h3>
-                </header>
-                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-latent-title bifurcation-latent-desc" data-bifurcation-plot="latent"></svg>
-
-                <fieldset class="bifurcation-control bifurcation-control--segments">
-                  <legend>Highlight a latent code</legend>
-                  <div class="bifurcation-segments">
-                    <input type="radio" name="latent-branch" id="latent-both" value="both" data-bifurcation-latent checked>
-                    <label for="latent-both">Both</label>
-                    <input type="radio" name="latent-branch" id="latent-negative" value="negative" data-bifurcation-latent>
-                    <label for="latent-negative"><span class="math-inline">z &lt; 0</span></label>
-                    <input type="radio" name="latent-branch" id="latent-positive" value="positive" data-bifurcation-latent>
-                    <label for="latent-positive"><span class="math-inline">z ≥ 0</span></label>
-                  </div>
-                  <p>A velocity slider is not needed: the sign of <span class="math-inline">z</span> selects <span class="math-inline">b(z)</span>, and the ideal field determines the motion.</p>
-                </fieldset>
-              </article>
-
-              <article class="bifurcation-panel bifurcation-panel--sensitivity">
-                <header class="bifurcation-panel__header">
-                  <span>4 · Linked sensitivity</span>
-                  <h3>Sensitivity required by standard SF</h3>
-                </header>
-                <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sensitivity-title bifurcation-sensitivity-desc" data-bifurcation-plot="sensitivity"></svg>
-                <div class="bifurcation-readout">
-                  <span><span class="math-inline">ε<sub>τ</sub></span> = <output for="sf-tube-width" data-bifurcation-epsilon-output>0.189</output></span>
-                  <i aria-hidden="true">→</i>
-                  <strong>log <span class="math-inline">J<sup>SF</sup><sub>τ,t*</sub></span> = <output data-bifurcation-sensitivity-output>29.46</output></strong>
-                </div>
-                <p class="bifurcation-panel__copy">The blue marker follows the same slider along the appendix curve <span class="math-inline">−kΔt + C/ε<sub>τ</sub><sup>2</sup></span>; the dashed ideal-latent baseline stays at <span class="math-inline">−kΔt</span>. Both axes remain raw and linear. The paper-scale vertical window stays at <span class="math-inline">−2–50</span>; when log sensitivity exceeds 50, the marker pins to the ceiling while the readout reports its exact off-scale value. Across <span class="math-inline">ε<sub>τ</sub> = 0.01–1.00</span>, log sensitivity falls from <span class="math-inline">10,673.40</span> to <span class="math-inline">0.65</span>.</p>
-              </article>
-            </div>
-
-            <div class="bifurcation-equations" role="group" aria-label="Equations used by the interactive bifurcation model">
-              <div>
-                <span>Ground truth</span>
-                <strong>ξ<sub>B</sub>(t) = Bm(t)</strong>
+                <figure class="research-figure latent-figure">
+                  <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-latent-title bifurcation-latent-desc" data-bifurcation-plot="latent"></svg>
+                  <figcaption><strong>Ideal latent construction.</strong> Branch identity is supplied by <span class="math-inline" data-tex="Z">Z</span>, so the physical state need not retain a small branch-selecting offset.</figcaption>
+                </figure>
               </div>
-              <div>
-                <span>Population-optimal SF</span>
-                <strong>v*<sub>SF</sub> = −kx + q(t)tanh(xm/σ<sub>t</sub><sup>2</sup>)</strong>
-                <small>σ<sub>t</sub> = ε<sub>τ</sub>e<sup>−k(t−τ)</sup></small>
-              </div>
-              <div>
-                <span>Ideal latent field</span>
-                <strong>v<sup>ideal</sup> = −kx + q(t)b(z)</strong>
-                <small>b(z) = 2𝟙[z ≥ 0] − 1</small>
-              </div>
-              <div>
-                <span>Local sensitivity</span>
-                <strong>log J<sup>SF</sup> = −kΔt + C / ε<sub>τ</sub><sup>2</sup></strong>
-                <small>C = ½m(t*)<sup>2</sup>e<sup>2kΔt</sup></small>
-              </div>
-            </div>
+            </section>
 
-            <p class="bifurcation-demo__caption">Figure-matched linear bifurcation with <span class="math-inline">τ = 0.42</span>, <span class="math-inline">k = 1.4</span>, and <span class="math-inline">m(t) = 3.2(t − τ)<sub>+</sub></span>. As in the source figure, the posterior inset uses <span class="math-inline">t = 0.60</span> and sensitivity uses <span class="math-inline">t* = 0.72</span> (<span class="math-inline">Δt = 0.30</span>). The exact central state <span class="math-inline">x<sub>τ</sub> = 0</span> remains a separator for every finite <span class="math-inline">ε<sub>τ</sub></span>; the paired off-center probes and marginal law converge to the target as <span class="math-inline">ε<sub>τ</sub> ↓ 0</span>.</p>
             <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
-          </div>
-        </figure>
-
-        <div class="theory-note">
-          <span class="note-icon" aria-hidden="true">∴</span>
-          <div>
-            <strong>What the theory says.</strong>
-            <p>The analysis proves that an ideal latent construction can remove this particular fidelity–sensitivity bottleneck. It motivates VSF; it is not a blanket guarantee that every learned latent model eliminates rollout sensitivity.</p>
           </div>
         </div>
       </div>
@@ -317,19 +299,13 @@
     <section class="section" id="method">
       <div class="container">
         <div class="section-heading centered-heading narrow">
-          <p class="eyebrow">Method</p>
-          <h2>Sample once, then evolve in physical time.</h2>
-          <p>VSF augments the forecast dynamics with a latent <em>z</em>. One draw selects a coherent velocity field for the complete rollout.</p>
+          <p class="section-number">2 · Method</p>
+          <h2>Variational Streaming Flow</h2>
+          <p>VSF augments the forecast dynamics with a latent <span class="math-inline" data-tex="z">z</span>. One draw selects a coherent velocity field for the complete rollout.</p>
         </div>
 
-        <div class="equation-card" aria-label="Variational Streaming Flow dynamics equation">
-          <div class="equation-label">Latent-conditioned dynamics</div>
-          <div class="equation">
-            <span class="fraction"><span>d&nbsp;x̂<sub>s</sub></span><span>d&nbsp;s</span></span>
-            <span>=</span>
-            <span>v<sub>θ</sub>(x̂<sub>s</sub>, s, h, z)</span>
-            <span class="equation-condition">z ∼ 𝒩(0, I)</span>
-          </div>
+        <div class="method-equation" aria-label="Latent-conditioned dynamics">
+          <div class="equation math-display math-display--inverse" data-tex-display data-tex="\frac{\mathrm{d}\widehat{x}_s}{\mathrm{d}s}=v_\theta(\widehat{x}_s,s,h,z),\qquad z\sim\mathcal{N}(0,I)">d x̂s / ds = vθ(x̂s, s, h, z), z ∼ N(0, I)</div>
         </div>
 
         <div class="method-grid">
@@ -339,7 +315,7 @@
               <svg viewBox="0 0 48 48"><path d="M8 13h13M8 24h13M8 35h13"/><circle cx="32" cy="13" r="5"/><circle cx="36" cy="24" r="5"/><circle cx="30" cy="35" r="5"/><path d="m21 13 6 0M21 24h10M21 35h4"/></svg>
             </div>
             <h3>Infer dynamics during training</h3>
-            <p>An encoder observes local state, physical velocity, forecast time, and history to infer <span class="math-inline">q<sub>φ</sub>(z | u<sub>s</sub>, x<sub>s</sub>, s, h)</span>. Multiple posterior latents produce a set of candidate velocities.</p>
+            <p>An encoder observes local state, physical velocity, forecast time, and history to infer <span class="math-inline" data-tex="q_\phi(z\mid u_s,x_s,s,h)">qφ(z | us, xs, s, h)</span>. Multiple posterior latents produce a set of candidate velocities.</p>
             <div class="mini-flow" aria-label="Training flow">
               <span>local motion</span><i>→</i><span>posterior</span><i>→</i><span>M velocities</span>
             </div>
@@ -351,7 +327,7 @@
               <svg viewBox="0 0 48 48"><path d="M7 25h10"/><path d="M17 25c8 0 7-12 22-12M17 25c8 0 7 0 22 0M17 25c8 0 7 12 22 12"/><circle cx="7" cy="25" r="3"/><circle cx="40" cy="13" r="3"/><circle cx="40" cy="25" r="3"/><circle cx="40" cy="37" r="3"/></svg>
             </div>
             <h3>Keep one latent during inference</h3>
-            <p>Draw <span class="math-inline">z ∼ 𝒩(0, I)</span> once, hold it fixed, and advance the state directly in physical time. The rolling history changes with the generated trajectory; the latent remains the same.</p>
+            <p>Draw <span class="math-inline" data-tex="z\sim\mathcal{N}(0,I)">z ∼ N(0, I)</span> once, hold it fixed, and advance the state directly in physical time. The rolling history changes with the generated trajectory; the latent remains the same.</p>
             <div class="mini-flow" aria-label="Inference flow">
               <span>one latent</span><i>→</i><span>fixed field</span><i>→</i><span>full rollout</span>
             </div>
@@ -365,16 +341,7 @@
             <p>The generalized energy reconstruction balances two forces: match each predicted velocity to the observed velocity, while rewarding meaningful spread across latent-conditioned predictions. KL regularization aligns the inferred posterior with the prior used at test time.</p>
             <p class="objective-footnote">Under aggregate posterior–prior alignment, the population objective controls the energy distance between the prior-predictive and true conditional velocity distributions.</p>
           </div>
-          <div class="objective-equation" aria-label="Generalized energy reconstruction objective">
-            <span>ℒ<sub>ES</sub></span>
-            <b>=</b>
-            <div>
-              <span class="term term-fit">1/M&nbsp; ∑<sub>i</sub> ‖û<sub>i</sub> − u‖<sup>α</sup></span>
-              <span class="minus">−</span>
-              <span class="term term-spread">1/2M²&nbsp; ∑<sub>i,j</sub> ‖û<sub>i</sub> − û<sub>j</sub>‖<sup>α</sup></span>
-            </div>
-            <small>fit <span>+</span> diversity, &nbsp;0 &lt; α &lt; 2</small>
-          </div>
+          <div class="objective-equation math-display" data-tex-display data-tex="\mathcal{L}_{\mathrm{ES}}(s)=\frac{1}{M}\sum_{i=1}^{M}\left\lVert\widehat{\boldsymbol{u}}_s^{(i)}-\boldsymbol{u}_s\right\rVert_2^\alpha-\frac{1}{2M^2}\sum_{i,j=1}^{M}\left\lVert\widehat{\boldsymbol{u}}_s^{(i)}-\widehat{\boldsymbol{u}}_s^{(j)}\right\rVert_2^\alpha,\qquad 0&lt;\alpha&lt;2">LES(s) = (1/M) Σi ‖ûs(i) − us‖₂α − (1/2M²) Σi,j ‖ûs(i) − ûs(j)‖₂α, 0 &lt; α &lt; 2</div>
         </div>
       </div>
     </section>
@@ -383,8 +350,8 @@
       <div class="container">
         <div class="split-heading light-heading">
           <div class="section-heading">
-            <p class="eyebrow">Forecasting results</p>
-            <h2>Lower error, even after 1,000 steps.</h2>
+            <p class="section-number">3 · Forecasting results</p>
+            <h2>Long-horizon forecasting</h2>
           </div>
           <p>VSF is evaluated on fully observed deterministic double-pendulum, Rössler, and Lorenz systems, and on partially observed parameter-mixture Rössler and Lorenz systems.</p>
         </div>
@@ -430,9 +397,9 @@
                 <thead>
                   <tr>
                     <th scope="col">Model</th>
-                    <th scope="col">Rössler<br><small>W₁ ↓</small></th>
+                    <th scope="col">Rössler<br><small><span class="math-inline" data-tex="W_1\downarrow">W₁ ↓</span></small></th>
                     <th scope="col">Rössler<br><small>ED ↓</small></th>
-                    <th scope="col">Lorenz<br><small>W₁ ↓</small></th>
+                    <th scope="col">Lorenz<br><small><span class="math-inline" data-tex="W_1\downarrow">W₁ ↓</span></small></th>
                     <th scope="col">Lorenz<br><small>ED ↓</small></th>
                     <th scope="col">Runtime<br><small>seconds ↓</small></th>
                   </tr>
@@ -446,7 +413,7 @@
               </table>
             </div>
           </div>
-          <p class="table-note">Selected baselines and metrics are shown for readability. The paper reports eight baselines and the complete CRPS/RMSE/MAE and CME/CSE/W₁/ED evaluation.</p>
+          <p class="table-note">Selected baselines and metrics are shown for readability. The paper reports eight baselines and the complete CRPS/RMSE/MAE and CME/CSE/<span class="math-inline" data-tex="W_1">W₁</span>/ED evaluation.</p>
         </div>
 
         <div class="qualitative-grid">
@@ -460,7 +427,7 @@
           </figure>
         </div>
 
-        <p class="benchmark-note"><strong>Benchmark note.</strong> The “stochastic” systems are partially observed trajectory-level parameter mixtures: each rollout becomes deterministic once its hidden parameter is sampled. The forecasting task is stochastic from the model’s observed history. Over 2,500-step stochastic Lorenz forecasts, VSF is best on CME, CSE, and ED; block diffusion attains the lower W₁.</p>
+        <p class="benchmark-note"><strong>Benchmark note.</strong> The “stochastic” systems are partially observed trajectory-level parameter mixtures: each rollout becomes deterministic once its hidden parameter is sampled. The forecasting task is stochastic from the model’s observed history. Over 2,500-step stochastic Lorenz forecasts, VSF is best on CME, CSE, and ED; block diffusion attains the lower <span class="math-inline" data-tex="W_1">W₁</span>.</p>
       </div>
     </section>
 
@@ -468,8 +435,8 @@
       <div class="container">
         <div class="split-heading">
           <div class="section-heading">
-            <p class="eyebrow">World-model predictor</p>
-            <h2>Forecast better to plan better.</h2>
+            <p class="section-number">4 · World-model application</p>
+            <h2>Planning with VSF predictions</h2>
           </div>
           <p>VSF can replace the deterministic autoregressive predictor inside a frozen JEPA world model. For each candidate action sequence, it imagines latent trajectories in physical time; CEM selects the plan whose terminal state best matches the encoded goal.</p>
         </div>
@@ -507,28 +474,26 @@
     </section>
 
     <section class="section citation-section" id="citation">
-      <div class="container narrow">
-        <div class="section-heading centered-heading">
-          <p class="eyebrow">Citation</p>
-          <h2>Build on Variational Streaming Flow.</h2>
-          <p>If this work is useful in your research, please cite the manuscript.</p>
-        </div>
-
-        <div class="citation-card">
-          <div class="citation-toolbar">
-            <span>BibTeX</span>
-            <button type="button" data-copy-citation aria-label="Copy BibTeX citation">
+      <div class="container citation-container">
+        <header class="citation-heading">
+          <h2>BibTeX</h2>
+          <div class="citation-actions">
+            <button class="citation-copy" type="button" data-copy-citation aria-label="Copy BibTeX citation">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Copy</span>
+              <span>Copy citation</span>
             </button>
+            <a class="citation-top" href="#top" aria-label="Back to top">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 14 5-5 5 5"/></svg>
+            </a>
             <span class="sr-only" aria-live="polite" data-copy-status></span>
           </div>
-          <pre><code id="bibtex">@misc{hsu2026variational,
-  title  = {Variational Streaming Flow: Probabilistic Forecasting
-            in Physical Time},
-  author = {Hsu, Hans Hao-Hsun and Gwak, Minseon and Lim, Soon Hoe
-            and Li, Pan and Erichson, N. Benjamin},
-  year   = {2026}
+        </header>
+        <div class="citation-card">
+          <pre><code id="bibtex">@article{hsu2026variational,
+  title={Variational Streaming Flow: Probabilistic Forecasting in Physical Time},
+  author={Hsu, Hans Hao-Hsun and Gwak, Minseon and Lim, Soon Hoe and Li, Pan and Erichson, N Benjamin},
+  journal={arXiv preprint arXiv:2610.00976},
+  year={2026}
 }</code></pre>
         </div>
       </div>
@@ -553,7 +518,6 @@
       </div>
     </div>
     <div class="container footer-credit">
-      <span>Academic project-page structure inspired by <a href="https://one-step-lm.github.io/" target="_blank" rel="noopener">Flow Map Language Models</a>.</span>
       <span>© 2026 VSF authors</span>
     </div>
   </footer>
