@@ -74,33 +74,6 @@
     if (event.key === "Escape") closeNav(true);
   });
 
-  const tabs = [...document.querySelectorAll("[role='tab'][data-tab]")];
-
-  const activateTab = (tab, shouldFocus = false) => {
-    tabs.forEach((item) => {
-      const isActive = item === tab;
-      const pane = document.getElementById(item.dataset.tab);
-      item.setAttribute("aria-selected", String(isActive));
-      item.tabIndex = isActive ? 0 : -1;
-      if (pane) pane.hidden = !isActive;
-    });
-    if (shouldFocus) tab.focus();
-  };
-
-  tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => activateTab(tab));
-    tab.addEventListener("keydown", (event) => {
-      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-      event.preventDefault();
-      let nextIndex = index;
-      if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-      if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-      if (event.key === "Home") nextIndex = 0;
-      if (event.key === "End") nextIndex = tabs.length - 1;
-      activateTab(tabs[nextIndex], true);
-    });
-  });
-
   const bifurcationRoot = document.querySelector("[data-bifurcation-demo]");
 
   const initBifurcationDemo = (root) => {
@@ -144,17 +117,17 @@
       xMin: -2.9,
       xMax: 2.9,
     };
-    const branchFrame = { left: 47, right: 65, top: 18, bottom: 43, width: 360, height: 300 };
-    const sensitivityFrame = { left: 56, right: 16, top: 18, bottom: 45, width: 360, height: 300 };
+    const branchFrame = { left: 62, right: 30, top: 18, bottom: 50, width: 360, height: 300 };
+    const sensitivityFrame = { left: 72, right: 18, top: 18, bottom: 52, width: 360, height: 300 };
     const posteriorInset = {
-      x: 181,
+      x: 176,
       y: 22,
-      width: 112,
-      height: 74,
-      innerLeft: 195,
-      innerRight: 288,
-      innerTop: 45,
-      innerBottom: 88,
+      width: 140,
+      height: 78,
+      innerLeft: 202,
+      innerRight: 307,
+      innerTop: 32,
+      innerBottom: 91,
     };
     const latentInputs = [...root.querySelectorAll("[data-bifurcation-latent]")];
 
@@ -360,21 +333,6 @@
         class: "plot-branch--negative",
       });
       add(layer, "circle", { cx: x(0), cy: t(model.tau), r: 4, class: "plot-split" });
-      add(layer, "text", {
-        x: x(0) + 8, y: t(0.2), class: "plot-note",
-      }, "same physical past");
-      add(layer, "text", {
-        x: x(0) + 8, y: t(model.tau) + 15, class: "plot-note",
-      }, "future unresolved");
-      add(layer, "text", {
-        x: x(m(1.04)) + 8, y: t(1.04), class: "plot-note plot-note--positive",
-      }, "positive future");
-      add(layer, "text", {
-        x: x(-m(1.04)) - 8,
-        y: t(1.04),
-        class: "plot-note plot-note--negative",
-        "text-anchor": "end",
-      }, "negative future");
     };
 
     const sfProbeTrajectory = (sigma0, count = 128, substeps = 4) => {
@@ -418,12 +376,6 @@
         height: inset.height,
         class: "plot-inset-frame",
       });
-      add(insetLayer, "text", {
-        x: (inset.x + inset.width / 2),
-        y: inset.y + 14,
-        class: "plot-inset-title",
-        "text-anchor": "middle",
-      }, "posterior branch mean");
       add(insetLayer, "line", {
         x1: inset.innerLeft,
         y1: y(0),
@@ -525,43 +477,6 @@
         "data-series": "sf-characteristic-negative",
       });
 
-      const calloutOffset = Math.max(9, Math.abs(x(probe) - x(0)) + 5);
-      add(layer, "text", {
-        x: x(0) - calloutOffset,
-        y: t(model.tau) + 9,
-        class: "plot-paper-callout",
-        "text-anchor": "end",
-      }, "negative fixed probe  →");
-      add(layer, "text", {
-        x: x(0) + calloutOffset,
-        y: t(model.tau) + 9,
-        class: "plot-paper-callout",
-        "text-anchor": "start",
-      }, "←  positive fixed probe");
-      add(layer, "text", {
-        x: x(0),
-        y: t(0.68),
-        class: "plot-paper-annotation plot-paper-gap",
-        "text-anchor": "middle",
-      }, `fixed probe gap ${(2 * probe).toFixed(3)}`);
-      add(layer, "text", {
-        x: x(0),
-        y: t(0.97),
-        class: "plot-paper-annotation plot-paper-explanation",
-        "text-anchor": "middle",
-      }, "branch identity is stored in");
-      add(layer, "text", {
-        x: x(0),
-        y: t(1.035),
-        class: "plot-paper-annotation plot-paper-explanation",
-        "text-anchor": "middle",
-      }, "fixed physical-state differences");
-      add(layer, "text", {
-        x: x(m(0.88) + sigma(0.88, sigma0)) + 5,
-        y: t(0.88) - 5,
-        class: "plot-tube-label",
-      }, "one-standard-deviation tube");
-
       drawBranchPosteriorInset(layer, sigma0);
     };
 
@@ -588,23 +503,6 @@
         class: `plot-latent-branch plot-latent-branch--negative${negativeClass}`,
       });
       add(layer, "circle", { cx: x(0), cy: t(model.tau), r: 4, class: "plot-split" });
-      add(layer, "text", {
-        x: x(0) + 8, y: t(0.2), class: "plot-note",
-      }, "same split state");
-      add(layer, "text", {
-        x: x(m(0.73)) + 8,
-        y: t(0.73),
-        class: `plot-note plot-note--latent-positive${positiveClass}`,
-      }, "positive latent branch");
-      add(layer, "text", {
-        x: x(-m(0.73)) - 8,
-        y: t(0.73),
-        class: `plot-note plot-note--latent-negative${negativeClass}`,
-        "text-anchor": "end",
-      }, "negative latent branch");
-      add(layer, "text", {
-        x: x(0), y: t(model.tau) - 9, class: "plot-note", "text-anchor": "middle",
-      }, "Z selects the future");
     };
 
     const drawSensitivity = (sigma0) => {
@@ -708,12 +606,6 @@
         y2: y(idealLogSensitivity),
         class: "plot-ideal-baseline",
       });
-      add(svg, "text", {
-        x: right - 3,
-        y: y(idealLogSensitivity) - 5,
-        class: "plot-ideal-label",
-        "text-anchor": "end",
-      }, "ideal latent");
 
       const markerX = x(epsilon);
       const markerY = y(sensitivity);
@@ -728,11 +620,6 @@
         r: 4.5,
         class: "plot-marker",
       });
-      add(svg, "text", {
-        x: sensitivityFrame.left + 7,
-        y: 12,
-        class: "plot-sensitivity-range-label",
-      }, "complete slider range shown · linear axes");
     };
 
     const selectedLatent = () => latentInputs.find((input) => input.checked)?.value || "both";
@@ -800,6 +687,643 @@
     } catch (error) {
       console.error("The interactive bifurcation figure could not be initialized.", error);
     }
+  }
+
+  const energyRoot = document.querySelector("[data-energy-demo]");
+
+  const initEnergyDemo = (root) => {
+    const interactive = root.querySelector(".energy-interactive");
+    const alphaInput = root.querySelector("[data-energy-alpha]");
+    const alphaOutput = root.querySelector("[data-energy-alpha-output]");
+    const regimeOutput = root.querySelector("[data-energy-alpha-regime]");
+    const selectedPairOutput = root.querySelector("[data-energy-selected-pair]");
+    const relativeOutput = root.querySelector("[data-energy-relative-output]");
+    const status = root.querySelector("[data-energy-status]");
+    const boundPlot = root.querySelector("[data-energy-bound-plot]");
+    const lossPlot = root.querySelector("[data-energy-loss-plot]");
+    const predictionButtons = [...root.querySelectorAll("[data-energy-prediction]")];
+
+    if (!interactive || !alphaInput || !alphaOutput || !regimeOutput
+      || !selectedPairOutput || !relativeOutput
+      || !boundPlot || !lossPlot || !predictionButtons.length) return;
+
+    const NS = "http://www.w3.org/2000/svg";
+    const model = {
+      alphaMin: Number.parseFloat(alphaInput.min),
+      alphaMax: Number.parseFloat(alphaInput.max),
+      posteriorAccuracy: 0.85,
+      predictionLow: -0.7,
+      predictionHigh: 0.7,
+    };
+
+    const svgElement = (name, attributes = {}, text = "") => {
+      const element = document.createElementNS(NS, name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, String(value)));
+      if (text) element.textContent = text;
+      return element;
+    };
+
+    const add = (parent, name, attributes = {}, text = "") => {
+      const element = svgElement(name, attributes, text);
+      parent.appendChild(element);
+      return element;
+    };
+
+    const formatMetric = (value) => {
+      if (Math.abs(value) < 1e-12) return "0";
+      if (Math.abs(value) < 0.001) return value.toExponential(2).replace("e-", "e−");
+      return value.toFixed(3);
+    };
+
+    const formatSigned = (value) => `${value < 0 ? "−" : "+"}${Math.abs(value).toFixed(1)}`;
+
+    const generalizedEnergyReconstruction = (low, high, alpha) => 0.25 * (
+      Math.abs(low + 1) ** alpha
+      + Math.abs(low - 1) ** alpha
+      + Math.abs(high + 1) ** alpha
+      + Math.abs(high - 1) ** alpha
+    ) - 0.25 * Math.abs(high - low) ** alpha;
+
+    const relativeGeneralizedEnergyReconstruction = (low, high, alpha) => {
+      const value = generalizedEnergyReconstruction(low, high, alpha) - 2 ** (alpha - 2);
+      return Math.abs(value) < 1e-12 ? 0 : Math.max(0, value);
+    };
+
+    const halfEnergyDistance = (alpha) => relativeGeneralizedEnergyReconstruction(
+      model.predictionLow,
+      model.predictionHigh,
+      alpha,
+    );
+
+    const expectedGeneralizedEnergyReconstruction = (alpha) => {
+      const low = model.predictionLow;
+      const high = model.predictionHigh;
+      const accuracy = model.posteriorAccuracy;
+      const attraction = 0.5 * (
+        accuracy * Math.abs(low + 1) ** alpha
+        + (1 - accuracy) * Math.abs(high + 1) ** alpha
+        + accuracy * Math.abs(high - 1) ** alpha
+        + (1 - accuracy) * Math.abs(low - 1) ** alpha
+      );
+      return attraction
+        - accuracy * (1 - accuracy) * Math.abs(high - low) ** alpha;
+    };
+
+    const drawBound = (alpha, isFailure) => {
+      boundPlot.replaceChildren();
+      const distance = halfEnergyDistance(alpha);
+      const reconstruction = expectedGeneralizedEnergyReconstruction(alpha);
+      add(boundPlot, "title", { id: "energy-bound-title" }, "Prior-predictive energy-distance control in an aggregate-aligned two-branch example");
+      add(
+        boundPlot,
+        "desc",
+        { id: "energy-bound-desc" },
+        `True velocities are minus and plus one, while the selected prior-predictive velocities are ${model.predictionLow} and ${model.predictionHigh}. At alpha ${alpha.toFixed(3)}, half the prior-predictive energy distance is ${formatMetric(distance)} and the expected generalized energy reconstruction is ${formatMetric(reconstruction)}.`,
+      );
+
+      const x = (value) => 120 + ((value + 1.25) / 2.5) * 420;
+      const truthY = 70;
+      const predictionY = 132;
+      const zeroX = x(0);
+
+      add(boundPlot, "line", {
+        x1: zeroX, y1: 43, x2: zeroX, y2: 157, class: "energy-bound-guide",
+      });
+      add(boundPlot, "text", { x: 14, y: truthY + 5, class: "energy-plot-label" }, "truth");
+      add(boundPlot, "text", { x: 14, y: predictionY + 5, class: "energy-plot-label" }, "prediction");
+
+      const truthNegativeX = x(-1);
+      const truthPositiveX = x(1);
+      const predictionLowX = x(model.predictionLow);
+      const predictionHighX = x(model.predictionHigh);
+
+      add(boundPlot, "path", {
+        d: `M${truthNegativeX},${truthY} L${predictionLowX},${predictionY}`,
+        class: "energy-bound-link",
+      });
+      add(boundPlot, "path", {
+        d: `M${truthPositiveX},${truthY} L${predictionHighX},${predictionY}`,
+        class: "energy-bound-link",
+      });
+      add(boundPlot, "path", {
+        d: `M${truthNegativeX},${truthY} L${predictionHighX},${predictionY}`,
+        class: "energy-bound-link energy-bound-link--unlikely",
+      });
+      add(boundPlot, "path", {
+        d: `M${truthPositiveX},${truthY} L${predictionLowX},${predictionY}`,
+        class: "energy-bound-link energy-bound-link--unlikely",
+      });
+
+      const diamond = (centerX) => add(boundPlot, "path", {
+        d: `M${centerX},${truthY - 8} L${centerX + 8},${truthY} L${centerX},${truthY + 8} L${centerX - 8},${truthY} Z`,
+        class: "energy-bound-data",
+      });
+      diamond(truthNegativeX);
+      diamond(truthPositiveX);
+      add(boundPlot, "circle", {
+        cx: predictionLowX, cy: predictionY, r: 8, class: "energy-bound-prediction",
+      });
+      add(boundPlot, "circle", {
+        cx: predictionHighX, cy: predictionY, r: 8, class: "energy-bound-prediction",
+      });
+
+      add(boundPlot, "text", {
+        x: truthNegativeX, y: truthY - 14, class: "energy-plot-note", "text-anchor": "middle",
+      }, "−1");
+      add(boundPlot, "text", {
+        x: truthPositiveX, y: truthY - 14, class: "energy-plot-note", "text-anchor": "middle",
+      }, "+1");
+      add(boundPlot, "text", {
+        x: predictionLowX, y: predictionY + 21, class: "energy-plot-note", "text-anchor": "middle",
+      }, formatSigned(model.predictionLow));
+      add(boundPlot, "text", {
+        x: predictionHighX, y: predictionY + 21, class: "energy-plot-note", "text-anchor": "middle",
+      }, formatSigned(model.predictionHigh));
+
+      const meterX = 60;
+      const meterWidth = 480;
+      const meterMax = 0.72;
+      const distanceWidth = Math.min(meterWidth, (distance / meterMax) * meterWidth);
+      const scoreWidth = Math.min(meterWidth, (reconstruction / meterMax) * meterWidth);
+      add(boundPlot, "text", { x: meterX, y: 186, class: "energy-bound-value" }, isFailure
+        ? "½ energy distance (mean only)"
+        : "½ energy distance");
+      add(boundPlot, "text", {
+        x: 580, y: 186, class: "energy-bound-value", "text-anchor": "end",
+      }, formatMetric(distance));
+      add(boundPlot, "rect", {
+        x: meterX, y: 196, width: meterWidth, height: 14, rx: 2, class: "energy-bound-meter-track",
+      });
+      if (distanceWidth > 0) {
+        add(boundPlot, "rect", {
+          x: meterX, y: 196, width: distanceWidth, height: 14, rx: 2, class: "energy-bound-meter-distance",
+        });
+      }
+      add(boundPlot, "text", { x: meterX, y: 250, class: "energy-bound-value" }, "generalized energy reconstruction");
+      add(boundPlot, "text", {
+        x: 580, y: 250, class: "energy-bound-value", "text-anchor": "end",
+      }, formatMetric(reconstruction));
+      add(boundPlot, "rect", {
+        x: meterX, y: 260, width: meterWidth, height: 14, rx: 2, class: "energy-bound-meter-track",
+      });
+      add(boundPlot, "rect", {
+        x: meterX,
+        y: 260,
+        width: scoreWidth,
+        height: 14,
+        rx: 2,
+        class: "energy-bound-meter-bound",
+      });
+    };
+
+    const contourFrame = {
+      left: 70,
+      top: 30,
+      size: 280,
+      lowMin: -1.4,
+      lowMax: -0.3,
+      highMin: 0.3,
+      highMax: 1.4,
+    };
+    const contourLevels = [0, 0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.225, 0.325, 0.5];
+    const contourColors = [
+      "#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4",
+      "#1d91c0", "#225ea8", "#253494", "#081d58",
+    ];
+    const contourRgb = contourColors.map((color) => [
+      Number.parseInt(color.slice(1, 3), 16),
+      Number.parseInt(color.slice(3, 5), 16),
+      Number.parseInt(color.slice(5, 7), 16),
+    ]);
+    const contourX = (value) => contourFrame.left
+      + ((value - contourFrame.lowMin) / (contourFrame.lowMax - contourFrame.lowMin)) * contourFrame.size;
+    const contourY = (value) => contourFrame.top
+      + ((contourFrame.highMax - value) / (contourFrame.highMax - contourFrame.highMin)) * contourFrame.size;
+    const contourBand = (value) => {
+      const index = contourLevels.findIndex((level, levelIndex) => (
+        levelIndex < contourLevels.length - 1
+        && value >= level
+        && value < contourLevels[levelIndex + 1]
+      ));
+      return index < 0 ? contourColors.length - 1 : index;
+    };
+    const starPath = (centerX, centerY, outerRadius = 8, innerRadius = 3.5) => {
+      const points = [];
+      for (let index = 0; index < 10; index += 1) {
+        const radius = index % 2 ? innerRadius : outerRadius;
+        const angle = -Math.PI / 2 + (index * Math.PI) / 5;
+        points.push([
+          centerX + radius * Math.cos(angle),
+          centerY + radius * Math.sin(angle),
+        ]);
+      }
+      return `${points.map(([xValue, yValue], index) => (
+        `${index ? "L" : "M"}${xValue.toFixed(2)},${yValue.toFixed(2)}`
+      )).join(" ")} Z`;
+    };
+
+    let contourDescription = null;
+    let contourSelectionLayer = null;
+
+    const drawContourSelection = (alpha, isFailure) => {
+      if (!contourSelectionLayer) return;
+      contourSelectionLayer.replaceChildren();
+      const low = model.predictionLow;
+      const high = model.predictionHigh;
+      const selectedValue = relativeGeneralizedEnergyReconstruction(low, high, alpha);
+      const selectedX = contourX(low);
+      const selectedY = contourY(high);
+      const truthX = contourX(-1);
+      const truthY = contourY(1);
+
+      add(contourSelectionLayer, "line", {
+        x1: selectedX,
+        y1: selectedY,
+        x2: truthX,
+        y2: truthY,
+        class: "energy-contour-path",
+      });
+      add(contourSelectionLayer, "circle", {
+        cx: selectedX,
+        cy: selectedY,
+        r: 6.5,
+        class: "energy-contour-selected",
+      });
+      if (contourDescription) {
+        contourDescription.textContent = `At alpha ${alpha.toFixed(3)}, the contour color shows generalized energy reconstruction relative to the truth at minus one and plus one. The selected prediction is ${low} and ${high}, with relative reconstruction ${formatMetric(selectedValue)}.`;
+      }
+    };
+
+    const drawGeneralizedEnergyContour = (alpha, isFailure) => {
+      lossPlot.replaceChildren();
+      add(lossPlot, "title", { id: "energy-loss-title" }, "Generalized energy reconstruction over two predicted values");
+      contourDescription = add(lossPlot, "desc", { id: "energy-loss-desc" });
+
+      const canvas = document.createElement("canvas");
+      const resolution = 180;
+      canvas.width = resolution;
+      canvas.height = resolution;
+      const context = canvas.getContext("2d");
+      if (context) {
+        const imageData = context.createImageData(resolution, resolution);
+        for (let row = 0; row < resolution; row += 1) {
+          const high = contourFrame.highMax
+            - ((row + 0.5) / resolution) * (contourFrame.highMax - contourFrame.highMin);
+          for (let column = 0; column < resolution; column += 1) {
+            const low = contourFrame.lowMin
+              + ((column + 0.5) / resolution) * (contourFrame.lowMax - contourFrame.lowMin);
+            const value = relativeGeneralizedEnergyReconstruction(low, high, alpha);
+            const [red, green, blue] = contourRgb[contourBand(value)];
+            const offset = (row * resolution + column) * 4;
+            imageData.data[offset] = red;
+            imageData.data[offset + 1] = green;
+            imageData.data[offset + 2] = blue;
+            imageData.data[offset + 3] = 255;
+          }
+        }
+        context.putImageData(imageData, 0, 0);
+        add(lossPlot, "image", {
+          x: contourFrame.left,
+          y: contourFrame.top,
+          width: contourFrame.size,
+          height: contourFrame.size,
+          href: canvas.toDataURL("image/png"),
+          preserveAspectRatio: "none",
+          class: "energy-contour-image",
+        });
+      }
+
+      const contourSamples = 91;
+      const sampleValues = Array.from({ length: contourSamples }, (_, row) => {
+        const high = contourFrame.highMax
+          - (row / (contourSamples - 1)) * (contourFrame.highMax - contourFrame.highMin);
+        return Array.from({ length: contourSamples }, (_, column) => {
+          const low = contourFrame.lowMin
+            + (column / (contourSamples - 1)) * (contourFrame.lowMax - contourFrame.lowMin);
+          return relativeGeneralizedEnergyReconstruction(low, high, alpha);
+        });
+      });
+      const cases = {
+        1: [[3, 0]], 2: [[0, 1]], 3: [[3, 1]], 4: [[1, 2]],
+        5: [[0, 1], [2, 3]], 6: [[0, 2]], 7: [[2, 3]], 8: [[2, 3]],
+        9: [[0, 2]], 10: [[0, 3], [1, 2]], 11: [[1, 2]], 12: [[1, 3]],
+        13: [[0, 1]], 14: [[0, 3]],
+      };
+      const interpolateEdge = (edge, points, values, threshold) => {
+        const edgeCorners = [[0, 1], [1, 2], [2, 3], [3, 0]];
+        const [startIndex, endIndex] = edgeCorners[edge];
+        const startValue = values[startIndex];
+        const endValue = values[endIndex];
+        const denominator = endValue - startValue;
+        const amount = Math.abs(denominator) < 1e-12
+          ? 0.5
+          : Math.max(0, Math.min(1, (threshold - startValue) / denominator));
+        return [
+          points[startIndex][0] + amount * (points[endIndex][0] - points[startIndex][0]),
+          points[startIndex][1] + amount * (points[endIndex][1] - points[startIndex][1]),
+        ];
+      };
+      contourLevels.slice(1, -1).forEach((threshold) => {
+        const segments = [];
+        for (let row = 0; row < contourSamples - 1; row += 1) {
+          const y0 = contourFrame.top + (row / (contourSamples - 1)) * contourFrame.size;
+          const y1 = contourFrame.top + ((row + 1) / (contourSamples - 1)) * contourFrame.size;
+          for (let column = 0; column < contourSamples - 1; column += 1) {
+            const x0 = contourFrame.left + (column / (contourSamples - 1)) * contourFrame.size;
+            const x1 = contourFrame.left + ((column + 1) / (contourSamples - 1)) * contourFrame.size;
+            const values = [
+              sampleValues[row][column],
+              sampleValues[row][column + 1],
+              sampleValues[row + 1][column + 1],
+              sampleValues[row + 1][column],
+            ];
+            const points = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+            const caseIndex = values.reduce((mask, value, index) => (
+              mask | (value >= threshold ? 1 << index : 0)
+            ), 0);
+            (cases[caseIndex] || []).forEach(([startEdge, endEdge]) => {
+              const startPoint = interpolateEdge(startEdge, points, values, threshold);
+              const endPoint = interpolateEdge(endEdge, points, values, threshold);
+              segments.push(
+                `M${startPoint[0].toFixed(2)},${startPoint[1].toFixed(2)}`
+                + `L${endPoint[0].toFixed(2)},${endPoint[1].toFixed(2)}`,
+              );
+            });
+          }
+        }
+        if (segments.length) {
+          add(lossPlot, "path", {
+            d: segments.join(" "),
+            class: "energy-contour-line",
+          });
+        }
+      });
+
+      [-1.4, -1.2, -1, -0.8, -0.6, -0.4].forEach((tick) => {
+        add(lossPlot, "line", {
+          x1: contourX(tick),
+          y1: contourFrame.top,
+          x2: contourX(tick),
+          y2: contourFrame.top + contourFrame.size,
+          class: "energy-contour-grid",
+        });
+        add(lossPlot, "text", {
+          x: contourX(tick),
+          y: contourFrame.top + contourFrame.size + 17,
+          class: "energy-plot-tick",
+          "text-anchor": "middle",
+        }, tick.toFixed(1).replace("-", "−"));
+      });
+      [0.4, 0.6, 0.8, 1, 1.2, 1.4].forEach((tick) => {
+        add(lossPlot, "line", {
+          x1: contourFrame.left,
+          y1: contourY(tick),
+          x2: contourFrame.left + contourFrame.size,
+          y2: contourY(tick),
+          class: "energy-contour-grid",
+        });
+        add(lossPlot, "text", {
+          x: contourFrame.left - 8,
+          y: contourY(tick) + 3,
+          class: "energy-plot-tick",
+          "text-anchor": "end",
+        }, tick.toFixed(1));
+      });
+      add(lossPlot, "rect", {
+        x: contourFrame.left,
+        y: contourFrame.top,
+        width: contourFrame.size,
+        height: contourFrame.size,
+        class: "energy-contour-frame",
+      });
+      add(lossPlot, "text", {
+        x: contourFrame.left + contourFrame.size / 2,
+        y: 366,
+        class: "energy-plot-label",
+        "text-anchor": "middle",
+      }, "lower prediction û−");
+      add(lossPlot, "text", {
+        x: 18,
+        y: contourFrame.top + contourFrame.size / 2,
+        class: "energy-plot-label",
+        "text-anchor": "middle",
+        transform: `rotate(-90 18 ${contourFrame.top + contourFrame.size / 2})`,
+      }, "upper prediction û+");
+
+      if (isFailure) {
+        add(lossPlot, "line", {
+          x1: contourX(-1.4),
+          y1: contourY(1.4),
+          x2: contourX(-0.3),
+          y2: contourY(0.3),
+          class: "energy-contour-valley",
+        });
+      }
+
+      const truthX = contourX(-1);
+      const truthY = contourY(1);
+      add(lossPlot, "path", {
+        d: starPath(truthX, truthY),
+        class: "energy-contour-truth",
+      });
+      add(lossPlot, "text", {
+        x: truthX,
+        y: truthY - 12,
+        class: "energy-contour-truth-label",
+        "text-anchor": "middle",
+      }, "truth");
+
+      const colorbar = { x: 390, y: 94, width: 15, height: 142 };
+      const colorbarY = (value) => colorbar.y + colorbar.height * (1 - value / 0.5);
+      contourLevels.slice(0, -1).forEach((level, index) => {
+        const upper = contourLevels[index + 1];
+        add(lossPlot, "rect", {
+          x: colorbar.x,
+          y: colorbarY(upper),
+          width: colorbar.width,
+          height: colorbarY(level) - colorbarY(upper) + 0.5,
+          fill: contourColors[index],
+        });
+      });
+      add(lossPlot, "rect", {
+        x: colorbar.x,
+        y: colorbar.y,
+        width: colorbar.width,
+        height: colorbar.height,
+        class: "energy-contour-colorbar-frame",
+      });
+      [0, 0.1, 0.25, 0.5].forEach((tick) => {
+        add(lossPlot, "line", {
+          x1: colorbar.x + colorbar.width,
+          y1: colorbarY(tick),
+          x2: colorbar.x + colorbar.width + 4,
+          y2: colorbarY(tick),
+          class: "energy-contour-colorbar-tick",
+        });
+        add(lossPlot, "text", {
+          x: colorbar.x + colorbar.width + 8,
+          y: colorbarY(tick) + 3,
+          class: "energy-plot-tick",
+        }, tick === 0 ? "0" : tick.toFixed(2));
+      });
+      contourSelectionLayer = add(lossPlot, "g", { "data-energy-contour-selection": "" });
+      drawContourSelection(alpha, isFailure);
+    };
+
+    const regimeFor = (alpha, isFailure) => {
+      if (isFailure) return "At α = 2, the landscape depends only on the prediction mean; equal-mean predictions share a flat valley.";
+      if (alpha < 0.9995) return "For 0 < α < 2, the truth remains the unique minimum of the landscape.";
+      if (alpha < 1.0005) return "At α = 1, generalized energy reconstruction uses unsquared distances.";
+      if (alpha >= 1.95) return "Near 2, the basin flattens along predictions with nearly the correct mean.";
+      return "For 0 < α < 2, the truth remains the unique minimum of the landscape.";
+    };
+
+    const updateAlpha = (announce = false, redrawLandscape = true) => {
+      const alpha = Number.parseFloat(alphaInput.value);
+      const isFailure = Math.abs(alpha - 2) < 0.0005;
+      const regime = regimeFor(alpha, isFailure);
+      alphaOutput.textContent = alpha.toFixed(3);
+      regimeOutput.textContent = regime;
+      selectedPairOutput.textContent = `{${formatSigned(model.predictionLow)}, ${formatSigned(model.predictionHigh)}}`;
+      relativeOutput.textContent = formatMetric(relativeGeneralizedEnergyReconstruction(
+        model.predictionLow,
+        model.predictionHigh,
+        alpha,
+      ));
+      interactive.classList.toggle("is-alpha-failure", isFailure);
+      const progress = ((alpha - model.alphaMin) / (model.alphaMax - model.alphaMin)) * 100;
+      alphaInput.style.setProperty("--range-progress", `${progress.toFixed(2)}%`);
+      alphaInput.setAttribute(
+        "aria-valuetext",
+        isFailure
+          ? "alpha 2; generalized energy reconstruction depends only on the prediction mean"
+          : `alpha ${alpha.toFixed(3)}; ${regime}`,
+      );
+      drawBound(alpha, isFailure);
+      if (redrawLandscape) drawGeneralizedEnergyContour(alpha, isFailure);
+      else drawContourSelection(alpha, isFailure);
+      if (announce && status) {
+        const pair = `${formatSigned(model.predictionLow)} and ${formatSigned(model.predictionHigh)}`;
+        const relativeValue = relativeGeneralizedEnergyReconstruction(
+          model.predictionLow,
+          model.predictionHigh,
+          alpha,
+        );
+        status.textContent = isFailure
+          ? `Using prediction ${pair}. Alpha equals two; reconstruction relative to truth is ${formatMetric(relativeValue)}, and the landscape is mean-only.`
+          : `Using prediction ${pair}. Alpha ${alpha.toFixed(3)}. Reconstruction relative to truth is ${formatMetric(relativeValue)}. ${regime}`;
+      }
+    };
+
+    updateAlpha();
+    let alphaAnimationFrame = 0;
+    let alphaAnnouncementTimer = 0;
+    alphaInput.addEventListener("input", () => {
+      window.cancelAnimationFrame(alphaAnimationFrame);
+      alphaAnimationFrame = window.requestAnimationFrame(() => updateAlpha());
+    });
+    alphaInput.addEventListener("change", () => {
+      window.cancelAnimationFrame(alphaAnimationFrame);
+      updateAlpha();
+      window.clearTimeout(alphaAnnouncementTimer);
+      alphaAnnouncementTimer = window.setTimeout(() => updateAlpha(true), 450);
+    });
+    predictionButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        model.predictionLow = Number.parseFloat(button.dataset.low);
+        model.predictionHigh = Number.parseFloat(button.dataset.high);
+        predictionButtons.forEach((candidate) => {
+          candidate.setAttribute("aria-pressed", String(candidate === button));
+        });
+        updateAlpha(true, false);
+      });
+    });
+  };
+
+  if (energyRoot) {
+    try {
+      initEnergyDemo(energyRoot);
+    } catch (error) {
+      console.error("The interactive population energy figure could not be initialized.", error);
+    }
+  }
+
+  const deterministicGallery = document.querySelector("[data-deterministic-gallery]");
+
+  if (deterministicGallery) {
+    const datasetTabs = Array.from(deterministicGallery.querySelectorAll("[data-deterministic-dataset]"));
+    const datasetPanels = Array.from(deterministicGallery.querySelectorAll("[data-deterministic-panel]"));
+    const comparisonScroll = deterministicGallery.querySelector(".forecast-comparison-scroll");
+
+    const selectDeterministicDataset = (selectedTab, shouldFocus = false) => {
+      const selectedPanelId = selectedTab.getAttribute("aria-controls");
+
+      datasetTabs.forEach((tab) => {
+        const isSelected = tab === selectedTab;
+        tab.setAttribute("aria-selected", String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+      });
+
+      datasetPanels.forEach((panel) => {
+        panel.hidden = panel.id !== selectedPanelId;
+      });
+
+      if (comparisonScroll) comparisonScroll.scrollLeft = 0;
+      if (shouldFocus) selectedTab.focus();
+    };
+
+    datasetTabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectDeterministicDataset(tab));
+      tab.addEventListener("keydown", (event) => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+
+        let nextIndex = index;
+        if (event.key === "ArrowLeft") nextIndex = (index - 1 + datasetTabs.length) % datasetTabs.length;
+        if (event.key === "ArrowRight") nextIndex = (index + 1) % datasetTabs.length;
+        if (event.key === "Home") nextIndex = 0;
+        if (event.key === "End") nextIndex = datasetTabs.length - 1;
+        selectDeterministicDataset(datasetTabs[nextIndex], true);
+      });
+    });
+
+    const linkedPanelId = window.location.hash.slice(1);
+    const linkedTab = datasetTabs.find((tab) => tab.getAttribute("aria-controls") === linkedPanelId);
+    const initialTab = linkedTab || datasetTabs.find((tab) => tab.getAttribute("aria-selected") === "true") || datasetTabs[0];
+    if (initialTab) selectDeterministicDataset(initialTab);
+  }
+
+  const lorenzSampleGallery = document.querySelector("[data-lorenz-sample-gallery]");
+
+  if (lorenzSampleGallery) {
+    const methodDescriptions = {
+      gt: "Ground-truth",
+      vsf: "VSF",
+      "streaming-flow": "Standard Streaming Flow",
+      "block-diffusion": "Block diffusion",
+      "ar-diffusion": "Autoregressive diffusion",
+    };
+    const buttons = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-draw]"));
+    const panels = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-panel]"));
+    const status = lorenzSampleGallery.querySelector("[data-lorenz-sample-status]");
+
+    const showLorenzDraw = (button) => {
+      const draw = button.dataset.lorenzDraw;
+      const displayedIndex = buttons.indexOf(button) + 1;
+      buttons.forEach((candidate) => {
+        candidate.setAttribute("aria-pressed", String(candidate === button));
+      });
+      panels.forEach((panel) => {
+        const method = panel.dataset.lorenzPanel;
+        panel.src = `assets/figures/forecasting/stochastic/lorenz/sample-${draw}-${method}.png`;
+        panel.alt = `${methodDescriptions[method]} stochastic Lorenz trajectory for displayed draw ${displayedIndex}.`;
+      });
+      if (status) status.textContent = `Showing draw ${displayedIndex} of ${buttons.length}.`;
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => showLorenzDraw(button));
+    });
   }
 
   const copyButton = document.querySelector("[data-copy-citation]");

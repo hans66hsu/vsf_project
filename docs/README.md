@@ -7,10 +7,12 @@ This directory contains a dependency-free static project page for **Variational 
 From the repository root, run:
 
 ```bash
-python3 -m http.server 8090 --directory docs
+python3 serve_docs.py
 ```
 
-Then open <http://localhost:8090/>. There is no build step.
+Then open <http://localhost:8090/>. This development server disables caching, so a normal refresh always requests the current HTML, CSS, JavaScript, and figures. There is no build step.
+
+If a previous server is still using port `8090`, stop it with `Ctrl+C` before starting this one.
 
 ## Structure
 

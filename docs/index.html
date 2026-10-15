@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Variational Streaming Flow enables probabilistic forecasting directly in physical time with one latent variable per coherent rollout.">
+  <meta name="description" content="Variational Streaming Flow enables probabilistic forecasting with latent-conditioned dynamics directly in physical time.">
   <meta name="keywords" content="variational streaming flow, probabilistic forecasting, physical-time flow, dynamical systems, world models">
   <meta name="theme-color" content="#102a56">
   <meta property="og:title" content="Variational Streaming Flow">
@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=academic-layout-6">
+  <link rel="stylesheet" href="static/css/site.css?v=academic-structure-7">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=academic-layout-3" defer></script>
+  <script src="static/js/site.js?v=caption-error-1" defer></script>
 </head>
 
 <body>
@@ -47,10 +47,10 @@
       </button>
 
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
-        <a href="#overview">Overview</a>
+        <a href="#abstract">Abstract</a>
         <a href="#motivation">Motivation</a>
         <a href="#method">Method</a>
-        <a href="#results">Results</a>
+        <a href="#results">Forecasting</a>
         <a href="#world-model">World model</a>
         <a href="#citation">Citation</a>
       </nav>
@@ -97,42 +97,18 @@
 
         <figure class="hero-figure paper-figure">
           <img src="assets/figures/vsf-motivation.png" alt="Comparison of deterministic and partially observed stochastic dynamics, showing that Streaming Flow predicts a single future while Variational Streaming Flow predicts multiple plausible futures." width="2434" height="525" fetchpriority="high">
-          <figcaption><strong>Overview.</strong> Standard non-latent Streaming Flow yields one forecast from a fixed history. VSF uses a rollout-level latent to represent distinct, coherent futures.</figcaption>
+          <figcaption><strong>Overview.</strong> Standard Streaming Flow produces a single forecast from an observed history, whereas VSF represents a distribution over coherent futures.</figcaption>
         </figure>
       </div>
     </section>
 
-    <section class="section section-intro" id="overview">
+    <section class="section section-intro" id="abstract">
       <div class="container narrow">
-        <div class="tldr" role="note" aria-label="Key idea">
-          <div class="tldr-label">Key idea</div>
-          <p>VSF adds a variational, trajectory-level latent to a physical-time velocity field. It preserves the direct rollout efficiency of Streaming Flow while turning a single deterministic forecast into a learned distribution over long-horizon futures.</p>
-        </div>
-
         <div class="section-heading article-heading">
-          <p class="section-number">Abstract</p>
-          <h2>Variational Streaming Flow</h2>
+          <h2>Abstract</h2>
         </div>
         <div class="abstract-copy">
-          <p>Probabilistic forecasting is essential when intrinsic randomness or incomplete observations allow the same observed state to evolve into multiple plausible futures. Flow matching can model those distributions, but generation requires integration through an auxiliary flow time in addition to the system’s physical evolution.</p>
-          <p>Streaming Flow avoids that extra generative clock by learning a velocity field directly in physical time. In its standard non-latent form, however, a fixed initial state and history determine only one future. <strong>Variational Streaming Flow (VSF)</strong> conditions the physical-time velocity on a latent variable inferred from dynamics during training and sampled from a prior at inference.</p>
-          <p>Across deterministic and partially observed stochastic systems, VSF improves long-horizon predictive accuracy and distributional fidelity. As a plug-in predictor for a JEPA-based world model, it also improves goal-directed planning while retaining one velocity-field evaluation per imagined transition.</p>
-        </div>
-
-        <p class="results-kicker">Main results</p>
-        <div class="stats" aria-label="Headline results">
-          <div class="stat">
-            <strong>17 / 17</strong>
-            <span>lowest forecasting-error metrics across the reported 1,000-step deterministic and stochastic tasks</span>
-          </div>
-          <div class="stat">
-            <strong>up to 7×</strong>
-            <span>faster inference than autoregressive diffusion</span>
-          </div>
-          <div class="stat">
-            <strong>+7.34 pp</strong>
-            <span>average planning-success gain over the autoregressive world-model predictor</span>
-          </div>
+          <p>Streaming Flow models temporal evolution directly in physical time, but its standard non-latent formulation produces a single trajectory from a fixed observed history. We introduce <strong>Variational Streaming Flow (VSF)</strong>, which conditions the physical-time velocity field on a variational latent variable inferred from local dynamics during training and sampled from a prior at inference. VSF is trained with a generalized energy reconstruction for latent-conditioned velocities. Under aggregate posterior–prior alignment, its population counterpart controls the energy distance between the prior-predictive and true conditional velocity laws. Across deterministic and partially observed stochastic systems, VSF improves long-horizon forecasting and, as a JEPA world-model predictor, improves goal-directed planning.</p>
         </div>
       </div>
     </section>
@@ -141,8 +117,8 @@
       <div class="container article-container">
         <header class="section-heading article-heading motivation-heading">
           <p class="section-number">1 · Motivation</p>
-          <h2>Why standard Streaming Flow becomes sensitive</h2>
-          <p>A symmetric two-branch example isolates the difficulty: both futures occupy the same physical state until a split, yet a non-latent field must decide which branch to follow from the physical state alone.</p>
+          <h2>Why do we need a latent variable?</h2>
+          <p>A symmetric two-branch construction isolates a limitation of standard Streaming Flow. When two futures share the same physical state at the split time, branch selection must be represented through small physical-state differences. Proposition A.1 shows that improving split-time fidelity increases the sensitivity of the branch-separating flow.</p>
         </header>
 
         <div class="bifurcation-demo" data-bifurcation-demo>
@@ -154,16 +130,12 @@
           <div class="bifurcation-demo__interactive" data-bifurcation-interactive hidden>
             <section class="motivation-block motivation-block--ground" aria-labelledby="ground-truth-heading">
               <header class="motivation-block__header">
-                <span aria-hidden="true">1</span>
-                <div>
-                  <p>Ground truth and proposition</p>
-                  <h3 id="ground-truth-heading">One observed past, two possible futures</h3>
-                </div>
+                <h3 id="ground-truth-heading">Ground truth: one observed past, two possible futures</h3>
               </header>
 
               <div class="ground-truth-layout">
                 <div class="ground-truth-copy">
-                  <p>A branch label <span class="math-inline" data-tex="B\in\{-1,+1\}">B ∈ {−1,+1}</span> selects one of two trajectories that coincide through the bifurcation time <span class="math-inline" data-tex="\tau">τ</span>:</p>
+                  <p>Let <span class="math-inline" data-tex="B\in\{-1,+1\}">B ∈ {−1,+1}</span> index the two futures. Both trajectories remain at <span class="math-inline" data-tex="x=0">x = 0</span> through the bifurcation time <span class="math-inline" data-tex="\tau">τ</span>; for <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span>, <span class="math-inline" data-tex="B=-1">B = −1</span> and <span class="math-inline" data-tex="B=+1">B = +1</span> select the negative and positive branches:</p>
                   <div class="motivation-equation math-display" data-tex-display data-tex="\xi_B(t)=B\,m(t),\qquad m(t)=0\ \text{for}\ t\le\tau,\qquad m(t)&gt;0\ \text{for}\ t&gt;\tau">ξB(t) = Bm(t), with m(t) = 0 before τ and positive after τ</div>
 
                   <dl class="notation-list" aria-label="Bifurcation notation">
@@ -178,13 +150,13 @@
 
                 <figure class="research-figure ground-truth-figure">
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-truth-title bifurcation-truth-desc" data-bifurcation-plot="truth"></svg>
-                  <figcaption><strong>Ground truth.</strong> The branches share <span class="math-inline" data-tex="x=0">x = 0</span> through <span class="math-inline" data-tex="\tau">τ</span> and separate only afterward.</figcaption>
+                  <figcaption><strong>Ground truth.</strong> The shared history ends at the split point <span class="math-inline" data-tex="(x,t)=(0,\tau)">(x, t) = (0, τ)</span>.</figcaption>
                 </figure>
               </div>
 
-              <aside class="proposition" aria-labelledby="proposition-title">
-                <div class="proposition__label">Proposition B.1</div>
-                <h4 id="proposition-title">Fidelity–sensitivity tradeoff</h4>
+              <aside class="proposition proposition--fidelity" aria-labelledby="proposition-title">
+                <div class="proposition__label">Proposition A.1 · Paper result</div>
+                <h4 id="proposition-title">Fidelity–sensitivity tradeoff near a bifurcation</h4>
                 <p>Assume the population optimum of the standard-SF objective is attained. The split-time fidelity error is the 2-Wasserstein distance between the standard-SF and data marginals:</p>
                 <div class="proposition__equation math-display" data-tex-display data-tex="\varepsilon_\tau:=W_2\!\left(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}}\right)=\sigma_\tau=\sigma_0e^{-k\tau}">ετ := W₂(PτSF, Pτdata) = στ = σ₀e−kτ</div>
                 <p>For every fixed <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span> with <span class="math-inline" data-tex="m(t)&gt;0">m(t) &gt; 0</span>, let <span class="math-inline" data-tex="J_{\tau,t}^{\mathrm{SF}}">JSFτ,t</span> denote the derivative of the standard-SF flow map with respect to its split-time initial state, evaluated at <span class="math-inline" data-tex="x=0">x = 0</span>. Then</p>
@@ -195,26 +167,20 @@
 
             <section class="motivation-block" aria-labelledby="standard-sf-heading">
               <header class="motivation-block__header">
-                <span aria-hidden="true">2</span>
-                <div>
-                  <p>Standard Streaming Flow</p>
-                  <h3 id="standard-sf-heading">Fidelity and sensitivity are linked</h3>
-                </div>
+                <p>Interactive illustration of Proposition A.1</p>
+                <h3 id="standard-sf-heading">Standard SF: fidelity and sensitivity are linked</h3>
               </header>
 
               <p class="motivation-lead">The population-optimal marginal field must infer branch identity from <span class="math-inline" data-tex="x">x</span>:</p>
               <div class="motivation-equation motivation-equation--field math-display" data-tex-display data-tex="v_{\mathrm{SF}}^\star(x,t)=-kx+q(t)\tanh\!\left(\frac{x\,m(t)e^{2kt}}{\sigma_0^2}\right),\qquad q(t)=\dot m(t)+km(t)">v⋆SF(x,t) = −kx + q(t)tanh(xm(t)e2kt/σ₀²)</div>
+              <p class="motivation-lead motivation-lead--figure-guide">The left panel integrates two fixed probes from <span class="math-inline" data-tex="x_\tau=\pm0.01">xτ = ±0.01</span>. Dashed curves are the data trajectories, solid curves are the standard-SF characteristics, and the shaded regions are the component <span class="math-inline" data-tex="1\sigma_t">1σt</span> tubes. Its inset reports <span class="math-inline" data-tex="\mathbb E[B\mid X_t=x]">E[B | Xt = x]</span> at <span class="math-inline" data-tex="t=0.60">t = 0.60</span>: values near <span class="math-inline" data-tex="-1">−1</span> or <span class="math-inline" data-tex="+1">+1</span> identify a branch, while zero denotes equal posterior probabilities.</p>
+              <p class="motivation-lead motivation-lead--figure-guide">The right panel evaluates <span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> at <span class="math-inline" data-tex="t^\star=0.72">t* = 0.72</span> as <span class="math-inline" data-tex="\sigma_0">σ₀</span>, and hence <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span>, varies. The dashed horizontal line is the ideal-latent reference <span class="math-inline" data-tex="-k(t^\star-\tau)">−k(t* − τ)</span>.</p>
 
               <div class="sf-evidence-grid">
                 <figure class="research-figure">
                   <h4>Standard-SF characteristics</h4>
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sf-title bifurcation-sf-desc" data-bifurcation-plot="sf"></svg>
-                  <ul class="bifurcation-plot-key" aria-label="Standard Streaming Flow plot legend">
-                    <li><i class="bifurcation-plot-key__mean" aria-hidden="true"></i>dashed data paths</li>
-                    <li><i class="bifurcation-plot-key__particle" aria-hidden="true"></i>solid SF probes</li>
-                    <li><i class="bifurcation-plot-key__tube" aria-hidden="true"></i>shaded component <span class="math-inline" data-tex="1\sigma">1σ</span> tubes</li>
-                  </ul>
-                  <figcaption><strong>Posterior inset.</strong> At <span class="math-inline" data-tex="t=0.60">t = 0.60</span>, <span class="math-inline" data-tex="\mathbb E[B\mid X_t=x]">E[B | Xt = x]</span> is the probability of the positive branch minus the probability of the negative branch. Values near <span class="math-inline" data-tex="-1">−1</span> or <span class="math-inline" data-tex="+1">+1</span> identify a branch; <span class="math-inline" data-tex="0">0</span> means the two branches are equally likely.</figcaption>
+                  <figcaption><strong>Standard-SF characteristics.</strong> Fixed split-time probes under the population-optimal field.</figcaption>
                 </figure>
 
                 <figure class="research-figure">
@@ -227,7 +193,7 @@
                     <i aria-hidden="true">→</i>
                     <strong><span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> = <output data-bifurcation-sensitivity-output>29.51</output></strong>
                   </div>
-                  <figcaption><strong>Linked sensitivity.</strong> The blue marker reports standard SF at <span class="math-inline" data-tex="t^\star=0.72">t* = 0.72</span>; the dashed orange line is the ideal-latent sensitivity <span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{ideal}}=-k(t^\star-\tau)">log Jidealτ,t* = −k(t*−τ)</span>.</figcaption>
+                  <figcaption><strong>Fidelity–sensitivity curve.</strong> The marker shows the current slider value.</figcaption>
                 </figure>
               </div>
 
@@ -254,21 +220,17 @@
 
             <section class="motivation-block motivation-block--latent" aria-labelledby="latent-resolution-heading">
               <header class="motivation-block__header">
-                <span aria-hidden="true">3</span>
-                <div>
-                  <p>Ideal construction to learned VSF</p>
-                  <h3 id="latent-resolution-heading">A rollout-level latent carries branch identity</h3>
-                </div>
+                <h3 id="latent-resolution-heading">Latent conditioning resolves the toy bottleneck</h3>
               </header>
 
               <div class="latent-layout">
                 <div class="latent-copy">
-                  <p>Sample <span class="math-inline" data-tex="Z\sim\mathcal N(0,1)">Z ∼ N(0,1)</span> once and use its sign as a branch code <span class="math-inline" data-tex="b(Z)\in\{-1,+1\}">b(Z) ∈ {−1,+1}</span>. The ideal latent-conditioned field is</p>
+                  <p>Let <span class="math-inline" data-tex="Z\sim\mathcal N(0,1)">Z ∼ N(0,1)</span>, with <span class="math-inline" data-tex="b(Z)=-1">b(Z) = −1</span> for <span class="math-inline" data-tex="Z&lt;0">Z &lt; 0</span> and <span class="math-inline" data-tex="b(Z)=+1">b(Z) = +1</span> for <span class="math-inline" data-tex="Z\ge0">Z ≥ 0</span>. Both continuations start from the same split state <span class="math-inline" data-tex="x_\tau=0">xτ = 0</span>; the sign of <span class="math-inline" data-tex="Z">Z</span> selects the branch-conditioned velocity field:</p>
                   <div class="motivation-equation math-display" data-tex-display data-tex="v_{\mathrm{ideal}}(x,t,Z)=-kx+b(Z)q(t)">videal(x,t,Z) = −kx + b(Z)q(t)</div>
                   <p>It realizes either future from the same state at the split and has</p>
                   <div class="latent-result math-display" data-tex-display data-tex="W_2\!\left(P_\tau^{\mathrm{ideal}},P_\tau^{\mathrm{data}}\right)=0,\qquad J_{\tau,t}^{\mathrm{ideal}}=e^{-k(t-\tau)}">W₂(Pτideal, Pτdata) = 0, Jidealτ,t = e−k(t−τ)</div>
-                  <p class="academic-note">This construction shows that a latent variable can remove this specific fidelity–sensitivity bottleneck; it is motivation for VSF, not a guarantee that every learned latent model attains the ideal field.</p>
-                  <p class="vsf-bridge">VSF learns the latent-conditioned field <span class="math-inline" data-tex="v_\theta(\widehat{x}_s,s,h,z)">vθ(x̂s,s,h,z)</span> from data, infers <span class="math-inline" data-tex="z">z</span> from local motion during training, and samples it once per rollout at inference.</p>
+                  <p>This construction shows that a latent variable can remove this specific fidelity–sensitivity bottleneck. It motivates VSF, but does not imply that every learned latent model attains the ideal field.</p>
+                  <p class="vsf-bridge">VSF learns the latent-conditioned field <span class="math-inline" data-tex="v_\theta(\widehat{x}_s,s,h,z)">vθ(x̂s,s,h,z)</span> from data, infers <span class="math-inline" data-tex="z">z</span> from local motion during training, and samples from the prior at inference.</p>
 
                   <fieldset class="bifurcation-control bifurcation-control--segments">
                     <legend>Highlight a latent branch code</legend>
@@ -285,7 +247,7 @@
 
                 <figure class="research-figure latent-figure">
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-latent-title bifurcation-latent-desc" data-bifurcation-plot="latent"></svg>
-                  <figcaption><strong>Ideal latent construction.</strong> Branch identity is supplied by <span class="math-inline" data-tex="Z">Z</span>, so the physical state need not retain a small branch-selecting offset.</figcaption>
+                  <figcaption><strong>Ideal latent construction.</strong> Changing the sign of <span class="math-inline" data-tex="Z">Z</span> switches the continuation without introducing a split-time state offset.</figcaption>
                 </figure>
               </div>
             </section>
@@ -297,149 +259,421 @@
     </section>
 
     <section class="section" id="method">
-      <div class="container">
-        <div class="section-heading centered-heading narrow">
+      <div class="container article-container">
+        <header class="section-heading article-heading method-heading">
           <p class="section-number">2 · Method</p>
           <h2>Variational Streaming Flow</h2>
-          <p>VSF augments the forecast dynamics with a latent <span class="math-inline" data-tex="z">z</span>. One draw selects a coherent velocity field for the complete rollout.</p>
-        </div>
+          <p>At a sampled physical time <span class="math-inline" data-tex="s">s</span>, VSF models the conditional law of the observed local velocity <span class="math-inline" data-tex="u_s">us</span> given the context <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span>. The starting objective is to maximize its conditional likelihood.</p>
+        </header>
 
-        <div class="method-equation" aria-label="Latent-conditioned dynamics">
-          <div class="equation math-display math-display--inverse" data-tex-display data-tex="\frac{\mathrm{d}\widehat{x}_s}{\mathrm{d}s}=v_\theta(\widehat{x}_s,s,h,z),\qquad z\sim\mathcal{N}(0,I)">d x̂s / ds = vθ(x̂s, s, h, z), z ∼ N(0, I)</div>
-        </div>
+        <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
+          <header class="method-subheading">
+            <p class="subsection-number">2.1 · Variational starting point</p>
+            <h3 id="velocity-evidence-heading">Conditional velocity evidence</h3>
+          </header>
 
-        <div class="method-grid">
-          <article class="method-card training-card">
-            <div class="card-number">01</div>
-            <div class="card-icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48"><path d="M8 13h13M8 24h13M8 35h13"/><circle cx="32" cy="13" r="5"/><circle cx="36" cy="24" r="5"/><circle cx="30" cy="35" r="5"/><path d="m21 13 6 0M21 24h10M21 35h4"/></svg>
-            </div>
-            <h3>Infer dynamics during training</h3>
-            <p>An encoder observes local state, physical velocity, forecast time, and history to infer <span class="math-inline" data-tex="q_\phi(z\mid u_s,x_s,s,h)">qφ(z | us, xs, s, h)</span>. Multiple posterior latents produce a set of candidate velocities.</p>
-            <div class="mini-flow" aria-label="Training flow">
-              <span>local motion</span><i>→</i><span>posterior</span><i>→</i><span>M velocities</span>
-            </div>
-          </article>
+          <p>With latent prior <span class="math-inline" data-tex="p(z)=\mathcal N(0,I)">p(z) = N(0, I)</span>, the local likelihood integrates over latent-conditioned velocity models. The quantity to maximize is</p>
+          <div class="derivation-equation math-display" data-tex-display data-tex="\max_\theta\ \log p_\theta(u_s\mid c_s),\qquad p_\theta(u_s\mid c_s)=\int p_\theta(u_s\mid c_s,z)\,p(z)\,\mathrm dz">maximize log pθ(us | cs), where pθ(us | cs) = ∫ pθ(us | cs, z)p(z) dz</div>
 
-          <article class="method-card inference-card">
-            <div class="card-number">02</div>
-            <div class="card-icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48"><path d="M7 25h10"/><path d="M17 25c8 0 7-12 22-12M17 25c8 0 7 0 22 0M17 25c8 0 7 12 22 12"/><circle cx="7" cy="25" r="3"/><circle cx="40" cy="13" r="3"/><circle cx="40" cy="25" r="3"/><circle cx="40" cy="37" r="3"/></svg>
-            </div>
-            <h3>Keep one latent during inference</h3>
-            <p>Draw <span class="math-inline" data-tex="z\sim\mathcal{N}(0,I)">z ∼ N(0, I)</span> once, hold it fixed, and advance the state directly in physical time. The rolling history changes with the generated trajectory; the latent remains the same.</p>
-            <div class="mini-flow" aria-label="Inference flow">
-              <span>one latent</span><i>→</i><span>fixed field</span><i>→</i><span>full rollout</span>
-            </div>
-          </article>
-        </div>
-
-        <div class="objective-panel">
-          <div class="objective-copy">
-            <p class="eyebrow">Distributional objective</p>
-            <h3>Fit the observed motion without collapsing the ensemble.</h3>
-            <p>The generalized energy reconstruction balances two forces: match each predicted velocity to the observed velocity, while rewarding meaningful spread across latent-conditioned predictions. KL regularization aligns the inferred posterior with the prior used at test time.</p>
-            <p class="objective-footnote">Under aggregate posterior–prior alignment, the population objective controls the energy distance between the prior-predictive and true conditional velocity distributions.</p>
+          <div class="derivation-block">
+            <h4>Standard variational lower bound</h4>
+            <p>Direct marginalization over <span class="math-inline" data-tex="z">z</span> is generally intractable. During training, the encoder <span class="math-inline" data-tex="q_\phi(z\mid u_s,c_s)">qφ(z | us, cs)</span> uses the observed local motion and gives the standard bound</p>
+            <div class="derivation-equation derivation-equation--wide math-display" data-tex-display data-tex="\log p_\theta(u_s\mid c_s)\geq\mathbb E_{Z\sim q_\phi(\cdot\mid u_s,c_s)}\!\left[\log p_\theta(u_s\mid c_s,Z)\right]-\operatorname{KL}\!\left(q_\phi(z\mid u_s,c_s)\,\Vert\,p(z)\right)">log pθ(us | cs) ≥ Eqφ[log pθ(us | cs, Z)] − KL(qφ(z | us, cs) ‖ p(z))</div>
+            <p>The reconstruction term rewards latent-conditioned fields that explain the observed physical-time velocity; the KL term aligns the training posterior with the prior used at inference.</p>
           </div>
-          <div class="objective-equation math-display" data-tex-display data-tex="\mathcal{L}_{\mathrm{ES}}(s)=\frac{1}{M}\sum_{i=1}^{M}\left\lVert\widehat{\boldsymbol{u}}_s^{(i)}-\boldsymbol{u}_s\right\rVert_2^\alpha-\frac{1}{2M^2}\sum_{i,j=1}^{M}\left\lVert\widehat{\boldsymbol{u}}_s^{(i)}-\widehat{\boldsymbol{u}}_s^{(j)}\right\rVert_2^\alpha,\qquad 0&lt;\alpha&lt;2">LES(s) = (1/M) Σi ‖ûs(i) − us‖₂α − (1/2M²) Σi,j ‖ûs(i) − ûs(j)‖₂α, 0 &lt; α &lt; 2</div>
-        </div>
+
+          <div class="derivation-block">
+            <h4>Gaussian likelihood</h4>
+            <p>The conventional realization is an isotropic Gaussian centered at the predicted velocity:</p>
+            <div class="derivation-equation math-display" data-tex-display data-tex="p_\theta(u_s\mid c_s,z)=\mathcal N\!\left(u_s;v_\theta(x_s,s,h,z),\sigma_u^2I_d\right)">pθ(us | cs, z) = N(us; vθ(xs, s, h, z), σu²Id)</div>
+            <p>Its negative expected log-likelihood is, up to a constant, latent-conditioned MSE:</p>
+            <div class="derivation-equation derivation-equation--wide math-display" data-tex-display data-tex="-\mathbb E_q\log p_\theta(u_s\mid c_s,Z)=\frac{1}{2\sigma_u^2}\mathbb E_q\!\left[\left\lVert v_\theta(x_s,s,h,Z)-u_s\right\rVert_2^2\right]+\mathrm{const}">−Eq log pθ(us | cs, Z) = (1/2σu²)Eq[‖vθ(xs, s, h, Z) − us‖₂²] + const</div>
+          </div>
+        </section>
+
+        <section class="objective-panel" aria-labelledby="energy-objective-heading">
+          <header class="objective-copy">
+            <p class="subsection-number">2.2 · Distributional objective</p>
+            <h3 id="energy-objective-heading">Distributional velocity reconstruction</h3>
+            <p>MSE is appropriate when the latent fully separates the future dynamics. If different continuations remain compatible with the same context and latent value, however, its population solution averages the remaining velocity variation:</p>
+          </header>
+
+          <div class="conditional-mean-equation math-display" data-tex-display data-tex="v^\star(c,z)=\mathbb E[U\mid C=c,Z=z]">v*(c, z) = E[U | C = c, Z = z]</div>
+          <p class="objective-explanation">VSF therefore evaluates <span class="math-inline" data-tex="M">M</span> posterior-conditioned predictions of the same observed transition jointly and replaces the Gaussian/MSE reconstruction term with generalized energy reconstruction:</p>
+          <div class="objective-equation math-display" data-tex-display data-tex="\mathcal{L}_{\mathrm{ES}}(s)=\frac{1}{M}\sum_{i=1}^{M}\left\lVert\widehat{u}_s^{(i)}-u_s\right\rVert_2^\alpha-\frac{1}{2M^2}\sum_{i,j=1}^{M}\left\lVert\widehat{u}_s^{(i)}-\widehat{u}_s^{(j)}\right\rVert_2^\alpha,\qquad 0&lt;\alpha&lt;2">LES(s) = (1/M) Σi ‖ûs(i) − us‖₂α − (1/2M²) Σi,j ‖ûs(i) − ûs(j)‖₂α, 0 &lt; α &lt; 2</div>
+          <p class="objective-explanation">The first term matches predictions to the observed velocity; the pairwise term accounts for their spread. Together with prior regularization, the training objective is</p>
+          <div class="training-objective-equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{VSF}}=\mathbb E\!\left[\mathcal L_{\mathrm{ES}}(s)+\beta_{\mathrm{KL}}\operatorname{KL}\!\left(q_\phi(z\mid u_s,x_s,s,h)\,\Vert\,p(z)\right)\right]">LVSF = E[LES(s) + βKL KL(qφ(z | us, xs, s, h) ‖ p(z))]</div>
+          <p class="derivation-note">After replacing the Gaussian reconstruction with <span class="math-inline" data-tex="\mathcal L_{\mathrm{ES}}">LES</span>, this objective is no longer an ELBO. It is a KL-regularized distributional reconstruction under the same local latent model.</p>
+        </section>
+
+        <section class="energy-theory" aria-labelledby="energy-control-heading" data-energy-demo>
+          <aside class="proposition proposition--energy" aria-labelledby="energy-control-heading">
+            <div class="proposition__label">Proposition C.1 · Paper result</div>
+            <h4 id="energy-control-heading">Prior-predictive energy-distance control</h4>
+            <p>Fix <span class="math-inline" data-tex="c=(x_s,s,h)">c = (xs, s, h)</span>. Assume <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, the required <span class="math-inline" data-tex="\alpha">α</span>-power expectations are finite, and the aggregate posterior equals the inference prior, <span class="math-inline" data-tex="\overline q_\phi(\cdot\mid c)=p">q̄φ(· | c) = p</span>. Then</p>
+            <div class="proposition__equation math-display" data-tex-display data-tex="\frac12D_\alpha(\widetilde U,U)\leq\mathbb E_U\!\left[S_\alpha(U)\right]">½Dα(Ũ, U) ≤ EU[Sα(U)]</div>
+            <p>The expected generalized energy reconstruction upper-bounds one-half of the energy distance between the prior-predictive and true conditional velocity laws.</p>
+          </aside>
+
+          <div class="energy-interactive">
+            <header class="energy-interactive__header">
+              <p class="illustration-label">Interactive illustration of Proposition C.1</p>
+              <h4>Effect of <span class="math-inline" data-tex="\alpha">α</span> on generalized energy reconstruction</h4>
+              <p>Panel (a) evaluates the two terms in Proposition C.1. Panel (b) shows generalized energy reconstruction over the lower and upper support points of an equally weighted two-point prediction. The star marks the true support <span class="math-inline" data-tex="(-1,+1)">(−1, +1)</span>, the circular marker shows the selected pair, and lighter contours indicate smaller reconstruction. The endpoint <span class="math-inline" data-tex="\alpha=2">α = 2</span> lies outside the proposition and gives the mean-only failure case.</p>
+            </header>
+
+            <section class="alignment-example" aria-labelledby="alignment-example-heading">
+              <h5 id="alignment-example-heading">How the example satisfies aggregate alignment</h5>
+              <p><span class="math-inline" data-tex="U=-1">U = −1</span> and <span class="math-inline" data-tex="U=+1">U = +1</span> are equally likely. For either target, the encoder assigns probability <span class="math-inline" data-tex="0.85">0.85</span> to the matching latent branch and <span class="math-inline" data-tex="0.15">0.15</span> to the other. Hence</p>
+              <div class="alignment-example__calculation">
+                <div class="math-display math-display--compact" data-tex-display data-tex="\overline q_\phi(\cdot\mid c)=\tfrac12(0.85,0.15)+\tfrac12(0.15,0.85)=(0.50,0.50)=p">
+                  q̄φ(· | c) = ½(0.85, 0.15) + ½(0.15, 0.85) = (0.50, 0.50) = p
+                </div>
+                <p>Both displayed prediction pairs use these encoder weights; changing their decoded values does not change the equality.</p>
+              </div>
+            </section>
+
+            <div class="energy-alpha-control">
+              <div class="energy-alpha-control__label-row">
+                <label for="energy-alpha">Exponent in generalized energy reconstruction</label>
+                <strong><span class="math-inline" data-tex="\alpha">α</span> = <output for="energy-alpha" data-energy-alpha-output>1.000</output></strong>
+              </div>
+              <div class="energy-prediction-switch">
+                <span class="energy-prediction-switch__label">Prediction</span>
+                <div role="group" aria-label="Choose the prediction shown in both figures">
+                  <button type="button" data-energy-prediction data-low="-0.7" data-high="0.7" aria-label="Show prediction minus 0.7 and plus 0.7" aria-pressed="true"><span class="math-inline" data-tex="\{-0.7,\,+0.7\}">{−0.7, +0.7}</span></button>
+                  <button type="button" data-energy-prediction data-low="-0.5" data-high="0.9" aria-label="Show prediction minus 0.5 and plus 0.9" aria-pressed="false"><span class="math-inline" data-tex="\{-0.5,\,+0.9\}">{−0.5, +0.9}</span></button>
+                </div>
+              </div>
+              <input id="energy-alpha" type="range" min="0.250" max="2.000" step="0.001" value="1.000" aria-describedby="energy-alpha-help" data-energy-alpha>
+              <div class="energy-alpha-control__ticks" aria-hidden="true">
+                <span style="left: 0%">0.25</span>
+                <span style="left: 42.857%">1</span>
+                <span style="left: 71.429%">1.5</span>
+                <span class="energy-alpha-control__failure-tick" style="left: 100%">2 · mean-only</span>
+              </div>
+              <div class="energy-alpha-control__readout">
+                <strong data-energy-alpha-regime>At α = 1, generalized energy reconstruction uses unsquared distances.</strong>
+                <span>Selected pair <output data-energy-selected-pair>{−0.7, +0.7}</output>.</span>
+              </div>
+              <p id="energy-alpha-help">The experiments use <span class="math-inline" data-tex="\alpha=1.999">α = 1.999</span>, which remains inside <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>. From the endpoint, one Left Arrow selects 1.999.</p>
+              <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-energy-status></p>
+            </div>
+
+            <div class="energy-alpha-plots">
+              <figure class="energy-bound-figure">
+                <div class="energy-figure-heading">
+                  <h5>(a) Energy-distance control</h5>
+                </div>
+                <svg class="energy-bound-plot" viewBox="0 0 600 318" role="img" aria-labelledby="energy-bound-title energy-bound-desc" data-energy-bound-plot></svg>
+                <figcaption>Diamonds mark the true support and circles mark the selected prediction. Solid links have encoder probability <span class="math-inline" data-tex="0.85">0.85</span>; dashed cross-links have probability <span class="math-inline" data-tex="0.15">0.15</span>. The upper bar is one-half of the energy distance, and the lower bar is expected generalized energy reconstruction.</figcaption>
+              </figure>
+
+              <figure class="energy-alpha-figure">
+                <div class="energy-figure-heading">
+                  <h5>(b) Generalized energy reconstruction landscape</h5>
+                </div>
+                <svg class="energy-alpha-plot" viewBox="0 0 460 390" role="img" aria-labelledby="energy-loss-title energy-loss-desc" data-energy-loss-plot></svg>
+                <figcaption>The selected pair has excess generalized energy reconstruction <strong><output data-energy-relative-output>0.150</output></strong> over the true support (zero at the star). The axes are the lower and upper support points. For <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, <span class="math-inline" data-tex="(-1,+1)">(−1, +1)</span> is the unique minimum; at the excluded endpoint <span class="math-inline" data-tex="\alpha=2">α = 2</span>, predictions with the same mean lie in a flat valley.</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="method-procedure" aria-labelledby="training-inference-heading">
+          <header class="method-subheading">
+            <p class="subsection-number">2.3 · Optimization and rollout</p>
+            <h3 id="training-inference-heading">Training and inference</h3>
+            <p>The learned latent-conditioned field advances the forecast directly in physical time:</p>
+          </header>
+
+          <div class="method-equation" aria-label="Latent-conditioned physical-time dynamics">
+            <div class="equation math-display" data-tex-display data-tex="\frac{\mathrm d\widehat{x}_s}{\mathrm ds}=v_\theta(\widehat{x}_s,s,h,z)">d x̂s / ds = vθ(x̂s, s, h, z)</div>
+          </div>
+
+          <div class="method-grid" aria-label="VSF training and inference procedures">
+            <article class="method-card training-card">
+              <h3>Training</h3>
+              <div class="method-card__body">
+                <p>Construct a local state and physical velocity <span class="math-inline" data-tex="(x_s,u_s)">(xs, us)</span>.</p>
+                <div class="method-card__equation math-display" data-tex-display data-tex="z^{(1:M)}\overset{\mathrm{iid}}{\sim}q_\phi(\,\cdot\mid u_s,x_s,s,h)">z(1:M) iid∼ qφ(· | us, xs, s, h)</div>
+                <p>Evaluate the corresponding physical-time velocities.</p>
+                <div class="method-card__equation math-display" data-tex-display data-tex="\widehat{u}_s^{(1:M)}=v_\theta(x_s,s,h,z^{(1:M)})">ûs(1:M) = vθ(xs, s, h, z(1:M))</div>
+                <p>Optimize generalized energy reconstruction together with KL regularization toward <span class="math-inline" data-tex="p(z)">p(z)</span>.</p>
+              </div>
+            </article>
+
+            <article class="method-card inference-card">
+              <h3>Inference</h3>
+              <div class="method-card__body">
+                <p>Sample <span class="math-inline" data-tex="z\sim p(z)">z ∼ p(z)</span> and retain it throughout the forecast.</p>
+                <p>Advance the predicted state directly in physical time.</p>
+                <div class="method-card__equation math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta s\,v_\theta(\widehat{x}_k,s_k,h,z)">x̂k+1 = x̂k + Δs vθ(x̂k, sk, h, z)</div>
+                <p>Append generated states to the rolling history and refresh <span class="math-inline" data-tex="h">h</span> at each segment boundary.</p>
+              </div>
+            </article>
+          </div>
+        </section>
       </div>
     </section>
 
     <section class="section section-results" id="results">
-      <div class="container">
-        <div class="split-heading light-heading">
-          <div class="section-heading">
-            <p class="section-number">3 · Forecasting results</p>
-            <h2>Long-horizon forecasting</h2>
-          </div>
-          <p>VSF is evaluated on fully observed deterministic double-pendulum, Rössler, and Lorenz systems, and on partially observed parameter-mixture Rössler and Lorenz systems.</p>
-        </div>
+      <div class="container article-container">
+        <header class="section-heading article-heading results-heading results-heading--standalone">
+          <p class="section-number">3 · Results</p>
+          <h2>Dynamical-system forecasting</h2>
+          <p>We evaluate 1,000-step forecasts on fully observed deterministic systems and partially observed parameter-mixture systems.</p>
+        </header>
 
-        <figure class="paper-figure dark-figure result-figure">
-          <img src="assets/figures/rollout-errors.png" alt="Long-horizon error curves showing lower CRPS for VSF on deterministic double pendulum and lower energy distance on stochastic Rössler." width="1053" height="326" loading="lazy">
-          <figcaption>VSF accumulates less error than standard Streaming Flow and diffusion baselines over long rollouts.</figcaption>
-        </figure>
+        <section class="forecast-subsection" aria-labelledby="deterministic-forecasting-heading">
+          <header class="forecast-subsection__heading">
+            <p class="subsection-number">3.1</p>
+            <h3 id="deterministic-forecasting-heading">Deterministic forecasting</h3>
+            <p>All state variables are observed. We report pointwise forecast accuracy and compare complete long-horizon trajectories.</p>
+          </header>
 
-        <div class="results-panel">
-          <div class="tab-list" role="tablist" aria-label="Forecasting results tables">
-            <button type="button" role="tab" aria-selected="true" aria-controls="deterministic-table" id="deterministic-tab" data-tab="deterministic-table">Deterministic</button>
-            <button type="button" role="tab" aria-selected="false" aria-controls="stochastic-table" id="stochastic-tab" data-tab="stochastic-table" tabindex="-1">Stochastic</button>
-          </div>
+          <figure class="results-panel results-table-figure" aria-labelledby="deterministic-table-caption">
+            <figcaption class="results-table-caption" id="deterministic-table-caption"><strong>Table 2, deterministic systems.</strong> Forecasting error over a 1,000-step rollout. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
 
-          <div class="table-pane is-active" id="deterministic-table" role="tabpanel" aria-labelledby="deterministic-tab">
-            <div class="table-scroll">
-              <table>
-                <caption>Selected 1,000-step deterministic results. Lower is better; runtime is averaged across tasks.</caption>
+          <section class="forecast-table-block forecast-table-block--first" aria-labelledby="deterministic-results-heading">
+            <h4 id="deterministic-results-heading" class="sr-only">Complete deterministic results</h4>
+            <p class="table-scroll-hint">Scroll horizontally to view all metrics.</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Complete deterministic forecasting results">
+              <table class="forecast-table forecast-table--deterministic" aria-describedby="deterministic-table-caption">
+                <caption>Complete 1,000-step deterministic forecasting results.</caption>
+                <colgroup>
+                  <col class="model-column">
+                  <col span="3" class="system-column system-column--pendulum">
+                  <col span="3" class="system-column system-column--rossler">
+                  <col span="3" class="system-column system-column--lorenz">
+                  <col class="runtime-column">
+                </colgroup>
                 <thead>
+                  <tr class="system-header-row">
+                    <th scope="col" rowspan="2">Model</th>
+                    <th class="system-header system-header--pendulum" scope="colgroup" colspan="3">Double pendulum</th>
+                    <th class="system-header system-header--rossler" scope="colgroup" colspan="3">Rössler</th>
+                    <th class="system-header system-header--lorenz" scope="colgroup" colspan="3">Lorenz</th>
+                    <th scope="col" rowspan="2"><abbr title="runtime">RT</abbr></th>
+                  </tr>
                   <tr>
-                    <th scope="col">Model</th>
-                    <th scope="col">Double pendulum<br><small>CRPS ↓</small></th>
-                    <th scope="col">Rössler<br><small>CRPS ↓</small></th>
-                    <th scope="col">Lorenz<br><small>CRPS ↓</small></th>
-                    <th scope="col">Runtime<br><small>seconds ↓</small></th>
+                    <th scope="col">CRPS ↓</th><th scope="col">RMSE ↓</th><th scope="col">MAE ↓</th>
+                    <th scope="col">CRPS ↓</th><th scope="col">RMSE ↓</th><th scope="col">MAE ↓</th>
+                    <th scope="col">CRPS ↓</th><th scope="col">RMSE ↓</th><th scope="col">MAE ↓</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><th scope="row">Block diffusion</th><td>0.46</td><td>0.29</td><td>0.31</td><td>30.2</td></tr>
-                  <tr><th scope="row">AR diffusion</th><td>0.43</td><td>0.35</td><td>0.86</td><td>78.2</td></tr>
-                  <tr><th scope="row">Streaming Flow</th><td>2.12</td><td>0.16</td><td>1.42</td><td><strong class="secondary-best">6.4</strong></td></tr>
-                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>0.25</strong></td><td><strong>0.03</strong></td><td><strong>0.16</strong></td><td>7.2</td></tr>
+                  <tr><th scope="row">Block diffusion</th><td>0.46 ± 0.07</td><td>0.91 ± 0.14</td><td>0.47 ± 0.07</td><td>0.29 ± 0.13</td><td>0.54 ± 0.26</td><td>0.29 ± 0.13</td><td>0.31 ± 0.12</td><td>0.42 ± 0.18</td><td>0.33 ± 0.12</td><td>30.2</td></tr>
+                  <tr><th scope="row">AR diffusion</th><td>0.43 ± 0.00</td><td>0.96 ± 0.01</td><td>0.59 ± 0.01</td><td>0.35 ± 0.06</td><td>1.00 ± 0.13</td><td>0.53 ± 0.08</td><td>0.86 ± 0.04</td><td>1.96 ± 0.06</td><td>1.50 ± 0.06</td><td>78.2</td></tr>
+                  <tr><th scope="row">Rectified flow</th><td>0.53 ± 0.07</td><td>1.08 ± 0.11</td><td>0.67 ± 0.07</td><td>0.40 ± 0.07</td><td>0.85 ± 0.20</td><td>0.48 ± 0.08</td><td>1.46 ± 0.89</td><td>2.69 ± 1.46</td><td>1.94 ± 1.14</td><td>41.1</td></tr>
+                  <tr><th scope="row">DeepAR</th><td>0.58 ± 0.00</td><td>1.07 ± 0.00</td><td>0.68 ± 0.00</td><td>0.17 ± 0.04</td><td>0.54 ± 0.05</td><td>0.21 ± 0.05</td><td>10.30 ± 0.22</td><td>12.42 ± 0.13</td><td>10.88 ± 0.13</td><td>3.9</td></tr>
+                  <tr><th scope="row">SF</th><td>2.12 ± 0.87</td><td>9.18 ± 5.17</td><td>2.12 ± 0.87</td><td>0.16 ± 0.07</td><td>0.34 ± 0.18</td><td>0.16 ± 0.07</td><td>1.42 ± 0.14</td><td>2.75 ± 0.31</td><td>1.42 ± 0.14</td><td>6.4</td></tr>
+                  <tr><th scope="row">SF (perturb.)</th><td>1.83 ± 0.86</td><td>8.38 ± 5.18</td><td>1.96 ± 0.89</td><td>0.11 ± 0.05</td><td>0.34 ± 0.18</td><td>0.16 ± 0.07</td><td>1.39 ± 0.14</td><td>2.75 ± 0.31</td><td>1.42 ± 0.14</td><td>6.4</td></tr>
+                  <tr><th scope="row">Chronos-2</th><td>0.78 ± 0.00</td><td>1.50 ± 0.02</td><td>0.96 ± 0.01</td><td>1.98 ± 0.00</td><td>4.11 ± 0.02</td><td>2.62 ± 0.01</td><td>13.50 ± 0.06</td><td>28.19 ± 1.14</td><td>25.22 ± 0.85</td><td>0.8</td></tr>
+                  <tr><th scope="row">Chronos-2 (calib.)</th><td>0.62 ± 0.00</td><td>1.16 ± 0.00</td><td>0.74 ± 0.00</td><td>1.91 ± 0.00</td><td>3.91 ± 0.02</td><td>2.52 ± 0.01</td><td>2.39 ± 0.02</td><td>6.01 ± 0.27</td><td>4.54 ± 0.27</td><td>0.4</td></tr>
+                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>0.25 ± 0.07</strong></td><td><strong>0.71 ± 0.11</strong></td><td><strong>0.33 ± 0.08</strong></td><td><strong>0.03 ± 0.00</strong></td><td><strong>0.13 ± 0.01</strong></td><td><strong>0.05 ± 0.00</strong></td><td><strong>0.16 ± 0.02</strong></td><td><strong>0.25 ± 0.02</strong></td><td><strong>0.19 ± 0.01</strong></td><td>7.2</td></tr>
                 </tbody>
               </table>
             </div>
-          </div>
+          </section>
 
-          <div class="table-pane" id="stochastic-table" role="tabpanel" aria-labelledby="stochastic-tab" hidden>
-            <div class="table-scroll">
-              <table>
-                <caption>Selected 1,000-step partially observed stochastic results. Lower is better; runtime is averaged across tasks.</caption>
+            <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
+          </figure>
+
+          <figure class="paper-figure forecast-error-figure">
+            <img src="assets/figures/forecasting/errors/deterministic-rollout-errors.png" alt="CRPS, RMSE, and MAE across 1,000 forecast steps for deterministic double-pendulum, Rössler, and Lorenz systems." width="990" height="783" loading="lazy">
+            <figcaption><strong>Long-horizon error.</strong> VSF maintains the lowest error across the three deterministic systems.</figcaption>
+          </figure>
+
+          <figure class="forecast-gallery forecast-gallery--deterministic" data-deterministic-gallery>
+            <div class="forecast-gallery__header">
+              <div>
+                <p class="figure-kicker">Qualitative comparison</p>
+                <h4>Deterministic systems</h4>
+              </div>
+              <div class="dataset-jump-list" role="tablist" aria-label="Select a deterministic dataset">
+                <button class="dataset-jump dataset-jump--pendulum-one" id="deterministic-pendulum-one-tab" type="button" role="tab" aria-selected="true" aria-controls="deterministic-pendulum-one" data-deterministic-dataset>Double pendulum 1</button>
+                <button class="dataset-jump dataset-jump--pendulum-two" id="deterministic-pendulum-two-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-pendulum-two" tabindex="-1" data-deterministic-dataset>Double pendulum 2</button>
+                <button class="dataset-jump dataset-jump--rossler" id="deterministic-rossler-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-rossler" tabindex="-1" data-deterministic-dataset>Rössler</button>
+                <button class="dataset-jump dataset-jump--lorenz" id="deterministic-lorenz-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-lorenz" tabindex="-1" data-deterministic-dataset>Lorenz</button>
+              </div>
+            </div>
+
+            <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Selected deterministic trajectory comparison">
+              <div class="deterministic-comparison-matrix">
+                <div class="forecast-method-header" aria-hidden="true">
+                  <span>Ground truth</span>
+                  <span>VSF samples</span>
+                  <span>VSF ensemble mean</span>
+                  <span>Standard SF</span>
+                  <span>Block diffusion</span>
+                </div>
+
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel>
+                  <h5 id="deterministic-pendulum-one-label">Double pendulum 1</h5>
+                  <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png" alt="Ground-truth trajectory for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-samples.png" alt="Ten VSF forecast samples for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/sf.png" alt="Standard Streaming Flow forecast for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/block-diffusion.png" alt="Block diffusion forecast for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                  </div>
+                </section>
+
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel hidden>
+                  <h5 id="deterministic-pendulum-two-label">Double pendulum 2 <span>chaotic</span></h5>
+                  <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png" alt="Ground-truth trajectory for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.png" alt="Ten VSF forecast samples for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/sf.png" alt="Standard Streaming Flow forecast for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/block-diffusion.png" alt="Block diffusion forecast for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                  </div>
+                </section>
+
+                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel hidden>
+                  <h5 id="deterministic-rossler-label">Rössler</h5>
+                  <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png" alt="Ground-truth deterministic Rössler trajectory." width="428" height="378" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-samples.png" alt="Ten VSF forecast samples for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/sf.png" alt="Standard Streaming Flow forecast for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/block-diffusion.png" alt="Block diffusion forecast for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
+                  </div>
+                </section>
+
+                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel hidden>
+                  <h5 id="deterministic-lorenz-label">Lorenz</h5>
+                  <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png" alt="Ground-truth deterministic Lorenz trajectory." width="428" height="374" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-samples.png" alt="Ten VSF forecast samples for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/sf.png" alt="Standard Streaming Flow forecast for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/block-diffusion.png" alt="Block diffusion forecast for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
+                  </div>
+                </section>
+              </div>
+            </div>
+            <figcaption>Select a system above. Sample panels contain <span class="math-inline" data-tex="N=10">N = 10</span> trajectories; the VSF ensemble column shows their predictive mean.</figcaption>
+          </figure>
+        </section>
+
+        <section class="forecast-subsection" aria-labelledby="stochastic-forecasting-heading">
+          <header class="forecast-subsection__heading">
+            <p class="subsection-number">3.2</p>
+            <h3 id="stochastic-forecasting-heading">Stochastic forecasting</h3>
+            <p>Rössler and Lorenz are partially observed parameter-mixture systems. We evaluate the conditional distribution of complete future trajectories.</p>
+          </header>
+
+          <figure class="results-panel results-table-figure" aria-labelledby="stochastic-table-caption">
+            <figcaption class="results-table-caption" id="stochastic-table-caption"><strong>Table 2, stochastic systems.</strong> Distributional forecasting error over a 1,000-step rollout. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
+
+          <section class="forecast-table-block forecast-table-block--first" aria-labelledby="stochastic-results-heading">
+            <h4 id="stochastic-results-heading" class="sr-only">Complete stochastic results</h4>
+            <p class="table-scroll-hint">Scroll horizontally to view all metrics.</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="Complete stochastic forecasting results">
+              <table class="forecast-table forecast-table--stochastic" aria-describedby="stochastic-table-caption">
+                <caption>Complete 1,000-step partially observed stochastic forecasting results.</caption>
+                <colgroup>
+                  <col class="model-column">
+                  <col span="4" class="system-column system-column--rossler">
+                  <col span="4" class="system-column system-column--lorenz">
+                  <col class="runtime-column">
+                </colgroup>
                 <thead>
+                  <tr class="system-header-row">
+                    <th scope="col" rowspan="2">Model</th>
+                    <th class="system-header system-header--rossler" scope="colgroup" colspan="4">Rössler</th>
+                    <th class="system-header system-header--lorenz" scope="colgroup" colspan="4">Lorenz</th>
+                    <th scope="col" rowspan="2"><abbr title="runtime">RT</abbr></th>
+                  </tr>
                   <tr>
-                    <th scope="col">Model</th>
-                    <th scope="col">Rössler<br><small><span class="math-inline" data-tex="W_1\downarrow">W₁ ↓</span></small></th>
-                    <th scope="col">Rössler<br><small>ED ↓</small></th>
-                    <th scope="col">Lorenz<br><small><span class="math-inline" data-tex="W_1\downarrow">W₁ ↓</span></small></th>
-                    <th scope="col">Lorenz<br><small>ED ↓</small></th>
-                    <th scope="col">Runtime<br><small>seconds ↓</small></th>
+                    <th scope="col">CME ↓</th><th scope="col">CSE ↓</th><th scope="col">W<sub>1</sub> ↓</th><th scope="col">ED ↓</th>
+                    <th scope="col">CME ↓</th><th scope="col">CSE ↓</th><th scope="col">W<sub>1</sub> ↓</th><th scope="col">ED ↓</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><th scope="row">Block diffusion</th><td>8.88</td><td>12.67</td><td>19.88</td><td>13.73</td><td>21.8</td></tr>
-                  <tr><th scope="row">AR diffusion</th><td>16.21</td><td>11.46</td><td>25.64</td><td>5.60</td><td>42.4</td></tr>
-                  <tr><th scope="row">Streaming Flow</th><td>4.53</td><td>5.00</td><td>58.12</td><td>89.84</td><td>7.5</td></tr>
-                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>2.62</strong></td><td><strong>1.28</strong></td><td><strong>15.95</strong></td><td><strong>5.19</strong></td><td><strong>6.7</strong></td></tr>
+                  <tr><th scope="row">Block diffusion</th><td>0.16 ± 0.02</td><td>0.72 ± 0.08</td><td>8.88 ± 1.05</td><td>12.67 ± 1.71</td><td>0.20 ± 0.01</td><td>0.93 ± 0.01</td><td>19.88 ± 0.28</td><td>13.73 ± 0.45</td><td>21.8</td></tr>
+                  <tr><th scope="row">AR diffusion</th><td>0.20 ± 0.03</td><td>4.63 ± 0.40</td><td>16.21 ± 1.12</td><td>11.46 ± 2.06</td><td>0.22 ± 0.05</td><td>0.95 ± 0.14</td><td>25.64 ± 3.10</td><td>5.60 ± 1.54</td><td>42.4</td></tr>
+                  <tr><th scope="row">Rectified flow</th><td>0.22 ± 0.09</td><td>0.89 ± 0.30</td><td>12.60 ± 4.44</td><td>16.72 ± 8.72</td><td>0.26 ± 0.03</td><td>0.60 ± 0.12</td><td>19.74 ± 1.63</td><td>13.24 ± 2.69</td><td>19.4</td></tr>
+                  <tr><th scope="row">DeepAR</th><td>0.20 ± 0.02</td><td>0.61 ± 0.02</td><td>11.81 ± 0.80</td><td>15.62 ± 1.57</td><td>2.14 ± 0.49</td><td>2.61 ± 0.27</td><td>131.84 ± 15.99</td><td>138.30 ± 45.71</td><td>1.2</td></tr>
+                  <tr><th scope="row">SF</th><td>0.06 ± 0.02</td><td>1.00 ± 0.00</td><td>4.53 ± 0.67</td><td>5.00 ± 1.34</td><td>1.04 ± 0.56</td><td>1.00 ± 0.00</td><td>58.12 ± 24.23</td><td>89.84 ± 48.45</td><td>7.5</td></tr>
+                  <tr><th scope="row">SF (perturb.)</th><td>0.06 ± 0.02</td><td>1.12 ± 0.23</td><td>4.92 ± 0.84</td><td>2.28 ± 0.82</td><td>0.68 ± 0.33</td><td>1.33 ± 0.75</td><td>53.62 ± 25.69</td><td>35.78 ± 19.55</td><td>6.6</td></tr>
+                  <tr><th scope="row">Chronos-2</th><td>1.28 ± 0.06</td><td>47.87 ± 1.63</td><td>90.54 ± 3.86</td><td>94.84 ± 0.79</td><td>6.84 ± 0.17</td><td>37.49 ± 1.66</td><td>411.32 ± 9.43</td><td>342.98 ± 1.87</td><td>0.3</td></tr>
+                  <tr><th scope="row">Chronos-2 (calib.)</th><td>1.20 ± 0.06</td><td>61.83 ± 2.09</td><td>101.69 ± 4.61</td><td>93.23 ± 0.20</td><td>1.44 ± 0.06</td><td>10.53 ± 0.49</td><td>111.81 ± 3.11</td><td>64.97 ± 0.79</td><td>0.1</td></tr>
+                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>0.04 ± 0.01</strong></td><td><strong>0.36 ± 0.14</strong></td><td><strong>2.62 ± 0.38</strong></td><td><strong>1.28 ± 0.42</strong></td><td><strong>0.19 ± 0.03</strong></td><td><strong>0.50 ± 0.21</strong></td><td><strong>15.95 ± 5.64</strong></td><td><strong>5.19 ± 0.93</strong></td><td>6.7</td></tr>
                 </tbody>
               </table>
             </div>
-          </div>
-          <p class="table-note">Selected baselines and metrics are shown for readability. The paper reports eight baselines and the complete CRPS/RMSE/MAE and CME/CSE/<span class="math-inline" data-tex="W_1">W₁</span>/ED evaluation.</p>
-        </div>
+          </section>
 
-        <div class="qualitative-grid">
-          <figure class="paper-figure dark-figure">
-            <img src="assets/figures/stochastic-rossler.png" alt="Ground truth and forecast ensembles for stochastic Rössler, comparing VSF with Streaming Flow, block diffusion, and autoregressive diffusion." width="948" height="197" loading="lazy">
-            <figcaption><strong>Distributional fidelity.</strong> VSF preserves the Rössler geometry while capturing variability across plausible futures.</figcaption>
+            <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
-          <figure class="paper-figure dark-figure">
-            <img src="assets/figures/double-pendulum.png" alt="Ground truth and sampled forecasts for the chaotic double pendulum, comparing VSF with Streaming Flow, block diffusion, and autoregressive diffusion." width="932" height="184" loading="lazy">
-            <figcaption><strong>Long-horizon concentration.</strong> VSF samples remain concentrated around the double-pendulum reference trajectory.</figcaption>
-          </figure>
-        </div>
 
-        <p class="benchmark-note"><strong>Benchmark note.</strong> The “stochastic” systems are partially observed trajectory-level parameter mixtures: each rollout becomes deterministic once its hidden parameter is sampled. The forecasting task is stochastic from the model’s observed history. Over 2,500-step stochastic Lorenz forecasts, VSF is best on CME, CSE, and ED; block diffusion attains the lower <span class="math-inline" data-tex="W_1">W₁</span>.</p>
+          <figure class="paper-figure forecast-error-figure">
+            <img src="assets/figures/forecasting/errors/stochastic-rollout-errors.png" alt="Conditional mean, conditional standard deviation, Wasserstein-1, and energy-distance errors across forecast steps for partially observed Rössler and Lorenz systems." width="990" height="909" loading="lazy">
+            <figcaption><strong>Distributional error.</strong> VSF remains accurate across the conditional mean, conditional standard deviation, Wasserstein-1 distance, and energy distance.</figcaption>
+          </figure>
+
+          <figure class="forecast-gallery">
+            <div class="forecast-gallery__header forecast-gallery__header--plain">
+              <div>
+                <p class="figure-kicker">Generated trajectories</p>
+                <h4>Rössler</h4>
+              </div>
+            </div>
+            <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Stochastic Rössler trajectory comparison">
+              <div class="forecast-comparison-strip forecast-comparison-strip--stochastic">
+                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/gt.png" alt="Ground-truth trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/vsf.png" alt="VSF-generated trajectories for partially observed Rössler." width="308" height="275" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/sf.png" alt="Standard Streaming Flow trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/block-diffusion.png" alt="Block diffusion trajectories for partially observed Rössler." width="308" height="275" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
+              </div>
+            </div>
+            <figcaption>Ten trajectories per method. VSF preserves the Rössler geometry while capturing variability across plausible futures.</figcaption>
+          </figure>
+
+          <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery>
+            <div class="forecast-gallery__header">
+              <div>
+                <p class="figure-kicker">Generated trajectories</p>
+                <h4>Lorenz</h4>
+              </div>
+              <div>
+                <span class="figure-selector__label">Displayed draw</span>
+                <div class="figure-selector figure-selector--samples" aria-label="Select a stochastic Lorenz sample">
+                  <button type="button" aria-pressed="true" data-lorenz-draw="01">1</button>
+                  <button type="button" aria-pressed="false" data-lorenz-draw="08">2</button>
+                  <button type="button" aria-pressed="false" data-lorenz-draw="03">3</button>
+                  <button type="button" aria-pressed="false" data-lorenz-draw="04">4</button>
+                  <button type="button" aria-pressed="false" data-lorenz-draw="07">5</button>
+                </div>
+              </div>
+            </div>
+            <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Stochastic Lorenz trajectory comparison">
+              <div class="forecast-comparison-strip forecast-comparison-strip--stochastic">
+                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-gt.png" alt="Ground-truth stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="gt"></div></div>
+                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-vsf.png" alt="VSF stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="vsf"></div></div>
+                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-streaming-flow.png" alt="Standard Streaming Flow stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="streaming-flow"></div></div>
+                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-block-diffusion.png" alt="Block diffusion stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="block-diffusion"></div></div>
+                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.png" alt="Autoregressive diffusion stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="ar-diffusion"></div></div>
+              </div>
+            </div>
+            <figcaption>Conditioned on the same observed history, each model defines a distribution over future trajectories. Select a draw to view one reference trajectory and one sample from each forecast distribution; the columns are not pointwise-paired trajectories.</figcaption>
+            <p class="sample-readout" aria-live="polite" data-lorenz-sample-status>Showing draw 1 of 5.</p>
+          </figure>
+        </section>
       </div>
     </section>
 
     <section class="section section-soft" id="world-model">
-      <div class="container">
-        <div class="split-heading">
-          <div class="section-heading">
-            <p class="section-number">4 · World-model application</p>
-            <h2>Planning with VSF predictions</h2>
-          </div>
-          <p>VSF can replace the deterministic autoregressive predictor inside a frozen JEPA world model. For each candidate action sequence, it imagines latent trajectories in physical time; CEM selects the plan whose terminal state best matches the encoded goal.</p>
-        </div>
+      <div class="container article-container">
+        <header class="section-heading article-heading results-heading">
+          <p class="section-number">4 · Results</p>
+          <h2>World-model prediction</h2>
+          <p>We replace the deterministic autoregressive predictor in a frozen JEPA world model with action-conditioned VSF. For each candidate action sequence, CEM evaluates the predicted physical-time trajectory and selects the plan whose terminal state best matches the encoded goal.</p>
+        </header>
 
         <figure class="paper-figure wide-figure world-model-figure">
           <img src="assets/figures/vsf-world-model.png" alt="Action-conditioned VSF world-model pipeline, from CEM candidate actions and encoded observations through the VSF predictor to a latent goal cost." width="1592" height="549" loading="lazy">
