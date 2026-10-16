@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
   <link rel="stylesheet" href="static/css/site.css?v=world-model-outcomes-1">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=video-autoplay-1" defer></script>
+  <script src="static/js/site.js?v=paired-video-sync-2" defer></script>
 </head>
 
 <body>
@@ -754,9 +754,10 @@
 
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
-            <p class="subsection-number">4.1 · Rollout visualizations</p>
-            <h3 id="world-model-rollouts-heading">AR and VSF, rollout by rollout</h3>
-            <p>Each case places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p>
+            <!-- <p class="subsection-number">4.1 · Rollout visualizations</p> -->
+            <h3 id="world-model-rollouts-heading">World model visualizations</h3>
+            <p><strong>Plan 1</strong> (blue) is the predicted latent trajectory for the first action sequence chosen by the Cross-Entropy Method (CEM) planner from the initial observation. The agent executes that sequence for up to 25 environment steps. If the goal has not been reached, the actual simulator frame at step 25—not another model prediction—becomes the <strong>new observation</strong>. The encoder maps it into latent space, re-anchoring planning to the state that was actually reached. CEM then selects <strong>Plan 2</strong> (red) from this updated state for the remaining budget, up to step 50. The black dashed curve shows the realized ground-truth latent trajectory; successful episodes may end earlier.</p>
+            <!-- <p>Each case places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
           </header>
 
           <aside class="rollout-interpretation" aria-label="How to read the rollout videos">
@@ -772,14 +773,14 @@
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 1">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 1">
                     <source src="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 1.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 1">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 1">
                     <source src="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 1.</a>
                   </video>
@@ -795,14 +796,14 @@
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 2">
                     <source src="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 2.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 2">
                     <source src="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 2.</a>
                   </video>
@@ -818,14 +819,14 @@
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 1">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 1">
                     <source src="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 1.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 1">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 1">
                     <source src="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 1.</a>
                   </video>
@@ -841,14 +842,14 @@
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 2">
                     <source src="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 2.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 2">
                     <source src="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4" type="video/mp4">
                     Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 2.</a>
                   </video>

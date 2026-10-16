@@ -70,18 +70,72 @@
     document.documentElement.style.scrollBehavior = previousBehavior;
   });
 
-  document.querySelectorAll(".rollout-video-card video[autoplay]").forEach((video) => {
-    video.muted = true;
-    video.defaultMuted = true;
-    const beginPlayback = () => video.play().catch(() => {
-      // Some device-level data-saving policies can still require manual playback.
+  const rolloutRestartDelay = 500;
+
+  document.querySelectorAll(".rollout-comparison").forEach((comparison) => {
+    const videos = [...comparison.querySelectorAll(".rollout-video-card video")];
+    if (videos.length < 2) return;
+
+    let restartTimer = null;
+    let initialRoundStarted = false;
+
+    const cancelPendingRestart = () => {
+      if (restartTimer === null) return;
+      window.clearTimeout(restartTimer);
+      restartTimer = null;
+    };
+
+    const startRoundTogether = () => {
+      videos.forEach((video) => {
+        video.currentTime = 0;
+        video.controls = true;
+      });
+      const playbackAttempts = videos.map((video) => video.play());
+      Promise.all(playbackAttempts).catch(() => {
+        // Keep the pair together if a device requires manual playback.
+        videos.forEach((video) => video.pause());
+      });
+    };
+
+    const startInitialRoundWhenReady = () => {
+      if (initialRoundStarted) return;
+      const pairIsReady = videos.every(
+        (video) => video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA,
+      );
+      if (!pairIsReady) return;
+
+      initialRoundStarted = true;
+      startRoundTogether();
+    };
+
+    const queueNextRound = () => {
+      if (restartTimer !== null || !videos.every((video) => video.ended)) return;
+
+      restartTimer = window.setTimeout(() => {
+        restartTimer = null;
+        // Respect manual seeking or replay during the half-second end pause.
+        if (!videos.every((video) => video.ended)) return;
+        startRoundTogether();
+      }, rolloutRestartDelay);
+    };
+
+    videos.forEach((video) => {
+      video.loop = false;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.addEventListener("canplay", startInitialRoundWhenReady);
+      video.addEventListener("ended", () => {
+        // Native controls otherwise cover the final frame during the end pause.
+        video.controls = false;
+        queueNextRound();
+      });
+      video.addEventListener("play", () => {
+        if (!videos.every((pairedVideo) => pairedVideo.ended)) cancelPendingRestart();
+      });
+      video.addEventListener("seeking", cancelPendingRestart);
     });
 
-    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      beginPlayback();
-    } else {
-      video.addEventListener("canplay", beginPlayback, { once: true });
-    }
+    startInitialRoundWhenReady();
   });
 
   document.addEventListener("keydown", (event) => {
