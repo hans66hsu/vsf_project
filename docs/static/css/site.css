@@ -854,11 +854,11 @@ a {
 }
 
 .bifurcation-plot .plot-paper-target--negative {
-  stroke: #1f77b4;
+  stroke: #ff7f0e;
 }
 
 .bifurcation-plot .plot-paper-target--positive {
-  stroke: #ff7f0e;
+  stroke: #1f77b4;
 }
 
 .bifurcation-plot .plot-sf-characteristic {
@@ -874,14 +874,14 @@ a {
 }
 
 .bifurcation-plot .plot-tube--positive {
-  fill: rgba(255, 127, 14, 0.075);
-  stroke: rgba(255, 127, 14, 0.3);
+  fill: rgba(31, 119, 180, 0.075);
+  stroke: rgba(31, 119, 180, 0.3);
   stroke-width: 0.55;
 }
 
 .bifurcation-plot .plot-tube--negative {
-  fill: rgba(31, 119, 180, 0.075);
-  stroke: rgba(31, 119, 180, 0.3);
+  fill: rgba(255, 127, 14, 0.075);
+  stroke: rgba(255, 127, 14, 0.3);
   stroke-width: 0.55;
 }
 
@@ -926,24 +926,13 @@ a {
   font-weight: 700;
 }
 
-.bifurcation-plot .plot-inset-frame {
-  fill: rgba(255, 255, 255, 0.97);
-  stroke: #202735;
-  stroke-width: 1.05;
-}
-
-.bifurcation-plot .plot-inset-axis {
-  stroke: #202735;
-  stroke-width: 0.9;
-}
-
-.bifurcation-plot .plot-inset-guide {
+.bifurcation-plot .plot-posterior-guide {
   stroke: #1f77b4;
   stroke-dasharray: 1.5 1.5;
   stroke-width: 0.75;
 }
 
-.bifurcation-plot .plot-inset-posterior {
+.bifurcation-plot .plot-posterior-curve {
   fill: none;
   stroke: #1f77b4;
   stroke-linecap: round;
@@ -951,18 +940,10 @@ a {
   stroke-width: 1.8;
 }
 
-.bifurcation-plot .plot-inset-title {
+.bifurcation-plot .plot-posterior-title {
   fill: #273449;
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 9px;
-  font-style: italic;
+  font-size: 10px;
   font-weight: 600;
-}
-
-.bifurcation-plot .plot-inset-tick {
-  fill: #202735;
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 7.5px;
 }
 
 .bifurcation-plot .plot-curve {
@@ -1088,9 +1069,46 @@ a {
 
 .bifurcation-plot-key i.bifurcation-plot-key__tube {
   height: 8px;
-  background: linear-gradient(90deg, rgba(31, 119, 180, 0.12), rgba(255, 127, 14, 0.12));
+  background: linear-gradient(90deg, rgba(255, 127, 14, 0.12), rgba(31, 119, 180, 0.12));
   border: 1px solid rgba(84, 105, 134, 0.38);
   border-radius: 2px;
+}
+
+.bifurcation-plot-key__branch-positive::before,
+.bifurcation-plot-key__branch-negative::before,
+.bifurcation-plot-key__sensitivity-standard::before,
+.bifurcation-plot-key__sensitivity-ideal::before {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  left: 0;
+  border-top: 2px solid;
+  content: "";
+}
+
+.bifurcation-plot-key__branch-positive::before,
+.bifurcation-plot-key__sensitivity-standard::before {
+  border-color: #1f77b4;
+}
+
+.bifurcation-plot-key__branch-negative::before {
+  border-color: #ff7f0e;
+}
+
+.bifurcation-plot-key__sensitivity-ideal::before {
+  border-color: #e87519;
+  border-top-style: dashed;
+}
+
+.bifurcation-posterior-plot {
+  display: block;
+  width: min(100%, 320px);
+  margin: 16px auto 0;
+}
+
+.bifurcation-plot.bifurcation-posterior-plot .plot-tick,
+.bifurcation-plot.bifurcation-posterior-plot .plot-label {
+  font-size: 10px;
 }
 
 .bifurcation-control {
@@ -1492,8 +1510,7 @@ a {
 }
 
 .method-card h3,
-.objective-copy h3,
-.planning-results h3 {
+.objective-copy h3 {
   margin: 0 0 15px;
   color: var(--ink);
   font-size: clamp(1.25rem, 2.3vw, 1.6rem);
@@ -1956,49 +1973,218 @@ tbody tr:last-child td {
   margin-left: auto;
 }
 
-.planning-layout {
+.world-model-results {
+  margin-top: 54px;
+  margin-bottom: 68px;
+}
+
+.world-model-results-table {
+  min-width: 1060px;
+  font-variant-numeric: tabular-nums;
+}
+
+.world-model-results-table th,
+.world-model-results-table td {
+  padding: 12px 10px;
+}
+
+.world-model-results-table .world-model-task-header {
+  color: #344458;
+  background: #edf2f7;
+}
+
+.world-model-results-table .metric-group-start,
+.world-model-results-table tbody tr > :nth-child(2),
+.world-model-results-table tbody tr > :nth-child(4),
+.world-model-results-table tbody tr > :nth-child(6),
+.world-model-results-table tbody tr > :nth-child(8) {
+  border-left: 1px solid #dce2e9;
+}
+
+.world-model-rollouts {
+  width: min(1240px, calc(100vw - 48px));
+  margin-left: 50%;
+  padding-top: 54px;
+  border-top: 1px solid #ccd2da;
+  transform: translateX(-50%);
+}
+
+.rollout-interpretation {
+  margin: 0 0 40px;
+  padding: 17px 20px;
+  color: #596578;
+  background: #f4f7fa;
+  border: 1px solid #dbe1e8;
+  border-left: 3px solid var(--blue);
+  border-radius: 4px;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.rollout-interpretation strong {
+  color: var(--ink);
+}
+
+.rollout-comparison-list {
   display: grid;
-  margin-top: 34px;
-  grid-template-columns: minmax(370px, 0.72fr) minmax(0, 1.28fr);
-  gap: 24px;
-  align-items: stretch;
+  gap: 32px;
 }
 
-.planning-results {
-  min-width: 0;
-  padding: 34px;
-  background: white;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+.rollout-comparison {
+  overflow: hidden;
+  background: #f7f8fa;
+  border: 1px solid #ccd4de;
+  border-radius: 7px;
 }
 
-.planning-results > p:last-child {
-  margin: 22px 0 0;
-  color: var(--muted);
-  font-size: 0.8rem;
+.rollout-comparison__header {
+  padding: 18px 22px 16px;
+  background: #fff;
+  border-bottom: 1px solid #d9dfe6;
+}
+
+.rollout-comparison__header h4 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.55rem, 2.5vw, 1.9rem);
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.rollout-comparison__header h4 span {
+  color: #657184;
+  font-weight: 450;
+}
+
+.rollout-comparison__header p {
+  max-width: 880px;
+  margin: 7px 0 0;
+  color: #657184;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.9rem;
   line-height: 1.55;
 }
 
-.compact-table {
-  margin-top: 22px;
+.rollout-comparison__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  background: #fff;
 }
 
-.compact-table table {
-  min-width: 520px;
-  font-size: 0.73rem;
-}
-
-.compact-table th,
-.compact-table td {
-  padding: 11px 9px;
-}
-
-.cube-figure {
-  display: flex;
+.rollout-video-card {
   min-width: 0;
   margin: 0;
-  flex-direction: column;
+  padding: 0;
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+}
+
+.rollout-video-card + .rollout-video-card {
+  border-left: 1px solid #d9dfe6;
+}
+
+.rollout-video-card figcaption {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 11px 15px;
+  color: var(--ink);
+  background: #f7f9fb;
+  border-bottom: 1px solid #e0e5eb;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.rollout-video-card figcaption strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.rollout-outcome {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.045em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.rollout-outcome::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.rollout-outcome--success {
+  border-color: #b9dfc7;
+  background: #edf8f1;
+  color: #19663d;
+}
+
+.rollout-outcome--failure {
+  border-color: #efc2c2;
+  background: #fff0f0;
+  color: #9a3434;
+}
+
+.rollout-video-card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1530 / 792;
+  object-fit: contain;
+  background: #fff;
+  border: 0;
+  border-radius: 0;
+}
+
+.rollout-video-card video:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .world-model-rollouts {
+    width: calc(100vw - 32px);
+  }
+
+  .rollout-comparison__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rollout-comparison-list {
+    gap: 28px;
+  }
+
+  .rollout-comparison__header {
+    padding: 16px 17px 14px;
+  }
+
+  .rollout-video-card {
+    padding: 0;
+  }
+
+  .rollout-video-card + .rollout-video-card {
+    border-top: 1px solid #d9dfe6;
+    border-left: 0;
+  }
 }
 
 /* Citation and footer */
@@ -2168,17 +2354,6 @@ tbody tr:last-child td {
     gap: 30px;
   }
 
-  .planning-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .planning-results {
-    order: 2;
-  }
-
-  .cube-figure {
-    order: 1;
-  }
 }
 
 @media (max-width: 780px) {
@@ -2531,10 +2706,6 @@ tbody tr:last-child td {
     width: calc(100vw - 24px);
     margin: 0 0 0 50%;
     padding: 20px 12px;
-  }
-
-  .planning-results {
-    padding: 27px 21px;
   }
 
   .citation-card {
@@ -3165,7 +3336,7 @@ body {
 .bifurcation-plot-key {
   margin-top: 9px;
   color: #5c6879;
-  font-size: 0.67rem;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 
@@ -3539,10 +3710,6 @@ body {
 
 .benchmark-note strong {
   color: var(--blue-deep);
-}
-
-.planning-results {
-  border-radius: 5px;
 }
 
 .citation-section {
@@ -5278,8 +5445,7 @@ body {
 }
 
 .bifurcation-plot .plot-tick,
-.bifurcation-plot .plot-label,
-.bifurcation-plot .plot-inset-tick {
+.bifurcation-plot .plot-label {
   font-size: 15px;
 }
 
@@ -5305,8 +5471,7 @@ body {
   }
 
   .bifurcation-plot .plot-tick,
-  .bifurcation-plot .plot-label,
-  .bifurcation-plot .plot-inset-tick {
+  .bifurcation-plot .plot-label {
     font-size: 15px;
   }
 

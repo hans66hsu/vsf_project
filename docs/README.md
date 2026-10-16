@@ -19,7 +19,7 @@ If a previous server is still using port `8090`, stop it with `Ctrl+C` before st
 - `index.html` — page content and metadata
 - `static/css/site.css` — responsive visual design
 - `static/js/site.js` — mobile navigation, the linked bifurcation explainer, result tabs, and citation copying
-- `assets/paper.pdf` — linked manuscript
+- `assets/paper.pdf` — local manuscript copy
 - `assets/figures/` — web-ready figures converted from the LaTeX project
 
 ## GitHub Pages

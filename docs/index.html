@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=academic-structure-7">
+  <link rel="stylesheet" href="static/css/site.css?v=world-model-outcomes-1">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=caption-error-1" defer></script>
+  <script src="static/js/site.js?v=video-autoplay-1" defer></script>
 </head>
 
 <body>
@@ -60,8 +60,7 @@
   <main id="main-content">
     <section class="hero" id="top">
       <div class="container hero-content">
-        <p class="eyebrow">Research project · Probabilistic forecasting</p>
-        <h1>Variational Streaming Flow</h1>
+        <h1>Variational Streaming Flow:</h1>
         <p class="hero-deck">Probabilistic Forecasting in Physical Time</p>
 
         <div class="authors" aria-label="Authors">
@@ -81,7 +80,7 @@
         </p>
 
         <div class="hero-actions" aria-label="Project links">
-          <a class="button button-primary" href="assets/paper.pdf" target="_blank" rel="noopener">
+          <a class="button button-primary" href="https://arxiv.org/abs/2610.00976" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>
             Paper
           </a>
@@ -150,7 +149,11 @@
 
                 <figure class="research-figure ground-truth-figure">
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-truth-title bifurcation-truth-desc" data-bifurcation-plot="truth"></svg>
-                  <figcaption><strong>Ground truth.</strong> The shared history ends at the split point <span class="math-inline" data-tex="(x,t)=(0,\tau)">(x, t) = (0, τ)</span>.</figcaption>
+                  <ul class="bifurcation-plot-key" aria-label="Ground-truth branch legend">
+                    <li><i class="bifurcation-plot-key__branch-positive" aria-hidden="true"></i><span>B = +1</span></li>
+                    <li><i class="bifurcation-plot-key__branch-negative" aria-hidden="true"></i><span>B = −1</span></li>
+                  </ul>
+                  <figcaption><strong>Ground truth.</strong> The shared history ends at the split point <span class="math-inline" data-tex="(x,t)=(0,\tau)=(0,0.40)">(x, t) = (0, τ) = (0, 0.40)</span>.</figcaption>
                 </figure>
               </div>
 
@@ -173,27 +176,37 @@
 
               <p class="motivation-lead">The population-optimal marginal field must infer branch identity from <span class="math-inline" data-tex="x">x</span>:</p>
               <div class="motivation-equation motivation-equation--field math-display" data-tex-display data-tex="v_{\mathrm{SF}}^\star(x,t)=-kx+q(t)\tanh\!\left(\frac{x\,m(t)e^{2kt}}{\sigma_0^2}\right),\qquad q(t)=\dot m(t)+km(t)">v⋆SF(x,t) = −kx + q(t)tanh(xm(t)e2kt/σ₀²)</div>
-              <p class="motivation-lead motivation-lead--figure-guide">The left panel integrates two fixed probes from <span class="math-inline" data-tex="x_\tau=\pm0.01">xτ = ±0.01</span>. Dashed curves are the data trajectories, solid curves are the standard-SF characteristics, and the shaded regions are the component <span class="math-inline" data-tex="1\sigma_t">1σt</span> tubes. Its inset reports <span class="math-inline" data-tex="\mathbb E[B\mid X_t=x]">E[B | Xt = x]</span> at <span class="math-inline" data-tex="t=0.60">t = 0.60</span>: values near <span class="math-inline" data-tex="-1">−1</span> or <span class="math-inline" data-tex="+1">+1</span> identify a branch, while zero denotes equal posterior probabilities.</p>
-              <p class="motivation-lead motivation-lead--figure-guide">The right panel evaluates <span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> at <span class="math-inline" data-tex="t^\star=0.72">t* = 0.72</span> as <span class="math-inline" data-tex="\sigma_0">σ₀</span>, and hence <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span>, varies. The dashed horizontal line is the ideal-latent reference <span class="math-inline" data-tex="-k(t^\star-\tau)">−k(t* − τ)</span>.</p>
+              <p class="motivation-lead motivation-lead--figure-guide">For this illustration, the split occurs at <span class="math-inline" data-tex="\tau=0.40">τ = 0.40</span>. The left panel integrates two fixed probes from <span class="math-inline" data-tex="x_\tau=\pm0.01">xτ = ±0.01</span>. Dashed curves are the data trajectories, solid curves are the standard-SF characteristics, and the shaded regions are the component <span class="math-inline" data-tex="1\sigma_t">1σt</span> tubes. The separate mini-plot reports <span class="math-inline" data-tex="\mathbb E[B\mid X_t=x]">E[B | Xt = x]</span> at <span class="math-inline" data-tex="t=0.60">t = 0.60</span>: values near <span class="math-inline" data-tex="-1">−1</span> or <span class="math-inline" data-tex="+1">+1</span> identify a branch, while zero denotes equal posterior probabilities.</p>
+              <p class="motivation-lead motivation-lead--figure-guide">The right panel evaluates <span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> at <span class="math-inline" data-tex="t^\star=0.60">t* = 0.60</span> as <span class="math-inline" data-tex="\sigma_0">σ₀</span>, and hence <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span>, varies. The dashed horizontal line is the ideal-latent reference <span class="math-inline" data-tex="-k(t^\star-\tau)">−k(t* − τ)</span>.</p>
 
               <div class="sf-evidence-grid">
                 <figure class="research-figure">
                   <h4>Standard-SF characteristics</h4>
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sf-title bifurcation-sf-desc" data-bifurcation-plot="sf"></svg>
-                  <figcaption><strong>Standard-SF characteristics.</strong> Fixed split-time probes under the population-optimal field.</figcaption>
+                  <ul class="bifurcation-plot-key" aria-label="Standard-SF characteristics legend">
+                    <li><i class="bifurcation-plot-key__mean" aria-hidden="true"></i><span>data branches (dashed)</span></li>
+                    <li><i class="bifurcation-plot-key__particle" aria-hidden="true"></i><span>SF probes (solid)</span></li>
+                    <li><i class="bifurcation-plot-key__tube" aria-hidden="true"></i><span>component 1σ<sub>t</sub> tubes</span></li>
+                  </ul>
+                  <svg class="bifurcation-plot bifurcation-posterior-plot" viewBox="0 0 280 180" role="img" aria-labelledby="bifurcation-posterior-title bifurcation-posterior-desc" data-bifurcation-plot="posterior"></svg>
+                  <figcaption><strong>Standard-SF characteristics.</strong> Fixed split-time probes under the population-optimal field. The companion plot shows the posterior branch mean used to infer branch identity from physical state.</figcaption>
                 </figure>
 
                 <figure class="research-figure">
-                  <h4>Required physical-state sensitivity</h4>
+                  <h4>Required physical-state sensitivity (t* = 0.60)</h4>
                   <svg class="bifurcation-plot" viewBox="0 0 360 300" role="img" aria-labelledby="bifurcation-sensitivity-title bifurcation-sensitivity-desc" data-bifurcation-plot="sensitivity"></svg>
+                  <ul class="bifurcation-plot-key" aria-label="Physical-state sensitivity legend">
+                    <li><i class="bifurcation-plot-key__sensitivity-standard" aria-hidden="true"></i><span>standard SF</span></li>
+                    <li><i class="bifurcation-plot-key__sensitivity-ideal" aria-hidden="true"></i><span>ideal latent</span></li>
+                  </ul>
                   <div class="bifurcation-readout" aria-live="off">
                     <span><span class="math-inline" data-tex="\sigma_0">σ₀</span> = <output for="sf-tube-width" data-bifurcation-sigma0-output>0.340</output></span>
                     <i aria-hidden="true">→</i>
-                    <span><span class="math-inline" data-tex="\varepsilon_\tau">ετ</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.189</output></span>
+                    <span><span class="math-inline" data-tex="\varepsilon_\tau">ετ</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.194</output></span>
                     <i aria-hidden="true">→</i>
-                    <strong><span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> = <output data-bifurcation-sensitivity-output>29.51</output></strong>
+                    <strong><span class="math-inline" data-tex="\log J_{\tau,t^\star}^{\mathrm{SF}}">log JSFτ,t*</span> = <output data-bifurcation-sensitivity-output>9.23</output></strong>
                   </div>
-                  <figcaption><strong>Fidelity–sensitivity curve.</strong> The marker shows the current slider value.</figcaption>
+                  <figcaption><strong>Fidelity–sensitivity curve at <span class="math-inline" data-tex="t^\star=0.60">t* = 0.60</span>.</strong> The marker shows the current slider value.</figcaption>
                 </figure>
               </div>
 
@@ -212,7 +225,7 @@
                 </div>
                 <div class="bifurcation-control__derived" aria-live="off">
                   <span>Split-time fidelity error</span>
-                  <strong><span class="math-inline" data-tex="\varepsilon_\tau=W_2(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}})">ετ = W₂(PτSF, Pτdata)</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.189</output></strong>
+                  <strong><span class="math-inline" data-tex="\varepsilon_\tau=W_2(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}})">ετ = W₂(PτSF, Pτdata)</span> = <output for="sf-tube-width" data-bifurcation-fidelity-output>0.194</output></strong>
                 </div>
                 <p id="sf-tube-help">The probes remain fixed at <span class="math-inline" data-tex="x_\tau=\pm0.01">xτ = ±0.01</span>. Decreasing <span class="math-inline" data-tex="\sigma_0">σ₀</span> narrows the displayed tubes and lowers <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span>, while the sensitivity rises.</p>
               </div>
@@ -295,7 +308,7 @@
           <header class="objective-copy">
             <p class="subsection-number">2.2 · Distributional objective</p>
             <h3 id="energy-objective-heading">Distributional velocity reconstruction</h3>
-            <p>MSE is appropriate when the latent fully separates the future dynamics. If different continuations remain compatible with the same context and latent value, however, its population solution averages the remaining velocity variation:</p>
+            <p>MSE is appropriate when the latent fully separates the future dynamics. This separation fails when the encoder cannot reliably infer which continuation occurs, when the posterior distributions of distinct continuations overlap in latent space, or when posterior collapse leaves the latent with little or no continuation-specific information. In those cases, the same context and latent value remain compatible with multiple velocities, so the population MSE solution averages the remaining velocity variation:</p>
           </header>
 
           <div class="conditional-mean-equation math-display" data-tex-display data-tex="v^\star(c,z)=\mathbb E[U\mid C=c,Z=z]">v*(c, z) = E[U | C = c, Z = z]</div>
@@ -660,8 +673,7 @@
                 <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.png" alt="Autoregressive diffusion stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="ar-diffusion"></div></div>
               </div>
             </div>
-            <figcaption>Conditioned on the same observed history, each model defines a distribution over future trajectories. Select a draw to view one reference trajectory and one sample from each forecast distribution; the columns are not pointwise-paired trajectories.</figcaption>
-            <p class="sample-readout" aria-live="polite" data-lorenz-sample-status>Showing draw 1 of 5.</p>
+            <figcaption>Conditioned on the same observed history, each model defines a distribution over future trajectories. Select a draw to view one reference trajectory and one sample from each forecast distribution.</figcaption>
           </figure>
         </section>
       </div>
@@ -680,30 +692,171 @@
           <figcaption>Action-conditioned VSF plugs into the existing JEPA encoder and CEM planner while retaining one velocity-field evaluation per imagined transition.</figcaption>
         </figure>
 
-        <div class="planning-layout">
-          <div class="planning-results">
-            <p class="eyebrow">Planning success (%)</p>
-            <h3>Highest on all four tasks.</h3>
-            <div class="table-scroll compact-table">
-              <table>
+        <figure class="results-panel results-table-figure world-model-results" aria-labelledby="world-model-table-caption">
+          <figcaption class="results-table-caption" id="world-model-table-caption"><strong>Table 4 · World-model predictor.</strong> As a world-model predictor, VSF achieves the highest planning success on all four tasks and the lowest predictor RMSE on three of four tasks. RMSE is measured between predicted and ground-truth latent trajectories along the CEM-selected action sequence.</figcaption>
+          <div class="forecast-table-block forecast-table-block--first">
+            <p class="table-scroll-hint">Scroll horizontally to see every task and metric.</p>
+            <div class="table-scroll" tabindex="0" role="region" aria-label="World-model predictor results across four planning tasks">
+              <table class="forecast-table world-model-results-table" aria-describedby="world-model-table-note">
+                <caption>Planning success and latent-trajectory RMSE for AR, SF, and VSF predictors on PushT, Cube, TwoRoom, and Reacher.</caption>
+                <colgroup><col></colgroup>
+                <colgroup span="2"></colgroup>
+                <colgroup span="2"></colgroup>
+                <colgroup span="2"></colgroup>
+                <colgroup span="2"></colgroup>
                 <thead>
-                  <tr><th scope="col">Predictor</th><th scope="col">PushT</th><th scope="col">Cube</th><th scope="col">TwoRoom</th><th scope="col">Reacher</th></tr>
+                  <tr>
+                    <th scope="col" rowspan="2">Method</th>
+                    <th class="system-header world-model-task-header" scope="colgroup" colspan="2">PushT</th>
+                    <th class="system-header world-model-task-header" scope="colgroup" colspan="2">Cube</th>
+                    <th class="system-header world-model-task-header" scope="colgroup" colspan="2">TwoRoom</th>
+                    <th class="system-header world-model-task-header" scope="colgroup" colspan="2">Reacher</th>
+                  </tr>
+                  <tr>
+                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th scope="col">RMSE ↓</th>
+                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th scope="col">RMSE ↓</th>
+                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th scope="col">RMSE ↓</th>
+                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th scope="col">RMSE ↓</th>
+                  </tr>
                 </thead>
                 <tbody>
-                  <tr><th scope="row">AR</th><td>84.7</td><td>69.3</td><td>78.7</td><td>61.3</td></tr>
-                  <tr><th scope="row">SF</th><td>88.0</td><td>76.7</td><td>76.7</td><td>49.3</td></tr>
-                  <tr class="ours-row"><th scope="row"><span>VSF</span> <em>Ours</em></th><td><strong>92.7</strong></td><td><strong>80.0</strong></td><td><strong>82.7</strong></td><td><strong>68.0</strong></td></tr>
+                  <tr>
+                    <th scope="row">AR predictor</th>
+                    <td>84.7 &plusmn; 4.1</td><td>0.28 &plusmn; 0.01</td>
+                    <td>69.3 &plusmn; 2.5</td><td>0.80 &plusmn; 0.05</td>
+                    <td>78.7 &plusmn; 9.0</td><td>0.67 &plusmn; 0.03</td>
+                    <td>61.3 &plusmn; 8.2</td><td>1.06 &plusmn; 0.01</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SF predictor</th>
+                    <td>88.0 &plusmn; 2.8</td><td>0.30 &plusmn; 0.04</td>
+                    <td>76.7 &plusmn; 0.9</td><td><strong>0.64 &plusmn; 0.02</strong></td>
+                    <td>76.7 &plusmn; 8.2</td><td>0.59 &plusmn; 0.05</td>
+                    <td>49.3 &plusmn; 5.0</td><td>1.13 &plusmn; 0.03</td>
+                  </tr>
+                  <tr class="ours-row">
+                    <th scope="row"><span>VSF predictor</span> <em>Ours</em></th>
+                    <td><strong>92.7 &plusmn; 2.5</strong></td><td><strong>0.27 &plusmn; 0.03</strong></td>
+                    <td><strong>80.0 &plusmn; 1.6</strong></td><td>0.65 &plusmn; 0.08</td>
+                    <td><strong>82.7 &plusmn; 5.0</strong></td><td><strong>0.58 &plusmn; 0.01</strong></td>
+                    <td><strong>68.0 &plusmn; 0.0</strong></td><td><strong>1.03 &plusmn; 0.02</strong></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
-            <p>VSF also reduces latent-trajectory RMSE relative to the AR predictor on every task and achieves the lowest RMSE on three of four tasks.</p>
+            <p class="results-table-note" id="world-model-table-note">Bold marks the best result in each column. Success is reported in percent; lower RMSE is better.</p>
           </div>
+        </figure>
 
-          <figure class="paper-figure cube-figure">
-            <img src="assets/figures/cube-rollout.png" alt="Successful Cube manipulation rollout with frames from steps 0 through 25 and the VSF latent prediction tracking the ground-truth trajectory." width="2006" height="729" loading="lazy">
-            <figcaption>A successful Cube plan: VSF’s predicted latent path closely follows the ground-truth representation trajectory.</figcaption>
-          </figure>
-        </div>
+        <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
+          <header class="forecast-subsection__heading">
+            <p class="subsection-number">4.1 · Rollout visualizations</p>
+            <h3 id="world-model-rollouts-heading">AR and VSF, rollout by rollout</h3>
+            <p>Each case places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p>
+          </header>
+
+          <aside class="rollout-interpretation" aria-label="How to read the rollout videos">
+            <strong>How to read each video.</strong> The left panel compares the predicted latent rollout (solid; blue for Plan 1 and red for Plan 2) with the ground-truth trajectory embedded in that model’s latent space (black dashed). Judge agreement within each panel: AR and VSF do not share the same latent coordinates. The right panel shows the corresponding ground-truth physical rollout. The outcome badge reports whether the executed CEM plan met the simulator’s goal criterion within the evaluation budget.
+          </aside>
+
+          <div class="rollout-comparison-list">
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>PushT <span>case 1</span></h4>
+                <p>Push the T-shaped block to the demonstrated goal configuration; both the point pusher and block poses define the goal.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 1">
+                    <source src="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 1.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 1">
+                    <source src="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 1.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>PushT <span>case 2</span></h4>
+                <p>Push the T-shaped block to the demonstrated goal configuration; both the point pusher and block poses define the goal.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 2">
+                    <source src="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 2.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 2">
+                    <source src="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 2.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>Cube <span>case 1</span></h4>
+                <p>Use the UR5e gripper to pick up the cube and place its center at the target location; cube orientation does not matter.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 1">
+                    <source src="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 1.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 1">
+                    <source src="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 1.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>Cube <span>case 2</span></h4>
+                <p>Use the UR5e gripper to pick up the cube and place its center at the target location; cube orientation does not matter.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 2">
+                    <source src="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 2.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video autoplay controls muted loop playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 2">
+                    <source src="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 2.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -746,7 +899,7 @@
         <p>Probabilistic forecasting that evolves directly in physical time.</p>
       </div>
       <div class="footer-links">
-        <a href="assets/paper.pdf" target="_blank" rel="noopener">Paper</a>
+        <a href="https://arxiv.org/abs/2610.00976" target="_blank" rel="noopener">Paper</a>
         <a href="https://github.com/hans66hsu/VSF-forecasting" target="_blank" rel="noopener">Code</a>
         <a href="#citation">Citation</a>
       </div>

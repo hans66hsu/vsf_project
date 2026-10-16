@@ -70,6 +70,20 @@
     document.documentElement.style.scrollBehavior = previousBehavior;
   });
 
+  document.querySelectorAll(".rollout-video-card video[autoplay]").forEach((video) => {
+    video.muted = true;
+    video.defaultMuted = true;
+    const beginPlayback = () => video.play().catch(() => {
+      // Some device-level data-saving policies can still require manual playback.
+    });
+
+    if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      beginPlayback();
+    } else {
+      video.addEventListener("canplay", beginPlayback, { once: true });
+    }
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") closeNav(true);
   });
@@ -87,6 +101,7 @@
     const plots = {
       truth: root.querySelector("[data-bifurcation-plot='truth']"),
       sf: root.querySelector("[data-bifurcation-plot='sf']"),
+      posterior: root.querySelector("[data-bifurcation-plot='posterior']"),
       latent: root.querySelector("[data-bifurcation-plot='latent']"),
       sensitivity: root.querySelector("[data-bifurcation-plot='sensitivity']"),
     };
@@ -99,13 +114,12 @@
     // epsilon_tau = sigma0 exp(-k tau) is the split-time W2 fidelity error.
     const model = {
       T: 1.15,
-      tau: 0.42,
+      tau: 0.4,
       k: 1.4,
       slope: 3.2,
-      // The interactive illustration evaluates the posterior branch mean at t = 0.60
-      // and the sensitivity comparison at t = 0.72. These are display choices.
+      // Both diagnostics use the same post-split physical time, t = t* = 0.60.
       posteriorTime: 0.6,
-      sensitivityTime: 0.72,
+      sensitivityTime: 0.6,
       // This sigma0 interval keeps the complete linked sensitivity curve inside
       // the paper-style raw linear viewport while retaining the sigma0 = 0.34 reference.
       sigma0Min: 0.27,
@@ -113,22 +127,13 @@
       fixedProbe: 0.01,
       posteriorXMax: 0.1,
       // At sigma0 = 1.8 the positive/negative component tubes nearly reach
-      // +/-2.70 at T, so retain a small visual margin around them.
+      // +/-2.76 at T, so retain a small visual margin around them.
       xMin: -2.9,
       xMax: 2.9,
     };
     const branchFrame = { left: 62, right: 30, top: 18, bottom: 50, width: 360, height: 300 };
     const sensitivityFrame = { left: 72, right: 18, top: 18, bottom: 52, width: 360, height: 300 };
-    const posteriorInset = {
-      x: 176,
-      y: 22,
-      width: 140,
-      height: 78,
-      innerLeft: 202,
-      innerRight: 307,
-      innerTop: 32,
-      innerBottom: 91,
-    };
+    const posteriorFrame = { left: 58, right: 16, top: 34, bottom: 44, width: 280, height: 180 };
     const latentInputs = [...root.querySelectorAll("[data-bifurcation-latent]")];
 
     const svgElement = (name, attributes = {}, text = "") => {
@@ -275,6 +280,12 @@
         x1: branchFrame.left, y1: scales.t(model.tau), x2: right, y2: scales.t(model.tau),
         class: "plot-guide plot-guide--tau",
       });
+      add(svg, "text", {
+        x: right - 4,
+        y: scales.t(model.tau) - 7,
+        class: "plot-note",
+        "text-anchor": "end",
+      }, `τ = ${model.tau.toFixed(2)}`);
       add(svg, "line", {
         x1: branchFrame.left, y1: branchFrame.top, x2: branchFrame.left, y2: bottom,
         class: "plot-axis",
@@ -318,7 +329,7 @@
         plots.truth,
         "truth",
         "Ground-truth bifurcation",
-        "Two trajectories share physical state zero until time tau, then separate into positive and negative futures.",
+        `Two trajectories share physical state zero until time tau ${model.tau.toFixed(2)}, then separate into a blue B equals plus one future and an orange B equals minus one future.`,
       );
       add(layer, "path", {
         d: pathFrom([[0, 0], [0, model.tau]], x, t),
@@ -359,59 +370,107 @@
       ...branchPoints(sign),
     ];
 
-    const drawBranchPosteriorInset = (layer, sigma0) => {
-      const inset = posteriorInset;
+    const drawBranchPosterior = (sigma0) => {
+      const svg = plots.posterior;
+      svg.replaceChildren();
       const xLimit = model.posteriorXMax;
       const transitionWidth = posteriorTransitionWidth(sigma0);
-      const x = (state) => inset.innerLeft
-        + ((state + xLimit) / (2 * xLimit)) * (inset.innerRight - inset.innerLeft);
-      const y = (value) => inset.innerTop
-        + ((1.05 - value) / 2.1) * (inset.innerBottom - inset.innerTop);
+      const plotWidth = posteriorFrame.width - posteriorFrame.left - posteriorFrame.right;
+      const plotHeight = posteriorFrame.height - posteriorFrame.top - posteriorFrame.bottom;
+      const bottom = posteriorFrame.height - posteriorFrame.bottom;
+      const right = posteriorFrame.width - posteriorFrame.right;
+      const x = (state) => posteriorFrame.left
+        + ((state + xLimit) / (2 * xLimit)) * plotWidth;
+      const y = (value) => posteriorFrame.top
+        + ((1.05 - value) / 2.1) * plotHeight;
 
-      const insetLayer = add(layer, "g", { class: "plot-posterior-inset" });
-      add(insetLayer, "rect", {
-        x: inset.x,
-        y: inset.y,
-        width: inset.width,
-        height: inset.height,
-        class: "plot-inset-frame",
-      });
-      add(insetLayer, "line", {
-        x1: inset.innerLeft,
+      const posteriorTimeLabel = model.posteriorTime.toFixed(2);
+      add(svg, "title", { id: "bifurcation-posterior-title" }, `Posterior branch mean at physical time ${posteriorTimeLabel}`);
+      add(svg, "desc", { id: "bifurcation-posterior-desc" }, `The posterior expectation of branch label B conditional on physical state X at time ${posteriorTimeLabel}, shown from state minus 0.10 to plus 0.10 and expectation minus one to plus one.`);
+      add(svg, "text", {
+        x: (posteriorFrame.left + right) / 2,
+        y: 19,
+        class: "plot-posterior-title",
+        "text-anchor": "middle",
+      }, `Posterior branch mean at t = ${posteriorTimeLabel}`);
+
+      add(svg, "line", {
+        x1: posteriorFrame.left,
         y1: y(0),
-        x2: inset.innerRight,
+        x2: right,
         y2: y(0),
-        class: "plot-inset-guide",
+        class: "plot-posterior-guide",
       });
-      add(insetLayer, "line", {
+      add(svg, "line", {
         x1: x(0),
-        y1: inset.innerTop,
+        y1: posteriorFrame.top,
         x2: x(0),
-        y2: inset.innerBottom,
-        class: "plot-inset-guide",
+        y2: bottom,
+        class: "plot-posterior-guide",
       });
-      add(insetLayer, "line", {
-        x1: inset.innerLeft,
-        y1: inset.innerTop,
-        x2: inset.innerLeft,
-        y2: inset.innerBottom,
-        class: "plot-inset-axis",
+      add(svg, "line", {
+        x1: posteriorFrame.left,
+        y1: posteriorFrame.top,
+        x2: posteriorFrame.left,
+        y2: bottom,
+        class: "plot-axis",
       });
-      add(insetLayer, "line", {
-        x1: inset.innerLeft,
-        y1: inset.innerBottom,
-        x2: inset.innerRight,
-        y2: inset.innerBottom,
-        class: "plot-inset-axis",
+      add(svg, "line", {
+        x1: posteriorFrame.left,
+        y1: bottom,
+        x2: right,
+        y2: bottom,
+        class: "plot-axis",
       });
+
       [-1, 0, 1].forEach((tick) => {
-        add(insetLayer, "text", {
-          x: inset.innerLeft - 4,
-          y: y(tick) + 2.5,
-          class: "plot-inset-tick",
+        add(svg, "line", {
+          x1: posteriorFrame.left - 4,
+          y1: y(tick),
+          x2: posteriorFrame.left,
+          y2: y(tick),
+          class: "plot-axis",
+        });
+        add(svg, "text", {
+          x: posteriorFrame.left - 8,
+          y: y(tick) + 3,
+          class: "plot-tick",
           "text-anchor": "end",
         }, String(tick).replace("-", "−"));
       });
+      [
+        { value: -xLimit, label: "−0.10" },
+        { value: 0, label: "0" },
+        { value: xLimit, label: "0.10" },
+      ].forEach(({ value, label }) => {
+        add(svg, "line", {
+          x1: x(value),
+          y1: bottom,
+          x2: x(value),
+          y2: bottom + 4,
+          class: "plot-axis",
+        });
+        add(svg, "text", {
+          x: x(value),
+          y: bottom + 15,
+          class: "plot-tick",
+          "text-anchor": "middle",
+        }, label);
+      });
+
+      add(svg, "text", {
+        x: (posteriorFrame.left + right) / 2,
+        y: posteriorFrame.height - 9,
+        class: "plot-label",
+        "text-anchor": "middle",
+      }, "physical state x");
+      add(svg, "text", {
+        x: 15,
+        y: (posteriorFrame.top + bottom) / 2,
+        class: "plot-label",
+        "text-anchor": "middle",
+        transform: `rotate(-90 15 ${(posteriorFrame.top + bottom) / 2})`,
+      }, "E[B | Xₜ = x]");
 
       const adaptiveStates = [-8, -4, -2, -1, -0.5, -0.25, 0, 0.25, 0.5, 1, 2, 4, 8]
         .map((multiple) => multiple * transitionWidth)
@@ -423,9 +482,9 @@
         state,
         posteriorMean(state, model.posteriorTime, sigma0),
       ]);
-      add(insetLayer, "path", {
+      add(svg, "path", {
         d: pathFrom(curve, x, y),
-        class: "plot-inset-posterior",
+        class: "plot-posterior-curve",
       });
     };
 
@@ -434,7 +493,7 @@
       const positiveTrajectory = sfProbeTrajectory(sigma0);
       const negativeTrajectory = positiveTrajectory.map(([state, time]) => [-state, time]);
       const epsilon = fidelityError(sigma0);
-      const description = `The dashed data paths stay fixed. The solid green and red curves solve the population-optimal Standard Streaming Flow equation from fixed split-time states minus and plus ${probe.toFixed(2)}. Initial tube scale sigma zero ${sigma0.toFixed(3)} gives fidelity error epsilon tau ${formatEpsilon(epsilon)}. The inset shows the posterior branch mean.`;
+      const description = `The dashed data paths stay fixed. The solid green and red curves solve the population-optimal Standard Streaming Flow equation from fixed split-time states minus and plus ${probe.toFixed(2)}. Initial tube scale sigma zero ${sigma0.toFixed(3)} gives fidelity error epsilon tau ${formatEpsilon(epsilon)}.`;
       const { x, t, layer } = setupBranchPlot(
         plots.sf,
         "sf",
@@ -477,7 +536,7 @@
         "data-series": "sf-characteristic-negative",
       });
 
-      drawBranchPosteriorInset(layer, sigma0);
+      drawBranchPosterior(sigma0);
     };
 
     const drawLatent = (selection = "both") => {
@@ -510,13 +569,14 @@
       svg.replaceChildren();
       const sensitivity = logSensitivity(sigma0);
       const epsilon = fidelityError(sigma0);
-      add(svg, "title", { id: "bifurcation-sensitivity-title" }, "Standard Streaming Flow sensitivity versus fidelity error");
-      add(svg, "desc", { id: "bifurcation-sensitivity-desc" }, `On raw linear axes, standard Streaming Flow log sensitivity is ${formatSensitivity(sensitivity)} at fidelity error epsilon tau ${formatEpsilon(epsilon)}. A dashed line shows the ideal latent sensitivity. The complete selectable range is visible.`);
+      const sensitivityTimeLabel = model.sensitivityTime.toFixed(2);
+      add(svg, "title", { id: "bifurcation-sensitivity-title" }, `Standard Streaming Flow sensitivity versus fidelity error at physical time ${sensitivityTimeLabel}`);
+      add(svg, "desc", { id: "bifurcation-sensitivity-desc" }, `At physical time ${sensitivityTimeLabel} on raw linear axes, standard Streaming Flow log sensitivity is ${formatSensitivity(sensitivity)} at fidelity error epsilon tau ${formatEpsilon(epsilon)}. A dashed line shows the ideal latent sensitivity. The complete selectable range is visible.`);
 
       const plotWidth = sensitivityFrame.width - sensitivityFrame.left - sensitivityFrame.right;
       const plotHeight = sensitivityFrame.height - sensitivityFrame.top - sensitivityFrame.bottom;
       const yMin = -2;
-      const yMax = 50;
+      const yMax = 16;
       const epsilonMin = fidelityError(model.sigma0Min);
       const epsilonMax = fidelityError(model.sigma0Max);
       const x = (value) => sensitivityFrame.left
@@ -535,11 +595,10 @@
       });
       [
         { value: 0, label: "0" },
-        { value: 10, label: "10" },
-        { value: 20, label: "20" },
-        { value: 30, label: "30" },
-        { value: 40, label: "40" },
-        { value: 50, label: "50" },
+        { value: 4, label: "4" },
+        { value: 8, label: "8" },
+        { value: 12, label: "12" },
+        { value: 16, label: "16" },
       ].forEach(({ value, label }) => {
         add(svg, "line", {
           x1: sensitivityFrame.left - 4, y1: y(value), x2: sensitivityFrame.left, y2: y(value), class: "plot-axis",
@@ -589,6 +648,12 @@
         "text-anchor": "middle",
         transform: `rotate(-90 16 ${(sensitivityFrame.top + bottom) / 2})`,
       }, "log physical-state sensitivity");
+      add(svg, "text", {
+        x: right - 4,
+        y: sensitivityFrame.top + 13,
+        class: "plot-note",
+        "text-anchor": "end",
+      }, `t* = ${sensitivityTimeLabel}`);
 
       const curve = range(epsilonMin, epsilonMax, 260)
         .map((value) => [value, logSensitivityFromFidelity(value)]);
