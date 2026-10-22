@@ -19,6 +19,40 @@
 
   renderPageMath();
 
+  const mathDisplays = [...document.querySelectorAll(".math-display")];
+  const mobileEquationQuery = window.matchMedia("(max-width: 520px)");
+
+  const updateMathOverflow = () => {
+    mathDisplays.forEach((display) => {
+      const isOverflowing = display.scrollWidth > display.clientWidth + 2;
+      display.classList.toggle("math-display--overflowing", isOverflowing);
+
+      if (isOverflowing) {
+        display.tabIndex = 0;
+        display.dataset.mathScrollable = "true";
+      } else if (display.dataset.mathScrollable === "true") {
+        display.removeAttribute("tabindex");
+        delete display.dataset.mathScrollable;
+      }
+
+      let hint = display.nextElementSibling;
+      if (!hint?.matches("[data-math-scroll-hint]")) {
+        hint = document.createElement("span");
+        hint.className = "math-scroll-hint";
+        hint.dataset.mathScrollHint = "";
+        hint.setAttribute("aria-hidden", "true");
+        hint.textContent = "Swipe to see the full equation →";
+        display.insertAdjacentElement("afterend", hint);
+      }
+      hint.hidden = !(isOverflowing && mobileEquationQuery.matches);
+    });
+  };
+
+  window.requestAnimationFrame(updateMathOverflow);
+  window.addEventListener("load", updateMathOverflow, { once: true });
+  window.addEventListener("resize", updateMathOverflow, { passive: true });
+  mobileEquationQuery.addEventListener?.("change", updateMathOverflow);
+
   const header = document.querySelector("[data-header]");
   const nav = document.querySelector("[data-nav]");
   const navToggle = document.querySelector("[data-nav-toggle]");
@@ -68,6 +102,39 @@
     document.documentElement.style.scrollBehavior = "auto";
     target.scrollIntoView({ block: "start" });
     document.documentElement.style.scrollBehavior = previousBehavior;
+  });
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  const paradigmAnimations = [...document.querySelectorAll("[data-paradigm-animation]")];
+
+  const setParadigmAnimation = (root, shouldPlay) => {
+    const image = root.querySelector("img[data-static-src][data-animated-src]");
+    const button = root.querySelector("[data-paradigm-toggle]");
+    const label = button?.querySelector("span");
+    if (!image || !button || !label) return;
+
+    image.src = shouldPlay ? image.dataset.animatedSrc : image.dataset.staticSrc;
+    root.dataset.animationRunning = String(shouldPlay);
+    button.setAttribute("aria-pressed", String(shouldPlay));
+    label.textContent = shouldPlay ? "Pause animation" : "Play animation";
+  };
+
+  paradigmAnimations.forEach((root) => {
+    const button = root.querySelector("[data-paradigm-toggle]");
+    if (!button) return;
+    button.hidden = false;
+    setParadigmAnimation(root, !reducedMotion.matches);
+    button.addEventListener("click", () => {
+      const isRunning = root.dataset.animationRunning === "true";
+      setParadigmAnimation(root, !isRunning);
+    });
+  });
+
+  reducedMotion.addEventListener?.("change", () => {
+    paradigmAnimations.forEach((root) => {
+      setParadigmAnimation(root, !reducedMotion.matches);
+    });
   });
 
   const rolloutRestartDelay = 500;
@@ -1367,6 +1434,39 @@
     }
   }
 
+  const forecastAnimationGalleries = [
+    ...document.querySelectorAll("[data-forecast-animation-gallery]"),
+  ];
+
+  const setForecastGalleryAnimation = (root, shouldPlay) => {
+    const images = [...root.querySelectorAll(
+      "img[data-forecast-static-src][data-forecast-animated-src]",
+    )];
+
+    images.forEach((image) => {
+      const deterministicPanel = image.closest("[data-deterministic-panel]");
+      const isVisible = !deterministicPanel || !deterministicPanel.hidden;
+      const useAnimatedSource = shouldPlay && isVisible;
+      const nextSource = useAnimatedSource
+        ? `${image.dataset.forecastAnimatedSrc}?v=forecast-media-5`
+        : image.dataset.forecastStaticSrc;
+      image.dataset.forecastMedia = useAnimatedSource ? "animated" : "static";
+      if (image.getAttribute("src") !== nextSource) image.src = nextSource;
+    });
+
+    root.dataset.animationRunning = String(shouldPlay);
+  };
+
+  forecastAnimationGalleries.forEach((root) => {
+    setForecastGalleryAnimation(root, !reducedMotion.matches);
+  });
+
+  reducedMotion.addEventListener?.("change", () => {
+    forecastAnimationGalleries.forEach((root) => {
+      setForecastGalleryAnimation(root, !reducedMotion.matches);
+    });
+  });
+
   const deterministicGallery = document.querySelector("[data-deterministic-gallery]");
 
   if (deterministicGallery) {
@@ -1386,6 +1486,11 @@
       datasetPanels.forEach((panel) => {
         panel.hidden = panel.id !== selectedPanelId;
       });
+
+      setForecastGalleryAnimation(
+        deterministicGallery,
+        deterministicGallery.dataset.animationRunning === "true",
+      );
 
       if (comparisonScroll) comparisonScroll.scrollLeft = 0;
       if (shouldFocus) selectedTab.focus();
@@ -1434,9 +1539,19 @@
       });
       panels.forEach((panel) => {
         const method = panel.dataset.lorenzPanel;
-        panel.src = `assets/figures/forecasting/stochastic/lorenz/sample-${draw}-${method}.png`;
+        const assetStem = `assets/figures/forecasting/stochastic/lorenz/sample-${draw}-${method}`;
+        if (method === "gt") {
+          panel.src = `${assetStem}.png?v=forecast-gifs-2`;
+        } else {
+          panel.dataset.forecastStaticSrc = `${assetStem}.png`;
+          panel.dataset.forecastAnimatedSrc = `${assetStem}.gif`;
+        }
         panel.alt = `${methodDescriptions[method]} stochastic Lorenz trajectory for displayed draw ${displayedIndex}.`;
       });
+      setForecastGalleryAnimation(
+        lorenzSampleGallery,
+        lorenzSampleGallery.dataset.animationRunning === "true",
+      );
       if (status) status.textContent = `Showing draw ${displayedIndex} of ${buttons.length}.`;
     };
 

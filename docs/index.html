@@ -17,9 +17,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=world-model-outcomes-1">
+  <link rel="stylesheet" href="static/css/site.css?v=forecast-media-5">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=paired-video-sync-2" defer></script>
+  <script src="static/js/site.js?v=forecast-media-5" defer></script>
 </head>
 
 <body>
@@ -47,12 +47,12 @@
       </button>
 
       <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
-        <a href="#abstract">Abstract</a>
-        <a href="#motivation">Motivation</a>
+        <a href="#motivation">Why VSF?</a>
+        <a href="#forecasting-paradigms">Forecasting today</a>
+        <a href="#streaming-flow">Streaming Flow</a>
+        <a href="#sf-limitation">Limitation</a>
         <a href="#method">Method</a>
-        <a href="#results">Forecasting</a>
-        <a href="#world-model">World model</a>
-        <a href="#citation">Citation</a>
+        <a href="#results">Results</a>
       </nav>
     </div>
   </header>
@@ -94,14 +94,82 @@
           </a>
         </div>
 
-        <figure class="hero-figure paper-figure">
-          <img src="assets/figures/vsf-motivation.png" alt="Comparison of deterministic and partially observed stochastic dynamics, showing that Streaming Flow predicts a single future while Variational Streaming Flow predicts multiple plausible futures." width="2434" height="525" fetchpriority="high">
-          <figcaption><strong>Overview.</strong> Standard Streaming Flow produces a single forecast from an observed history, whereas VSF represents a distribution over coherent futures.</figcaption>
-        </figure>
+        <section class="hero-result-showcase" aria-labelledby="hero-results-heading">
+          <header class="hero-result-showcase__heading">
+            <h2 id="hero-results-heading">Why Variational Streaming Flow (VSF)?</h2>
+            <!-- <span>One example shows probabilistic forecasting in a partially observed dynamical system; the other shows goal-directed planning with a learned world model.</span> -->
+          </header>
+
+          <div class="vsf-value-grid">
+            <article class="vsf-value-card">
+              <span>01</span>
+              <h3>Fast trajectory generation</h3>
+              <p>VSF generates trajectories directly in physical time, using one velocity-field evaluation per forecast step and achieving up to a 7× speedup over autoregressive diffusion..</p>
+            </article>
+            <article class="vsf-value-card">
+              <span>02</span>
+              <h3>Multiple plausible futures</h3>
+              <p> Different latent codes let VSF generate multiple plausible futures from the same observed history. Holding each code fixed throughout a rollout helps preserve coherence as the dynamics branch.</p>
+            </article>
+            <article class="vsf-value-card">
+              <span>03</span>
+              <h3>Accurate long-horizon rollouts</h3>
+              <p>VSF mitigates error accumulation over 1,000-step chaotic-system forecasts. Its accurate imagined rollouts support JEPA world model planning, improving average success by 7.34% across robotics tasks.</p>
+            </article>
+          </div>
+
+          <article class="rollout-comparison hero-rollout-comparison" aria-labelledby="hero-rossler-comparison" data-forecast-animation-gallery>
+            <header class="rollout-comparison__header">
+              <h3 id="hero-rossler-comparison">Probabilistic forecasting</span></h3>
+              <p>Stochastic Rössler forecasting</p>
+            </header>
+            <div class="rollout-comparison__grid">
+              <figure class="rollout-video-card rollout-image-card">
+                <figcaption><strong>AR diffusion</strong><span class="rollout-outcome rollout-outcome--baseline">Baseline</span></figcaption>
+                <div class="hero-result-media">
+                  <img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.gif" alt="Animated AR-diffusion forecasts for the partially observed stochastic Rössler system." width="306" height="270" loading="eager" decoding="async">
+                </div>
+              </figure>
+              <figure class="rollout-video-card rollout-image-card">
+                <figcaption><strong>VSF</strong><span class="rollout-outcome rollout-outcome--ours">Ours</span></figcaption>
+                <div class="hero-result-media">
+                  <img src="assets/figures/forecasting/stochastic/rossler/vsf.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/vsf.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/vsf.gif" alt="Animated VSF forecasts for the same partially observed stochastic Rössler history." width="306" height="270" loading="eager" decoding="async">
+                </div>
+              </figure>
+            </div>
+          </article>
+
+          <article class="rollout-comparison hero-rollout-comparison" aria-labelledby="hero-cube-comparison">
+            <header class="rollout-comparison__header">
+              <h3 id="hero-cube-comparison">World Model Predictor</h3>
+              <p>LeWM Cube planning</p>
+            </header>
+            <div class="rollout-comparison__grid">
+              <figure class="rollout-video-card">
+                <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                <div class="hero-result-media">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube">
+                    <source src="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube.</a>
+                  </video>
+                </div>
+              </figure>
+              <figure class="rollout-video-card">
+                <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                <div class="hero-result-media">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube">
+                    <source src="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube.</a>
+                  </video>
+                </div>
+              </figure>
+            </div>
+          </article>
+        </section>
       </div>
     </section>
 
-    <section class="section section-intro" id="abstract">
+    <!-- <section class="section section-intro" id="abstract">
       <div class="container narrow">
         <div class="section-heading article-heading">
           <h2>Abstract</h2>
@@ -110,15 +178,141 @@
           <p>Streaming Flow models temporal evolution directly in physical time, but its standard non-latent formulation produces a single trajectory from a fixed observed history. We introduce <strong>Variational Streaming Flow (VSF)</strong>, which conditions the physical-time velocity field on a variational latent variable inferred from local dynamics during training and sampled from a prior at inference. VSF is trained with a generalized energy reconstruction for latent-conditioned velocities. Under aggregate posterior–prior alignment, its population counterpart controls the energy distance between the prior-predictive and true conditional velocity laws. Across deterministic and partially observed stochastic systems, VSF improves long-horizon forecasting and, as a JEPA world-model predictor, improves goal-directed planning.</p>
         </div>
       </div>
+    </section> -->
+
+    <section class="section section-soft section-paradigms" id="forecasting-paradigms">
+      <div class="container article-container">
+        <header class="section-heading article-heading narrative-heading">
+          <p class="section-number">1 · Why forecasting?</p>
+          <h2>Four generation schedules for forecasting</h2>
+          <p>Forecasting lets scientists and planners act before future observations arrive. In a live stream, the forecast may need to continue for an unknown length; the main design choice is whether generation progresses along an extra denoising clock, along physical time, or both.</p>
+        </header>
+
+        <div class="paradigm-legend" aria-label="Forecasting paradigm animation legend">
+          <span><i class="paradigm-legend__history" aria-hidden="true"></i>Observed history</span>
+          <span><i class="paradigm-legend__active" aria-hidden="true"></i>Being generated</span>
+          <span><i class="paradigm-legend__ready" aria-hidden="true"></i>Completed forecast</span>
+          <span><i class="paradigm-legend__waiting" aria-hidden="true"></i>Waiting</span>
+        </div>
+
+        <div class="paradigm-grid">
+          <figure class="paradigm-card">
+            <div class="paradigm-media" data-paradigm-animation>
+              <img src="assets/figures/concepts/full_sequence_diffusion.png" data-static-src="assets/figures/concepts/full_sequence_diffusion.png" data-animated-src="assets/figures/concepts/full_sequence_diffusion.gif" alt="Full-sequence diffusion denoises every requested future state together across an auxiliary diffusion-time axis." width="1440" height="696" loading="lazy">
+              <div class="paradigm-media__controls">
+                <button type="button" data-paradigm-toggle hidden><span>Play animation</span></button>
+                <a href="assets/figures/concepts/full_sequence_diffusion.gif" target="_blank" rel="noopener">Open full size</a>
+              </div>
+            </div>
+            <figcaption>
+              <div class="paradigm-card__title"><span>A</span><h3>Full-sequence diffusion</h3></div>
+              <p>Denoises the whole requested future jointly. This can coordinate the complete path, but the horizon must be chosen up front, so it does not naturally fit an open-ended stream with no known stopping time.</p>
+              <dl><div><dt>Forecast length</dt><dd>Fixed in advance</dd></div><div><dt>Generation path</dt><dd>Across diffusion time</dd></div></dl>
+            </figcaption>
+          </figure>
+
+          <figure class="paradigm-card">
+            <div class="paradigm-media" data-paradigm-animation>
+              <img src="assets/figures/concepts/block_diffusion.png" data-static-src="assets/figures/concepts/block_diffusion.png" data-animated-src="assets/figures/concepts/block_diffusion.gif" alt="Block diffusion denoises five future states together, appends the block, and repeats." width="1440" height="696" loading="lazy">
+              <div class="paradigm-media__controls">
+                <button type="button" data-paradigm-toggle hidden><span>Play animation</span></button>
+                <a href="assets/figures/concepts/block_diffusion.gif" target="_blank" rel="noopener">Open full size</a>
+              </div>
+            </div>
+            <figcaption>
+              <div class="paradigm-card__title"><span>B</span><h3>Block diffusion</h3></div>
+              <p>Denoises a fixed-size chunk, appends it, and repeats. It can continue a stream, but every new block must traverse the extra diffusion-time axis before forecasting resumes.</p>
+              <dl><div><dt>Forecast length</dt><dd>Open-ended</dd></div><div><dt>Generation path</dt><dd>One diffusion loop per block</dd></div></dl>
+            </figcaption>
+          </figure>
+
+          <figure class="paradigm-card">
+            <div class="paradigm-media" data-paradigm-animation>
+              <img src="assets/figures/concepts/ar_diffusion.png" data-static-src="assets/figures/concepts/ar_diffusion.png" data-animated-src="assets/figures/concepts/ar_diffusion.gif" alt="Autoregressive diffusion fully denoises one future state before advancing to the next physical time." width="1440" height="696" loading="lazy">
+              <div class="paradigm-media__controls">
+                <button type="button" data-paradigm-toggle hidden><span>Play animation</span></button>
+                <a href="assets/figures/concepts/ar_diffusion.gif" target="_blank" rel="noopener">Open full size</a>
+              </div>
+            </div>
+            <figcaption>
+              <div class="paradigm-card__title"><span>C</span><h3>Autoregressive diffusion</h3></div>
+              <p>Denoises one next state, feeds it back, and repeats. It supports an unknown horizon, but pays for a complete denoising loop at every physical step.</p>
+              <dl><div><dt>Forecast length</dt><dd>Open-ended</dd></div><div><dt>Generation path</dt><dd>One diffusion loop per state</dd></div></dl>
+            </figcaption>
+          </figure>
+
+          <figure class="paradigm-card paradigm-card--streaming">
+            <div class="paradigm-media" data-paradigm-animation>
+              <img src="assets/figures/concepts/streaming_flow.png" data-static-src="assets/figures/concepts/streaming_flow.png" data-animated-src="assets/figures/concepts/streaming_flow.gif" alt="Streaming Flow moves directly from one physical forecast time to the next without an auxiliary denoising loop." width="1440" height="696" loading="lazy">
+              <div class="paradigm-media__controls">
+                <button type="button" data-paradigm-toggle hidden><span>Play animation</span></button>
+                <a href="assets/figures/concepts/streaming_flow.gif" target="_blank" rel="noopener">Open full size</a>
+              </div>
+            </div>
+            <figcaption>
+              <div class="paradigm-card__title"><span>D</span><h3>Streaming Flow</h3></div>
+              <p>Moves directly to the next physical time. There is no separate denoising loop; with the Euler update used here, each transition takes one velocity-field evaluation. Standard SF gives one path; VSF adds learned trajectory-level uncertainty.</p>
+              <dl><div><dt>Forecast length</dt><dd>Open-ended</dd></div><div><dt>Generation path</dt><dd>Directly in physical time</dd></div></dl>
+            </figcaption>
+          </figure>
+        </div>
+
+        <aside class="paradigm-takeaway">
+          <strong>Why the streaming setting changes the choice</strong>
+          <p>The final forecast length is not known in advance, so full-sequence diffusion cannot be used as-is. Block and autoregressive diffusion can keep extending the forecast, but every block or state runs along an additional diffusion-time axis. Streaming Flow uses only physical time, making the one-evaluation update possible.</p>
+        </aside>
+
+      </div>
     </section>
 
-    <section class="section section-motivation" id="motivation">
+    <section class="section section-streaming-flow" id="streaming-flow">
+      <div class="container article-container">
+        <header class="section-heading article-heading narrative-heading">
+          <p class="section-number">2 · What is Streaming Flow?</p>
+          <h2>The rollout clock is the real clock</h2>
+          <p>Diffusion-style forecasting uses an inner generation process to create states at physical times. Streaming Flow removes that extra clock: advancing the learned dynamics advances the forecast itself.</p>
+        </header>
+
+        <div class="sf-explainer">
+          <ol class="sf-step-list">
+            <li><span>1</span><div><h3>Start from what was last observed</h3><p>The latest state and its recent history anchor the forecast.</p></div></li>
+            <li><span>2</span><div><h3>Ask how the state should move now</h3><p>A learned velocity field reads the current state, physical time, and history, then returns a direction of motion.</p></div></li>
+            <li><span>3</span><div><h3>Move forward and repeat</h3><p>The update becomes the next predicted state, is added to the rolling history, and can be extended for as long as needed.</p></div></li>
+          </ol>
+
+          <aside class="sf-equation-card" aria-label="Streaming Flow update equation">
+            <p>One physical-time update</p>
+            <div class="math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
+            <dl>
+              <div><dt><span class="math-inline" data-tex="\widehat{x}_k">x̂k</span></dt><dd>current predicted state</dd></div>
+              <div><dt><span class="math-inline" data-tex="h">h</span></dt><dd>observed and rolling history</dd></div>
+              <div><dt><span class="math-inline" data-tex="v_\theta">vθ</span></dt><dd>learned physical-time velocity</dd></div>
+            </dl>
+            <strong>Forward Euler: 1 NFE per transition</strong>
+          </aside>
+        </div>
+
+        <div class="clock-comparison" aria-label="Comparison of diffusion and Streaming Flow clocks">
+          <div><span>Diffusion forecasting</span><p>Physical time <i aria-hidden="true">×</i> auxiliary denoising time</p></div>
+          <div class="clock-comparison__arrow" aria-hidden="true">→</div>
+          <div><span>Streaming Flow</span><p>Physical time only</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-motivation" id="sf-limitation">
       <div class="container article-container">
         <header class="section-heading article-heading motivation-heading">
-          <p class="section-number">1 · Motivation</p>
-          <h2>Why do we need a latent variable?</h2>
-          <p>A symmetric two-branch construction isolates a limitation of standard Streaming Flow. When two futures share the same physical state at the split time, branch selection must be represented through small physical-state differences. Proposition A.1 shows that improving split-time fidelity increases the sensitivity of the branch-separating flow.</p>
+          <p class="section-number">3 · Limitation of standard Streaming Flow</p>
+          <h2>Fast, but only one future per history</h2>
+          <p>Standard non-latent SF assigns one direction to each state and observed history, so the same input always produces one continuation. In the paper’s two-branch example, it must encode the future choice in tiny physical-state differences; making those differences smaller makes the rollout more sensitive to perturbations.</p>
         </header>
+
+        <div class="limitation-summary">
+          <article><span>The problem</span><h3>One input, one direction</h3><p>A deterministic velocity field cannot express several future motions from the exact same state and history.</p></article>
+          <article><span>At a fork</span><h3>The state must carry the choice</h3><p>Standard SF separates branches through small state differences, which can amplify small rollout errors in the paper’s bifurcation construction.</p></article>
+          <article><span>VSF’s move</span><h3>Put the choice in a latent code</h3><p>One sampled code can select a continuation while both futures begin from the same physical state.</p></article>
+        </div>
 
         <div class="bifurcation-demo" data-bifurcation-demo>
           <figure class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
@@ -274,14 +468,22 @@
     <section class="section" id="method">
       <div class="container article-container">
         <header class="section-heading article-heading method-heading">
-          <p class="section-number">2 · Method</p>
+          <p class="section-number">4 · Method</p>
           <h2>Variational Streaming Flow</h2>
-          <p>At a sampled physical time <span class="math-inline" data-tex="s">s</span>, VSF models the conditional law of the observed local velocity <span class="math-inline" data-tex="u_s">us</span> given the context <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span>. The starting objective is to maximize its conditional likelihood.</p>
+          <p>VSF gives Streaming Flow a trajectory-level latent variable. During training, an encoder learns which latent values explain the motion that actually occurred. During forecasting, we draw one latent from a simple prior and keep it fixed while the state advances through physical time.</p>
         </header>
+
+        <div class="method-at-glance" aria-label="Variational Streaming Flow method at a glance">
+          <article><span>1</span><h3>Observe motion</h3><p>Choose a point on a training trajectory and measure its local state and velocity.</p></article>
+          <i aria-hidden="true">→</i>
+          <article><span>2</span><h3>Learn future codes</h3><p>Infer latent values from the observed motion and train the resulting velocities to match the observed velocity distribution.</p></article>
+          <i aria-hidden="true">→</i>
+          <article><span>3</span><h3>Sample once, then roll</h3><p>At inference, draw one latent from the prior, hold it fixed, and use one physical-time update per next state.</p></article>
+        </div>
 
         <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
           <header class="method-subheading">
-            <p class="subsection-number">2.1 · Variational starting point</p>
+            <p class="subsection-number">5.1 · Variational starting point</p>
             <h3 id="velocity-evidence-heading">Conditional velocity evidence</h3>
           </header>
 
@@ -306,7 +508,7 @@
 
         <section class="objective-panel" aria-labelledby="energy-objective-heading">
           <header class="objective-copy">
-            <p class="subsection-number">2.2 · Distributional objective</p>
+            <p class="subsection-number">5.2 · Distributional objective</p>
             <h3 id="energy-objective-heading">Distributional velocity reconstruction</h3>
             <p>MSE is appropriate when the latent fully separates the future dynamics. This separation fails when the encoder cannot reliably infer which continuation occurs, when the posterior distributions of distinct continuations overlap in latent space, or when posterior collapse leaves the latent with little or no continuation-specific information. In those cases, the same context and latent value remain compatible with multiple velocities, so the population MSE solution averages the remaining velocity variation:</p>
           </header>
@@ -395,7 +597,7 @@
 
         <section class="method-procedure" aria-labelledby="training-inference-heading">
           <header class="method-subheading">
-            <p class="subsection-number">2.3 · Optimization and rollout</p>
+            <p class="subsection-number">5.3 · Optimization and rollout</p>
             <h3 id="training-inference-heading">Training and inference</h3>
             <p>The learned latent-conditioned field advances the forecast directly in physical time:</p>
           </header>
@@ -433,14 +635,14 @@
     <section class="section section-results" id="results">
       <div class="container article-container">
         <header class="section-heading article-heading results-heading results-heading--standalone">
-          <p class="section-number">3 · Results</p>
+          <p class="section-number">5 · Results</p>
           <h2>Dynamical-system forecasting</h2>
           <p>We evaluate 1,000-step forecasts on fully observed deterministic systems and partially observed parameter-mixture systems.</p>
         </header>
 
         <section class="forecast-subsection" aria-labelledby="deterministic-forecasting-heading">
           <header class="forecast-subsection__heading">
-            <p class="subsection-number">3.1</p>
+            <p class="subsection-number">6.1</p>
             <h3 id="deterministic-forecasting-heading">Deterministic forecasting</h3>
             <p>All state variables are observed. We report pointwise forecast accuracy and compare complete long-horizon trajectories.</p>
           </header>
@@ -493,22 +695,19 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
-          <figure class="paper-figure forecast-error-figure">
-            <img src="assets/figures/forecasting/errors/deterministic-rollout-errors.png" alt="CRPS, RMSE, and MAE across 1,000 forecast steps for deterministic double-pendulum, Rössler, and Lorenz systems." width="990" height="783" loading="lazy">
-            <figcaption><strong>Long-horizon error.</strong> VSF maintains the lowest error across the three deterministic systems.</figcaption>
-          </figure>
-
-          <figure class="forecast-gallery forecast-gallery--deterministic" data-deterministic-gallery>
+          <figure class="forecast-gallery forecast-gallery--deterministic" data-deterministic-gallery data-forecast-animation-gallery>
             <div class="forecast-gallery__header">
               <div>
                 <p class="figure-kicker">Qualitative comparison</p>
                 <h4>Deterministic systems</h4>
               </div>
-              <div class="dataset-jump-list" role="tablist" aria-label="Select a deterministic dataset">
-                <button class="dataset-jump dataset-jump--pendulum-one" id="deterministic-pendulum-one-tab" type="button" role="tab" aria-selected="true" aria-controls="deterministic-pendulum-one" data-deterministic-dataset>Double pendulum 1</button>
-                <button class="dataset-jump dataset-jump--pendulum-two" id="deterministic-pendulum-two-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-pendulum-two" tabindex="-1" data-deterministic-dataset>Double pendulum 2</button>
-                <button class="dataset-jump dataset-jump--rossler" id="deterministic-rossler-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-rossler" tabindex="-1" data-deterministic-dataset>Rössler</button>
-                <button class="dataset-jump dataset-jump--lorenz" id="deterministic-lorenz-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-lorenz" tabindex="-1" data-deterministic-dataset>Lorenz</button>
+              <div class="forecast-gallery__controls">
+                <div class="dataset-jump-list" role="tablist" aria-label="Select a deterministic dataset">
+                  <button class="dataset-jump dataset-jump--pendulum-one" id="deterministic-pendulum-one-tab" type="button" role="tab" aria-selected="true" aria-controls="deterministic-pendulum-one" data-deterministic-dataset>Double pendulum 1</button>
+                  <button class="dataset-jump dataset-jump--pendulum-two" id="deterministic-pendulum-two-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-pendulum-two" tabindex="-1" data-deterministic-dataset>Double pendulum 2</button>
+                  <button class="dataset-jump dataset-jump--rossler" id="deterministic-rossler-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-rossler" tabindex="-1" data-deterministic-dataset>Rössler</button>
+                  <button class="dataset-jump dataset-jump--lorenz" id="deterministic-lorenz-tab" type="button" role="tab" aria-selected="false" aria-controls="deterministic-lorenz" tabindex="-1" data-deterministic-dataset>Lorenz</button>
+                </div>
               </div>
             </div>
 
@@ -525,44 +724,44 @@
                 <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel>
                   <h5 id="deterministic-pendulum-one-label">Double pendulum 1</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png" alt="Ground-truth trajectory for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-samples.png" alt="Ten VSF forecast samples for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/sf.png" alt="Standard Streaming Flow forecast for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/block-diffusion.png" alt="Block diffusion forecast for double pendulum instance 1." width="440" height="440" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-samples.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-samples.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-samples.gif" alt="Ten VSF forecast samples for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-ensemble-mean.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-ensemble-mean.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum-1/vsf-ensemble-mean.gif" alt="VSF ensemble predictive mean for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/sf.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum-1/sf.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum-1/sf.gif" alt="Standard Streaming Flow forecast for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum-1/block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum-1/block-diffusion.gif" alt="Block diffusion forecast for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
                   </div>
                 </section>
 
                 <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel hidden>
                   <h5 id="deterministic-pendulum-two-label">Double pendulum 2 <span>chaotic</span></h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png" alt="Ground-truth trajectory for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.png" alt="Ten VSF forecast samples for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/sf.png" alt="Standard Streaming Flow forecast for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/block-diffusion.png" alt="Block diffusion forecast for chaotic double pendulum instance 2." width="428" height="428" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.gif" alt="Ten VSF forecast samples for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-ensemble-mean.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum/vsf-ensemble-mean.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum/vsf-ensemble-mean.gif" alt="VSF ensemble predictive mean for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/sf.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum/sf.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum/sf.gif" alt="Standard Streaming Flow forecast for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/deterministic/double-pendulum/block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/double-pendulum/block-diffusion.gif" alt="Block diffusion forecast for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
                   </div>
                 </section>
 
                 <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel hidden>
                   <h5 id="deterministic-rossler-label">Rössler</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png" alt="Ground-truth deterministic Rössler trajectory." width="428" height="378" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-samples.png" alt="Ten VSF forecast samples for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/sf.png" alt="Standard Streaming Flow forecast for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/block-diffusion.png" alt="Block diffusion forecast for deterministic Rössler." width="428" height="378" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Rössler trajectory." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-samples.png" data-forecast-static-src="assets/figures/forecasting/deterministic/rossler/vsf-samples.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/rossler/vsf-samples.gif" alt="Ten VSF forecast samples for deterministic Rössler." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/vsf-ensemble-mean.png" data-forecast-static-src="assets/figures/forecasting/deterministic/rossler/vsf-ensemble-mean.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/rossler/vsf-ensemble-mean.gif" alt="VSF ensemble predictive mean for deterministic Rössler." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/sf.png" data-forecast-static-src="assets/figures/forecasting/deterministic/rossler/sf.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/rossler/sf.gif" alt="Standard Streaming Flow forecast for deterministic Rössler." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/deterministic/rossler/block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/rossler/block-diffusion.gif" alt="Block diffusion forecast for deterministic Rössler." width="306" height="270" loading="lazy"></div></div>
                   </div>
                 </section>
 
                 <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel hidden>
                   <h5 id="deterministic-lorenz-label">Lorenz</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png" alt="Ground-truth deterministic Lorenz trajectory." width="428" height="374" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-samples.png" alt="Ten VSF forecast samples for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-ensemble-mean.png" alt="VSF ensemble predictive mean for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/sf.png" alt="Standard Streaming Flow forecast for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
-                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/block-diffusion.png" alt="Block diffusion forecast for deterministic Lorenz." width="428" height="374" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Lorenz trajectory." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-samples.png" data-forecast-static-src="assets/figures/forecasting/deterministic/lorenz/vsf-samples.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/lorenz/vsf-samples.gif" alt="Ten VSF forecast samples for deterministic Lorenz." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/vsf-ensemble-mean.png" data-forecast-static-src="assets/figures/forecasting/deterministic/lorenz/vsf-ensemble-mean.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/lorenz/vsf-ensemble-mean.gif" alt="VSF ensemble predictive mean for deterministic Lorenz." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/sf.png" data-forecast-static-src="assets/figures/forecasting/deterministic/lorenz/sf.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/lorenz/sf.gif" alt="Standard Streaming Flow forecast for deterministic Lorenz." width="306" height="270" loading="lazy"></div></div>
+                    <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/deterministic/lorenz/block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/deterministic/lorenz/block-diffusion.gif" alt="Block diffusion forecast for deterministic Lorenz." width="306" height="270" loading="lazy"></div></div>
                   </div>
                 </section>
               </div>
@@ -573,7 +772,7 @@
 
         <section class="forecast-subsection" aria-labelledby="stochastic-forecasting-heading">
           <header class="forecast-subsection__heading">
-            <p class="subsection-number">3.2</p>
+            <p class="subsection-number">6.2</p>
             <h3 id="stochastic-forecasting-heading">Stochastic forecasting</h3>
             <p>Rössler and Lorenz are partially observed parameter-mixture systems. We evaluate the conditional distribution of complete future trajectories.</p>
           </header>
@@ -623,13 +822,8 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
-          <figure class="paper-figure forecast-error-figure">
-            <img src="assets/figures/forecasting/errors/stochastic-rollout-errors.png" alt="Conditional mean, conditional standard deviation, Wasserstein-1, and energy-distance errors across forecast steps for partially observed Rössler and Lorenz systems." width="990" height="909" loading="lazy">
-            <figcaption><strong>Distributional error.</strong> VSF remains accurate across the conditional mean, conditional standard deviation, Wasserstein-1 distance, and energy distance.</figcaption>
-          </figure>
-
-          <figure class="forecast-gallery">
-            <div class="forecast-gallery__header forecast-gallery__header--plain">
+          <figure class="forecast-gallery" data-forecast-animation-gallery>
+            <div class="forecast-gallery__header">
               <div>
                 <p class="figure-kicker">Generated trajectories</p>
                 <h4>Rössler</h4>
@@ -637,40 +831,42 @@
             </div>
             <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Stochastic Rössler trajectory comparison">
               <div class="forecast-comparison-strip forecast-comparison-strip--stochastic">
-                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/gt.png" alt="Ground-truth trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
-                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/vsf.png" alt="VSF-generated trajectories for partially observed Rössler." width="308" height="275" loading="lazy"></div></div>
-                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/sf.png" alt="Standard Streaming Flow trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
-                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/block-diffusion.png" alt="Block diffusion trajectories for partially observed Rössler." width="308" height="275" loading="lazy"></div></div>
-                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="307" height="275" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/vsf.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/vsf.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/vsf.gif" alt="VSF-generated trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/sf.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/sf.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/sf.gif" alt="Standard Streaming Flow trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/block-diffusion.gif" alt="Block diffusion trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
+                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" data-forecast-static-src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.gif" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
               </div>
             </div>
             <figcaption>Ten trajectories per method. VSF preserves the Rössler geometry while capturing variability across plausible futures.</figcaption>
           </figure>
 
-          <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery>
+          <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery data-forecast-animation-gallery>
             <div class="forecast-gallery__header">
               <div>
                 <p class="figure-kicker">Generated trajectories</p>
                 <h4>Lorenz</h4>
               </div>
-              <div>
-                <span class="figure-selector__label">Displayed draw</span>
-                <div class="figure-selector figure-selector--samples" aria-label="Select a stochastic Lorenz sample">
-                  <button type="button" aria-pressed="true" data-lorenz-draw="01">1</button>
-                  <button type="button" aria-pressed="false" data-lorenz-draw="08">2</button>
-                  <button type="button" aria-pressed="false" data-lorenz-draw="03">3</button>
-                  <button type="button" aria-pressed="false" data-lorenz-draw="04">4</button>
-                  <button type="button" aria-pressed="false" data-lorenz-draw="07">5</button>
+              <div class="forecast-gallery__controls">
+                <div>
+                  <span class="figure-selector__label" id="lorenz-draw-selector-label">Displayed draw</span>
+                  <div class="figure-selector figure-selector--samples" role="group" aria-labelledby="lorenz-draw-selector-label">
+                    <button type="button" aria-pressed="true" data-lorenz-draw="01">1</button>
+                    <button type="button" aria-pressed="false" data-lorenz-draw="08">2</button>
+                    <button type="button" aria-pressed="false" data-lorenz-draw="03">3</button>
+                    <button type="button" aria-pressed="false" data-lorenz-draw="04">4</button>
+                    <button type="button" aria-pressed="false" data-lorenz-draw="07">5</button>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Stochastic Lorenz trajectory comparison">
               <div class="forecast-comparison-strip forecast-comparison-strip--stochastic">
-                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-gt.png" alt="Ground-truth stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="gt"></div></div>
-                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-vsf.png" alt="VSF stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="vsf"></div></div>
-                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-streaming-flow.png" alt="Standard Streaming Flow stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="streaming-flow"></div></div>
-                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-block-diffusion.png" alt="Block diffusion stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="block-diffusion"></div></div>
-                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.png" alt="Autoregressive diffusion stochastic Lorenz trajectory for displayed draw 1." width="503" height="440" loading="lazy" data-lorenz-panel="ar-diffusion"></div></div>
+                <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-gt.png?v=forecast-gifs-2" alt="Ground-truth stochastic Lorenz trajectory for displayed draw 1." width="306" height="270" loading="lazy" data-lorenz-panel="gt"></div></div>
+                <div class="forecast-panel"><p>VSF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-vsf.png" data-forecast-static-src="assets/figures/forecasting/stochastic/lorenz/sample-01-vsf.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/lorenz/sample-01-vsf.gif" alt="VSF stochastic Lorenz trajectory for displayed draw 1." width="306" height="270" loading="lazy" data-lorenz-panel="vsf"></div></div>
+                <div class="forecast-panel"><p>Standard SF</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-streaming-flow.png" data-forecast-static-src="assets/figures/forecasting/stochastic/lorenz/sample-01-streaming-flow.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/lorenz/sample-01-streaming-flow.gif" alt="Standard Streaming Flow stochastic Lorenz trajectory for displayed draw 1." width="306" height="270" loading="lazy" data-lorenz-panel="streaming-flow"></div></div>
+                <div class="forecast-panel"><p>Block diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-block-diffusion.png" data-forecast-static-src="assets/figures/forecasting/stochastic/lorenz/sample-01-block-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/lorenz/sample-01-block-diffusion.gif" alt="Block diffusion stochastic Lorenz trajectory for displayed draw 1." width="306" height="270" loading="lazy" data-lorenz-panel="block-diffusion"></div></div>
+                <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.png" data-forecast-static-src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.png" data-forecast-animated-src="assets/figures/forecasting/stochastic/lorenz/sample-01-ar-diffusion.gif" alt="Autoregressive diffusion stochastic Lorenz trajectory for displayed draw 1." width="306" height="270" loading="lazy" data-lorenz-panel="ar-diffusion"></div></div>
               </div>
             </div>
             <figcaption>Conditioned on the same observed history, each model defines a distribution over future trajectories. Select a draw to view one reference trajectory and one sample from each forecast distribution.</figcaption>
@@ -682,7 +878,7 @@
     <section class="section section-soft" id="world-model">
       <div class="container article-container">
         <header class="section-heading article-heading results-heading">
-          <p class="section-number">4 · Results</p>
+          <p class="section-number">7 · Results</p>
           <h2>World-model prediction</h2>
           <p>We replace the deterministic autoregressive predictor in a frozen JEPA world model with action-conditioned VSF. For each candidate action sequence, CEM evaluates the predicted physical-time trajectory and selects the plan whose terminal state best matches the encoded goal.</p>
         </header>
@@ -754,10 +950,10 @@
 
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
-            <!-- <p class="subsection-number">4.1 · Rollout visualizations</p> -->
+            <!-- <p class="subsection-number">7.1 · Rollout visualizations</p> -->
             <h3 id="world-model-rollouts-heading">World model visualizations</h3>
             <p><strong>Plan 1</strong> (blue) is the predicted latent trajectory for the first action sequence chosen by the Cross-Entropy Method (CEM) planner from the initial observation. The agent executes that sequence for up to 25 environment steps. If the goal has not been reached, the actual simulator frame at step 25—not another model prediction—becomes the <strong>new observation</strong>. The encoder maps it into latent space, re-anchoring planning to the state that was actually reached. CEM then selects <strong>Plan 2</strong> (red) from this updated state for the remaining budget, up to step 50. The black dashed curve shows the realized ground-truth latent trajectory; successful episodes may end earlier.</p>
-            <!-- <p>Each case places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
+            <!-- <p>Each example places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
           </header>
 
           <aside class="rollout-interpretation" aria-label="How to read the rollout videos">
@@ -767,22 +963,22 @@
           <div class="rollout-comparison-list">
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
-                <h4>PushT <span>case 1</span></h4>
+                <h4>PushT <span>rotated alignment</span></h4>
                 <p>Push the T-shaped block to the demonstrated goal configuration; both the point pusher and block poses define the goal.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 1">
-                    <source src="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 1.</a>
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for the rotated PushT alignment">
+                    <source src="assets/figures/videos/pusht_task_022_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_022_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 1">
-                    <source src="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_021_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 1.</a>
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for the rotated PushT alignment">
+                    <source src="assets/figures/videos/pusht_task_022_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_022_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT.</a>
                   </video>
                 </figure>
               </div>
@@ -790,68 +986,68 @@
 
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
-                <h4>PushT <span>case 2</span></h4>
-                <p>Push the T-shaped block to the demonstrated goal configuration; both the point pusher and block poses define the goal.</p>
-              </header>
-              <div class="rollout-comparison__grid">
-                <figure class="rollout-video-card">
-                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for PushT case 2">
-                    <source src="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for PushT case 2.</a>
-                  </video>
-                </figure>
-                <figure class="rollout-video-card">
-                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for PushT case 2">
-                    <source src="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/pusht_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for PushT case 2.</a>
-                  </video>
-                </figure>
-              </div>
-            </article>
-
-            <article class="rollout-comparison">
-              <header class="rollout-comparison__header">
-                <h4>Cube <span>case 1</span></h4>
+                <h4>Cube</h4>
                 <p>Use the UR5e gripper to pick up the cube and place its center at the target location; cube orientation does not matter.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 1">
-                    <source src="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 1.</a>
-                  </video>
-                </figure>
-                <figure class="rollout-video-card">
-                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 1">
-                    <source src="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 1.</a>
-                  </video>
-                </figure>
-              </div>
-            </article>
-
-            <article class="rollout-comparison">
-              <header class="rollout-comparison__header">
-                <h4>Cube <span>case 2</span></h4>
-                <p>Use the UR5e gripper to pick up the cube and place its center at the target location; cube orientation does not matter.</p>
-              </header>
-              <div class="rollout-comparison__grid">
-                <figure class="rollout-video-card">
-                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="AR predictor latent trajectory and physical rollout for Cube">
                     <source src="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube case 2.</a>
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_arp_latent_trajectory.mp4">Open the AR predictor clip for Cube.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
-                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube case 2">
+                  <video controls muted playsinline preload="auto" width="1530" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Cube">
                     <source src="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube case 2.</a>
+                    Your browser cannot play this video. <a href="assets/figures/videos/cube_task_044_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Cube.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>TwoRoom</h4>
+                <p>Guide the red point agent from one room to a target in the other through the single doorway.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="AR predictor latent trajectory and physical rollout for TwoRoom">
+                    <source src="assets/figures/videos/tworoom_task_041_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/tworoom_task_041_arp_latent_trajectory.mp4">Open the AR predictor clip for TwoRoom.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="VSF predictor latent trajectory and physical rollout for TwoRoom">
+                    <source src="assets/figures/videos/tworoom_task_041_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/tworoom_task_041_vsf_latent_trajectory.mp4">Open the VSF predictor clip for TwoRoom.</a>
+                  </video>
+                </figure>
+              </div>
+            </article>
+
+            <article class="rollout-comparison">
+              <header class="rollout-comparison__header">
+                <h4>Reacher</h4>
+                <p>Move the planar two-link arm to match the complete target joint configuration.</p>
+              </header>
+              <div class="rollout-comparison__grid">
+                <figure class="rollout-video-card">
+                  <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
+                  <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="AR predictor latent trajectory and physical rollout for Reacher">
+                    <source src="assets/figures/videos/reacher_task_042_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Reacher.</a>
+                  </video>
+                </figure>
+                <figure class="rollout-video-card">
+                  <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
+                  <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Reacher">
+                    <source src="assets/figures/videos/reacher_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Reacher.</a>
                   </video>
                 </figure>
               </div>
