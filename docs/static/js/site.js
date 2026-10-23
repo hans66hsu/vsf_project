@@ -53,6 +53,12 @@
   window.addEventListener("resize", updateMathOverflow, { passive: true });
   mobileEquationQuery.addEventListener?.("change", updateMathOverflow);
 
+  document.querySelectorAll("[data-technical-details]").forEach((details) => {
+    details.addEventListener("toggle", () => {
+      if (details.open) window.requestAnimationFrame(updateMathOverflow);
+    });
+  });
+
   const header = document.querySelector("[data-header]");
   const nav = document.querySelector("[data-nav]");
   const navToggle = document.querySelector("[data-nav-toggle]");
@@ -94,15 +100,19 @@
     if (window.innerWidth > 780) closeNav();
   }, { passive: true });
 
-  window.addEventListener("load", () => {
+  const revealHashTarget = () => {
     if (!window.location.hash) return;
     const target = document.querySelector(window.location.hash);
     if (!target) return;
+    target.closest("details:not([open])")?.setAttribute("open", "");
     const previousBehavior = document.documentElement.style.scrollBehavior;
     document.documentElement.style.scrollBehavior = "auto";
     target.scrollIntoView({ block: "start" });
     document.documentElement.style.scrollBehavior = previousBehavior;
-  });
+  };
+
+  window.addEventListener("load", revealHashTarget);
+  window.addEventListener("hashchange", revealHashTarget);
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -110,25 +120,13 @@
 
   const setParadigmAnimation = (root, shouldPlay) => {
     const image = root.querySelector("img[data-static-src][data-animated-src]");
-    const button = root.querySelector("[data-paradigm-toggle]");
-    const label = button?.querySelector("span");
-    if (!image || !button || !label) return;
+    if (!image) return;
 
     image.src = shouldPlay ? image.dataset.animatedSrc : image.dataset.staticSrc;
-    root.dataset.animationRunning = String(shouldPlay);
-    button.setAttribute("aria-pressed", String(shouldPlay));
-    label.textContent = shouldPlay ? "Pause animation" : "Play animation";
   };
 
   paradigmAnimations.forEach((root) => {
-    const button = root.querySelector("[data-paradigm-toggle]");
-    if (!button) return;
-    button.hidden = false;
     setParadigmAnimation(root, !reducedMotion.matches);
-    button.addEventListener("click", () => {
-      const isRunning = root.dataset.animationRunning === "true";
-      setParadigmAnimation(root, !isRunning);
-    });
   });
 
   reducedMotion.addEventListener?.("change", () => {
@@ -238,7 +236,7 @@
       tau: 0.4,
       k: 1.4,
       slope: 3.2,
-      // Both diagnostics use the same post-split physical time, t = t* = 0.60.
+      // Both diagnostics use the same post-split physical time, t = 0.60.
       posteriorTime: 0.6,
       sensitivityTime: 0.6,
       // This sigma0 interval keeps the complete linked sensitivity curve inside
@@ -769,13 +767,6 @@
         "text-anchor": "middle",
         transform: `rotate(-90 16 ${(sensitivityFrame.top + bottom) / 2})`,
       }, "log physical-state sensitivity");
-      add(svg, "text", {
-        x: right - 4,
-        y: sensitivityFrame.top + 13,
-        class: "plot-note",
-        "text-anchor": "end",
-      }, `t* = ${sensitivityTimeLabel}`);
-
       const curve = range(epsilonMin, epsilonMax, 260)
         .map((value) => [value, logSensitivityFromFidelity(value)]);
       add(svg, "path", {
@@ -959,12 +950,12 @@
       boundPlot.replaceChildren();
       const distance = halfEnergyDistance(alpha);
       const reconstruction = expectedGeneralizedEnergyReconstruction(alpha);
-      add(boundPlot, "title", { id: "energy-bound-title" }, "Prior-predictive energy-distance control in an aggregate-aligned two-branch example");
+      add(boundPlot, "title", { id: "energy-bound-title" }, "Prediction–truth mismatch and training reconstruction loss");
       add(
         boundPlot,
         "desc",
         { id: "energy-bound-desc" },
-        `True velocities are minus and plus one, while the selected prior-predictive velocities are ${model.predictionLow} and ${model.predictionHigh}. At alpha ${alpha.toFixed(3)}, half the prior-predictive energy distance is ${formatMetric(distance)} and the expected generalized energy reconstruction is ${formatMetric(reconstruction)}.`,
+        `True velocities are minus and plus one, while the selected predictions are ${model.predictionLow} and ${model.predictionHigh}. At alpha ${alpha.toFixed(3)}, the prediction–truth mismatch is ${formatMetric(distance)} and the training reconstruction loss L E S is ${formatMetric(reconstruction)}.`,
       );
 
       const x = (value) => 120 + ((value + 1.25) / 2.5) * 420;
@@ -1032,8 +1023,8 @@
       const distanceWidth = Math.min(meterWidth, (distance / meterMax) * meterWidth);
       const scoreWidth = Math.min(meterWidth, (reconstruction / meterMax) * meterWidth);
       add(boundPlot, "text", { x: meterX, y: 186, class: "energy-bound-value" }, isFailure
-        ? "½ energy distance (mean only)"
-        : "½ energy distance");
+        ? "Mean mismatch at α = 2"
+        : "Prediction–truth mismatch");
       add(boundPlot, "text", {
         x: 580, y: 186, class: "energy-bound-value", "text-anchor": "end",
       }, formatMetric(distance));
@@ -1045,7 +1036,13 @@
           x: meterX, y: 196, width: distanceWidth, height: 14, rx: 2, class: "energy-bound-meter-distance",
         });
       }
-      add(boundPlot, "text", { x: meterX, y: 250, class: "energy-bound-value" }, "generalized energy reconstruction");
+      const lossLabel = add(boundPlot, "text", { x: meterX, y: 250, class: "energy-bound-value" });
+      add(lossLabel, "tspan", {}, "Training reconstruction loss ");
+      add(lossLabel, "tspan", { "font-style": "italic" }, "ℒ");
+      add(lossLabel, "tspan", {
+        class: "energy-bound-loss-subscript",
+        "baseline-shift": "sub",
+      }, "ES");
       add(boundPlot, "text", {
         x: 580, y: 250, class: "energy-bound-value", "text-anchor": "end",
       }, formatMetric(reconstruction));
@@ -1121,28 +1118,31 @@
       const selectedY = contourY(high);
       const truthX = contourX(-1);
       const truthY = contourY(1);
+      const isExactMatch = Math.abs(low + 1) < 1e-12 && Math.abs(high - 1) < 1e-12;
 
-      add(contourSelectionLayer, "line", {
-        x1: selectedX,
-        y1: selectedY,
-        x2: truthX,
-        y2: truthY,
-        class: "energy-contour-path",
-      });
+      if (!isExactMatch) {
+        add(contourSelectionLayer, "line", {
+          x1: selectedX,
+          y1: selectedY,
+          x2: truthX,
+          y2: truthY,
+          class: "energy-contour-path",
+        });
+      }
       add(contourSelectionLayer, "circle", {
         cx: selectedX,
         cy: selectedY,
-        r: 6.5,
-        class: "energy-contour-selected",
+        r: isExactMatch ? 11 : 6.5,
+        class: `energy-contour-selected${isExactMatch ? " energy-contour-selected--exact" : ""}`,
       });
       if (contourDescription) {
-        contourDescription.textContent = `At alpha ${alpha.toFixed(3)}, the contour color shows generalized energy reconstruction relative to the truth at minus one and plus one. The selected prediction is ${low} and ${high}, with relative reconstruction ${formatMetric(selectedValue)}.`;
+        contourDescription.textContent = `At alpha ${alpha.toFixed(3)}, the contour color shows prediction–truth mismatch. The selected prediction is ${low} and ${high}, with mismatch ${formatMetric(selectedValue)}.`;
       }
     };
 
     const drawGeneralizedEnergyContour = (alpha, isFailure) => {
       lossPlot.replaceChildren();
-      add(lossPlot, "title", { id: "energy-loss-title" }, "Generalized energy reconstruction over two predicted values");
+      add(lossPlot, "title", { id: "energy-loss-title" }, "Prediction–truth mismatch landscape over two predicted values");
       contourDescription = add(lossPlot, "desc", { id: "energy-loss-desc" });
 
       const canvas = document.createElement("canvas");
@@ -1357,11 +1357,10 @@
     };
 
     const regimeFor = (alpha, isFailure) => {
-      if (isFailure) return "At α = 2, the landscape depends only on the prediction mean; equal-mean predictions share a flat valley.";
-      if (alpha < 0.9995) return "For 0 < α < 2, the truth remains the unique minimum of the landscape.";
-      if (alpha < 1.0005) return "At α = 1, generalized energy reconstruction uses unsquared distances.";
-      if (alpha >= 1.95) return "Near 2, the basin flattens along predictions with nearly the correct mean.";
-      return "For 0 < α < 2, the truth remains the unique minimum of the landscape.";
+      if (isFailure) return "At α = 2, every prediction with the correct mean is a minimum.";
+      if (alpha < 0.9995) return "For 0 < α < 1, the loss is nonconvex but has a unique minimum at the truth.";
+      if (alpha < 1.0005) return "At α = 1, the loss uses unsquared distances.";
+      return "For 1 < α < 2, the loss has a unique minimum at the truth.";
     };
 
     const updateAlpha = (announce = false, redrawLandscape = true) => {
@@ -1382,7 +1381,7 @@
       alphaInput.setAttribute(
         "aria-valuetext",
         isFailure
-          ? "alpha 2; generalized energy reconstruction depends only on the prediction mean"
+          ? "alpha 2; mismatch depends only on the prediction mean"
           : `alpha ${alpha.toFixed(3)}; ${regime}`,
       );
       drawBound(alpha, isFailure);
@@ -1396,8 +1395,8 @@
           alpha,
         );
         status.textContent = isFailure
-          ? `Using prediction ${pair}. Alpha equals two; reconstruction relative to truth is ${formatMetric(relativeValue)}, and the landscape is mean-only.`
-          : `Using prediction ${pair}. Alpha ${alpha.toFixed(3)}. Reconstruction relative to truth is ${formatMetric(relativeValue)}. ${regime}`;
+          ? `Using prediction ${pair}. Alpha equals two; mean mismatch is ${formatMetric(relativeValue)}, and the landscape is mean-only.`
+          : `Using prediction ${pair}. Alpha ${alpha.toFixed(3)}. Prediction–truth mismatch is ${formatMetric(relativeValue)}. ${regime}`;
       }
     };
 
@@ -1444,8 +1443,8 @@
     )];
 
     images.forEach((image) => {
-      const deterministicPanel = image.closest("[data-deterministic-panel]");
-      const isVisible = !deterministicPanel || !deterministicPanel.hidden;
+      const selectablePanel = image.closest("[data-deterministic-panel], [data-lorenz-draw-panel]");
+      const isVisible = !selectablePanel || !selectablePanel.hidden;
       const useAnimatedSource = shouldPlay && isVisible;
       const nextSource = useAnimatedSource
         ? `${image.dataset.forecastAnimatedSrc}?v=forecast-media-5`
@@ -1520,44 +1519,42 @@
   const lorenzSampleGallery = document.querySelector("[data-lorenz-sample-gallery]");
 
   if (lorenzSampleGallery) {
-    const methodDescriptions = {
-      gt: "Ground-truth",
-      vsf: "VSF",
-      "streaming-flow": "Standard Streaming Flow",
-      "block-diffusion": "Block diffusion",
-      "ar-diffusion": "Autoregressive diffusion",
-    };
-    const buttons = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-draw]"));
-    const panels = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-panel]"));
+    const drawButtons = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-draw]"));
+    const drawPanels = Array.from(lorenzSampleGallery.querySelectorAll("[data-lorenz-draw-panel]"));
+    const matrix = lorenzSampleGallery.querySelector(".lorenz-comparison-matrix");
+    const comparisonScroll = lorenzSampleGallery.querySelector(".forecast-comparison-scroll");
     const status = lorenzSampleGallery.querySelector("[data-lorenz-sample-status]");
 
-    const showLorenzDraw = (button) => {
-      const draw = button.dataset.lorenzDraw;
-      const displayedIndex = buttons.indexOf(button) + 1;
-      buttons.forEach((candidate) => {
-        candidate.setAttribute("aria-pressed", String(candidate === button));
+    const selectLorenzDraw = (selectedButton) => {
+      const selectedDraw = selectedButton.dataset.lorenzDraw;
+      const showAll = selectedDraw === "all";
+
+      drawButtons.forEach((button) => {
+        button.setAttribute("aria-pressed", String(button === selectedButton));
       });
-      panels.forEach((panel) => {
-        const method = panel.dataset.lorenzPanel;
-        const assetStem = `assets/figures/forecasting/stochastic/lorenz/sample-${draw}-${method}`;
-        if (method === "gt") {
-          panel.src = `${assetStem}.png?v=forecast-gifs-2`;
-        } else {
-          panel.dataset.forecastStaticSrc = `${assetStem}.png`;
-          panel.dataset.forecastAnimatedSrc = `${assetStem}.gif`;
-        }
-        panel.alt = `${methodDescriptions[method]} stochastic Lorenz trajectory for displayed draw ${displayedIndex}.`;
+      drawPanels.forEach((panel) => {
+        panel.hidden = !showAll && panel.dataset.lorenzDrawPanel !== selectedDraw;
       });
+      matrix?.classList.toggle("is-showing-all", showAll);
+
       setForecastGalleryAnimation(
         lorenzSampleGallery,
         lorenzSampleGallery.dataset.animationRunning === "true",
       );
-      if (status) status.textContent = `Showing draw ${displayedIndex} of ${buttons.length}.`;
+      if (comparisonScroll) comparisonScroll.scrollLeft = 0;
+      if (status) {
+        status.textContent = showAll
+          ? `Showing all ${drawPanels.length} draws.`
+          : `Showing draw ${selectedDraw} of ${drawPanels.length}.`;
+      }
     };
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => showLorenzDraw(button));
+    drawButtons.forEach((button) => {
+      button.addEventListener("click", () => selectLorenzDraw(button));
     });
+
+    const initialButton = drawButtons.find((button) => button.getAttribute("aria-pressed") === "true") || drawButtons[0];
+    if (initialButton) selectLorenzDraw(initialButton);
   }
 
   const copyButton = document.querySelector("[data-copy-citation]");
