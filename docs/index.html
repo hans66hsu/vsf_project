@@ -776,7 +776,7 @@
           </header>
 
           <figure class="results-panel results-table-figure" aria-labelledby="deterministic-table-caption">
-            <figcaption class="results-table-caption" id="deterministic-table-caption"><strong>Table 1, deterministic systems.</strong> Forecasting error over a 1,000-step rollout. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
+            <figcaption class="results-table-caption" id="deterministic-table-caption"><strong>Table 1, deterministic systems.</strong> Forecasting error over a 1,000-step rollout. CRPS evaluates the forecast ensemble, while RMSE and MAE evaluate its mean. VSF achieves the lowest value for all three metrics on double pendulum, Rössler, and Lorenz, with samples concentrated near the ground-truth trajectory. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
 
           <section class="forecast-table-block forecast-table-block--first" aria-labelledby="deterministic-results-heading">
             <h4 id="deterministic-results-heading" class="sr-only">Complete deterministic results</h4>
@@ -849,7 +849,7 @@
                   <span>Block diffusion</span>
                 </div>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel>
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel data-caption="Double pendulum 1 is the less chaotic case: VSF, Standard SF and block diffusion both track the ground truth well.">
                   <h5 id="deterministic-pendulum-one-label">Double pendulum 1</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
@@ -860,7 +860,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel data-caption="Double pendulum 2 is more chaotic. Standard SF accumulates error and drifts substantially, whereas VSF samples and their ensemble mean stay close to the ground truth." hidden>
                   <h5 id="deterministic-pendulum-two-label">Double pendulum 2 <span>chaotic</span></h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
@@ -871,7 +871,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel data-caption="VSF and SF preserve the Rössler attractor geometry, while block diffusion introduces visible small-scale deviations." hidden>
                   <h5 id="deterministic-rossler-label">Rössler</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Rössler trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -882,7 +882,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel data-caption="VSF and block diffusion follow the ground truth Lorenz attractor with concentrated samples. Standard SF accumulates phase error and makes extra rotations around the lobe." hidden>
                   <h5 id="deterministic-lorenz-label">Lorenz</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Lorenz trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -894,7 +894,7 @@
                 </section>
               </div>
             </div>
-            <figcaption>Select a system above. Sample panels contain <span class="math-inline" data-tex="N=10">N = 10</span> trajectories; the VSF ensemble column shows their predictive mean.</figcaption>
+            <figcaption><span data-deterministic-caption aria-live="polite">Double pendulum 1 is the less chaotic case: Standard SF and block diffusion both track the ground truth reasonably well, while VSF samples and their ensemble mean remain tightly aligned with it.</span> Each sample panel contains <span class="math-inline" data-tex="N=10">N = 10</span> trajectories; the VSF ensemble column shows their predictive mean.</figcaption>
           </figure>
         </section>
 
@@ -906,7 +906,7 @@
           </header>
 
           <figure class="results-panel results-table-figure" aria-labelledby="stochastic-table-caption">
-            <figcaption class="results-table-caption" id="stochastic-table-caption"><strong>Table 2, stochastic systems.</strong> Distributional forecasting error over a 1,000-step rollout. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
+            <figcaption class="results-table-caption" id="stochastic-table-caption"><strong>Table 2, stochastic systems.</strong> Distributional forecasting error over a 1,000-step rollout. CME and CSE measure errors in the conditional mean and spread, while Wasserstein and energy distances compare complete trajectory distributions. VSF achieves the lowest value for every metric on both Rössler and Lorenz, showing the best recovery of the distribution of plausible futures. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
 
           <section class="forecast-table-block forecast-table-block--first" aria-labelledby="stochastic-results-heading">
             <h4 id="stochastic-results-heading" class="sr-only">Complete stochastic results</h4>
@@ -966,7 +966,7 @@
                 <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.gif" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
               </div>
             </div>
-            <figcaption>Ten trajectories per method. VSF preserves the Rössler geometry while capturing variability across plausible futures.</figcaption>
+            <figcaption>Ten trajectories are shown per method. VSF preserves the ground-truth Rössler geometry while capturing plausible variation. Standard SF produces one deterministic future, block diffusion generates less diverse samples, and AR diffusion is prone to rollout drift.</figcaption>
           </figure>
 
           <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery data-forecast-animation-gallery>
@@ -1056,7 +1056,7 @@
                 </section>
               </div>
             </div>
-            <figcaption>One draw per trajectory. Choose <strong>See all</strong> to compare five draws from the same observed history.</figcaption>
+            <figcaption>Each panel shows one sampled trajectory from the same observed history. VSF retains the characteristic Lorenz geometry and continues to traverse both lobes. Standard SF produces one deterministic continuation. Block diffusion is underdispersed and covers only part of the dynamics. AR diffusion generates diverse trajectories that can drift away from the system. Choose <strong>See all</strong> to compare five draws.</figcaption>
           </figure>
         </section>
       </div>
@@ -1143,6 +1143,7 @@
               <li><strong>Plan 1 (blue): initial planning.</strong> CEM uses the world-model predictor to choose an action sequence from the initial observation, then the agent executes it for 25 time steps.</li>
               <li><strong>Plan 2 (red): replanning.</strong> If the goal remains unreached, CEM uses the same predictor to choose a new action sequence from the latest observation.</li>
             </ol>
+            <p class="world-model-plan-takeaway"><strong>Predictions that stay close to the dashed ground-truth latent trajectory help CEM rank candidate action sequences more accurately.</strong> In the examples below, the AR prediction diverges and the rollout fails, whereas VSF tracks the ground truth more closely and succeeds.</p>
             <!-- <p>Each example places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
           </header>
 

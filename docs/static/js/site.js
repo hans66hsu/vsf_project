@@ -1567,6 +1567,7 @@
   if (deterministicGallery) {
     const datasetTabs = Array.from(deterministicGallery.querySelectorAll("[data-deterministic-dataset]"));
     const datasetPanels = Array.from(deterministicGallery.querySelectorAll("[data-deterministic-panel]"));
+    const datasetCaption = deterministicGallery.querySelector("[data-deterministic-caption]");
     const comparisonScroll = deterministicGallery.querySelector(".forecast-comparison-scroll");
 
     const selectDeterministicDataset = (selectedTab, shouldFocus = false) => {
@@ -1581,6 +1582,11 @@
       datasetPanels.forEach((panel) => {
         panel.hidden = panel.id !== selectedPanelId;
       });
+
+      const selectedPanel = datasetPanels.find((panel) => panel.id === selectedPanelId);
+      if (datasetCaption && selectedPanel?.dataset.caption) {
+        datasetCaption.textContent = selectedPanel.dataset.caption;
+      }
 
       if (comparisonScroll) comparisonScroll.scrollLeft = 0;
       if (shouldFocus) selectedTab.focus();

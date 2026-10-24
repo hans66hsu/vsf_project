@@ -1723,7 +1723,8 @@ a {
 }
 
 .results-table-caption {
-  max-width: 980px;
+  width: 100%;
+  max-width: none;
   margin: 0;
   color: #4d596a;
   font-family: "Source Serif 4", Georgia, serif;
@@ -5841,6 +5842,10 @@ body {
   color: var(--ink);
 }
 
+.world-model-plan-takeaway strong {
+  color: var(--ink);
+}
+
 .forecast-subsection .results-table-figure {
   margin-bottom: 42px;
   border-color: #d6dbe2;
@@ -6228,7 +6233,8 @@ body {
 }
 
 .forecast-gallery > figcaption {
-  max-width: 900px;
+  width: 100%;
+  max-width: none;
   margin: 13px 0 0;
   color: #667184;
   font-size: 0.74rem;
