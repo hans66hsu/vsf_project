@@ -1,4 +1,68 @@
 (() => {
+  const themeStorageKey = "vsf-theme";
+  const themeToggle = document.querySelector("[data-theme-toggle]");
+  const darkThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  const readStoredTheme = () => {
+    try {
+      const value = window.localStorage.getItem(themeStorageKey);
+      return value === "light" || value === "dark" ? value : null;
+    } catch {
+      return null;
+    }
+  };
+
+  let followsSystemTheme = readStoredTheme() === null;
+
+  const setTheme = (theme, { persist = false } = {}) => {
+    const nextTheme = theme === "dark" ? "dark" : "light";
+    const isDark = nextTheme === "dark";
+
+    document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.style.colorScheme = nextTheme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      "content",
+      isDark ? "#0f1620" : "#fdfdfc",
+    );
+
+    if (themeToggle) {
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+      themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+    }
+
+    if (persist) {
+      try {
+        window.localStorage.setItem(themeStorageKey, nextTheme);
+      } catch {}
+    }
+  };
+
+  setTheme(
+    document.documentElement.dataset.theme
+      || readStoredTheme()
+      || (darkThemeQuery.matches ? "dark" : "light"),
+  );
+
+  themeToggle?.addEventListener("click", () => {
+    followsSystemTheme = false;
+    const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme, { persist: true });
+  });
+
+  darkThemeQuery.addEventListener?.("change", (event) => {
+    if (followsSystemTheme) setTheme(event.matches ? "dark" : "light");
+  });
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== themeStorageKey) return;
+    const storedTheme = event.newValue === "light" || event.newValue === "dark"
+      ? event.newValue
+      : null;
+    followsSystemTheme = storedTheme === null;
+    setTheme(storedTheme || (darkThemeQuery.matches ? "dark" : "light"));
+  });
+
   const renderPageMath = () => {
     if (!window.katex) {
       console.warn("KaTeX did not load; keeping readable equation fallbacks.");
@@ -57,6 +121,57 @@
     details.addEventListener("toggle", () => {
       if (details.open) window.requestAnimationFrame(updateMathOverflow);
     });
+  });
+
+  document.querySelectorAll("[data-sf-stage-switcher]").forEach((switcher) => {
+    const tabs = [...switcher.querySelectorAll("[data-sf-stage-tab]")];
+    const panels = [...switcher.querySelectorAll("[data-sf-stage-panel]")];
+    if (tabs.length !== panels.length || tabs.length === 0) return;
+
+    const selectStage = (index, { focus = false, restart = true } = {}) => {
+      tabs.forEach((tab, tabIndex) => {
+        const isSelected = tabIndex === index;
+        tab.classList.toggle("is-active", isSelected);
+        tab.setAttribute("aria-selected", String(isSelected));
+        tab.tabIndex = isSelected ? 0 : -1;
+        if (isSelected && focus) tab.focus();
+      });
+
+      panels.forEach((panel, panelIndex) => {
+        panel.hidden = panelIndex !== index;
+      });
+
+      if (restart) {
+        const image = panels[index]?.querySelector("img[src$='.gif']");
+        if (image) image.src = image.currentSrc || image.src;
+      }
+      window.requestAnimationFrame(updateMathOverflow);
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectStage(index));
+      tab.addEventListener("keydown", (event) => {
+        let nextIndex = null;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          nextIndex = (index + 1) % tabs.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          nextIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = tabs.length - 1;
+        }
+        if (nextIndex === null) return;
+        event.preventDefault();
+        selectStage(nextIndex, { focus: true });
+      });
+    });
+
+    switcher.classList.add("is-enhanced");
+    const initialIndex = Math.max(0, tabs.findIndex(
+      (tab) => tab.getAttribute("aria-selected") === "true",
+    ));
+    selectStage(initialIndex, { restart: false });
   });
 
   const header = document.querySelector("[data-header]");

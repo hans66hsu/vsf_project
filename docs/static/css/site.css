@@ -24,6 +24,33 @@
   --narrow: 870px;
 }
 
+/* Narrative bridges between major sections. */
+.section-transition {
+  max-width: 960px;
+  margin: 34px 0 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.section-transition--lead {
+  margin: 0 0 26px;
+}
+
+.section-transition--after-heading {
+  margin-top: -24px;
+  margin-bottom: 34px;
+}
+
+.section-transition--before-details {
+  margin-top: 30px;
+}
+
+.section-transition--before-details + .bifurcation-technical-details {
+  margin-top: 18px;
+}
+
 *,
 *::before,
 *::after {
@@ -2722,6 +2749,738 @@ tbody tr:last-child td {
   }
 }
 
+/* Alternating page bands and light/dark appearance ---------------------- */
+:root {
+  --section-base: #ffffff;
+  --section-alt: #f6f7f8;
+  --surface-1: #ffffff;
+  --surface-2: #f2f4f7;
+  --surface-3: #e9edf2;
+  --figure-paper: #ffffff;
+  --theme-border: #d7dee7;
+}
+
+.hero,
+.section-why-vsf,
+.section-streaming-flow,
+#method,
+#world-model {
+  background: var(--section-base);
+}
+
+.section-abstract,
+.section-paradigms,
+.section-motivation,
+.section-results,
+.citation-section {
+  background: var(--section-alt);
+}
+
+.section-abstract,
+.section-why-vsf,
+.section-paradigms,
+.section-streaming-flow,
+.section-motivation,
+.section-results,
+#world-model,
+.citation-section {
+  border-color: var(--theme-border);
+}
+
+/* Dark-mode contrast repairs for labels with legacy fixed colors. */
+html[data-theme="dark"] .clock-comparison p i {
+  color: #ff9b87;
+}
+
+html[data-theme="dark"] .paper-figure figcaption strong,
+html[data-theme="dark"] .research-figure figcaption strong,
+html[data-theme="dark"] .forecast-gallery > figcaption strong {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .bifurcation-plot-key,
+html[data-theme="dark"] .bifurcation-plot-key span,
+html[data-theme="dark"] .bifurcation-control__label-row,
+html[data-theme="dark"] .bifurcation-control__label-row label,
+html[data-theme="dark"] .bifurcation-control__endpoints,
+html[data-theme="dark"] .bifurcation-control p,
+html[data-theme="dark"] .bifurcation-control__derived,
+html[data-theme="dark"] .bifurcation-control--segments legend,
+html[data-theme="dark"] .bifurcation-readout,
+html[data-theme="dark"] .energy-alpha-control__readout span,
+html[data-theme="dark"] .results-table-note,
+html[data-theme="dark"] .table-scroll-hint,
+html[data-theme="dark"] .figure-selector__label,
+html[data-theme="dark"] .forecast-method-header span,
+html[data-theme="dark"] .forecast-panel > p,
+html[data-theme="dark"] .forecast-dataset-row h5,
+html[data-theme="dark"] .lorenz-sample-row h5 {
+  color: #b7c4d4;
+}
+
+html[data-theme="dark"] .bifurcation-control__label-row strong,
+html[data-theme="dark"] .bifurcation-control__derived strong,
+html[data-theme="dark"] .bifurcation-readout strong,
+html[data-theme="dark"] .energy-alpha-control__readout output {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .bifurcation-model {
+  --model-accent: #83c4fa;
+  --model-soft: var(--surface-2);
+}
+
+html[data-theme="dark"] .bifurcation-model--latent {
+  --model-accent: #62c8bd;
+}
+
+html[data-theme="dark"] .energy-interactive {
+  --energy-warning: #ff8c7b;
+}
+
+html[data-theme="dark"] .energy-alpha-control__failure-tick {
+  color: var(--energy-warning);
+}
+
+html[data-theme="dark"] .forecast-table .system-header,
+html[data-theme="dark"] .world-model-results-table .world-model-task-header {
+  color: #dbe5f1;
+}
+
+html[data-theme="dark"] .ours-row th em {
+  color: #ffffff;
+  background: #2f73b1;
+}
+
+html[data-theme="dark"] .forecast-dataset-row h5 span {
+  color: #d8ccef;
+  background: #302744;
+  border-color: #55476e;
+}
+
+html[data-theme="dark"] .paradigm-card--streaming .paradigm-card__title > span {
+  background: #126e67;
+}
+
+.header-actions {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle {
+  position: relative;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  padding: 0;
+  color: #4f5968;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  place-items: center;
+}
+
+.theme-toggle:hover {
+  color: var(--blue-deep);
+  background: #eef2f6;
+  border-color: #d7dee7;
+}
+
+.theme-toggle:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--blue), transparent 68%);
+  outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+  grid-area: 1 / 1;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.theme-toggle__icon--sun {
+  display: none;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eef3f8;
+  --ink-2: #cdd7e3;
+  --muted: #98a7ba;
+  --line: #344255;
+  --paper: #0f1620;
+  --soft: #151f2c;
+  --soft-blue: #17283b;
+  --navy: #294f75;
+  --navy-deep: #09111b;
+  --blue: #5ca9e6;
+  --blue-deep: #83c4fa;
+  --violet: #b09be3;
+  --teal: #62c8bd;
+  --green: #5fc8a7;
+  --section-base: #0f1620;
+  --section-alt: #151f2c;
+  --surface-1: #1b2735;
+  --surface-2: #202e3e;
+  --surface-3: #29384a;
+  --figure-paper: #ffffff;
+  --theme-border: #344255;
+  --shadow-sm: 0 3px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"] .theme-toggle__icon--moon {
+  display: none;
+}
+
+html[data-theme="dark"] .theme-toggle__icon--sun {
+  display: block;
+}
+
+html[data-theme="dark"] body {
+  color: var(--ink-2);
+  background: var(--section-base);
+}
+
+html[data-theme="dark"] .site-header,
+html[data-theme="dark"] .site-header.is-scrolled,
+html[data-theme="dark"] .site-header.is-open {
+  background: rgba(15, 22, 32, 0.95);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .brand-mark,
+html[data-theme="dark"] .brand-mark circle {
+  fill: var(--section-base);
+}
+
+html[data-theme="dark"] .site-nav a,
+html[data-theme="dark"] .theme-toggle {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .theme-toggle:hover {
+  color: var(--blue-deep);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .button-primary,
+html[data-theme="dark"] .button-primary:hover,
+html[data-theme="dark"] .button-primary:focus-visible {
+  color: #ffffff;
+  background: #2f73b1;
+}
+
+html[data-theme="dark"] .button-dark,
+html[data-theme="dark"] .button-dark:hover,
+html[data-theme="dark"] .button-dark:focus-visible,
+html[data-theme="dark"] .button-ghost,
+html[data-theme="dark"] .button-ghost:hover,
+html[data-theme="dark"] .button-ghost:focus-visible {
+  color: var(--ink);
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .hero-deck,
+html[data-theme="dark"] .abstract-copy,
+html[data-theme="dark"] .vsf-value-card p,
+html[data-theme="dark"] .limitation-summary p,
+html[data-theme="dark"] .hero-result-showcase__heading > span,
+html[data-theme="dark"] .article-heading > p:last-child,
+html[data-theme="dark"] .method-overview__lead,
+html[data-theme="dark"] .method-subheading > p:last-child,
+html[data-theme="dark"] .method-derivation > p,
+html[data-theme="dark"] .derivation-block > p,
+html[data-theme="dark"] .objective-copy p:not(.eyebrow):not(.subsection-number),
+html[data-theme="dark"] .objective-explanation,
+html[data-theme="dark"] .sf-stage__copy > p,
+html[data-theme="dark"] .forecast-subsection__heading > p:last-child,
+html[data-theme="dark"] .forecast-gallery > figcaption,
+html[data-theme="dark"] .results-table-caption,
+html[data-theme="dark"] .paper-figure figcaption,
+html[data-theme="dark"] .research-figure figcaption,
+html[data-theme="dark"] .bifurcation-technical-details__copy small,
+html[data-theme="dark"] .energy-interactive__intro,
+html[data-theme="dark"] .energy-theory__header > p:last-child,
+html[data-theme="dark"] .world-model-plan-list,
+html[data-theme="dark"] .ground-truth-copy > p,
+html[data-theme="dark"] .latent-copy > p,
+html[data-theme="dark"] .motivation-lead {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .section-why-vsf .vsf-value-grid,
+html[data-theme="dark"] .section-why-vsf .hero-rollout-comparison {
+  background: transparent;
+}
+
+html[data-theme="dark"] .vsf-value-grid,
+html[data-theme="dark"] .limitation-summary,
+html[data-theme="dark"] .vsf-value-card + .vsf-value-card,
+html[data-theme="dark"] .limitation-summary article + article,
+html[data-theme="dark"] .forecast-subsection,
+html[data-theme="dark"] .world-model-rollouts,
+html[data-theme="dark"] .motivation-block,
+html[data-theme="dark"] .derivation-block,
+html[data-theme="dark"] .objective-panel,
+html[data-theme="dark"] .bifurcation-technical-details,
+html[data-theme="dark"] .bifurcation-technical-section,
+html[data-theme="dark"] .bifurcation-model {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .rollout-comparison,
+html[data-theme="dark"] .rollout-comparison__header,
+html[data-theme="dark"] .rollout-comparison__grid,
+html[data-theme="dark"] .rollout-video-card,
+html[data-theme="dark"] .rollout-video-card figcaption {
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .rollout-video-card figcaption {
+  background: var(--surface-2);
+}
+
+html[data-theme="dark"] .rollout-video-card + .rollout-video-card,
+html[data-theme="dark"] .hero-result-showcase .rollout-video-card + .rollout-video-card {
+  border-color: var(--line);
+  box-shadow: inset 1px 0 var(--line);
+}
+
+html[data-theme="dark"] .rollout-comparison__header p,
+html[data-theme="dark"] .rollout-comparison__header h3 span,
+html[data-theme="dark"] .rollout-comparison__header h4 span {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .rollout-outcome--success,
+html[data-theme="dark"] .rollout-outcome--ours {
+  color: #87e0c1;
+  background: #16352f;
+  border-color: #2f6658;
+}
+
+html[data-theme="dark"] .rollout-outcome--failure {
+  color: #ffaaaa;
+  background: #3a2024;
+  border-color: #724047;
+}
+
+html[data-theme="dark"] .rollout-outcome--baseline {
+  color: #c0ccda;
+  background: #283546;
+  border-color: #46576d;
+}
+
+html[data-theme="dark"] .paradigm-legend,
+html[data-theme="dark"] .paradigm-card,
+html[data-theme="dark"] .paradigm-card figcaption,
+html[data-theme="dark"] .paradigm-card dl {
+  color: var(--ink-2);
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .paradigm-card dl {
+  background: var(--surface-2);
+}
+
+html[data-theme="dark"] .paradigm-card--streaming figcaption,
+html[data-theme="dark"] .paradigm-card--streaming dl,
+html[data-theme="dark"] .paradigm-takeaway {
+  background: #142d2c;
+  border-color: #356c67;
+}
+
+html[data-theme="dark"] .paradigm-card dt,
+html[data-theme="dark"] .paradigm-note,
+html[data-theme="dark"] .paradigm-card__action {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .paradigm-card dd,
+html[data-theme="dark"] .paradigm-note strong {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .paradigm-card__action:hover,
+html[data-theme="dark"] .paradigm-card__action:focus-visible,
+html[data-theme="dark"] .sf-stage__view:hover,
+html[data-theme="dark"] .sf-stage__view:focus-visible {
+  color: var(--blue-deep);
+  background: var(--surface-3);
+}
+
+html[data-theme="dark"] .paradigm-takeaway > strong,
+html[data-theme="dark"] .paradigm-takeaway ul,
+html[data-theme="dark"] .paradigm-takeaway li strong,
+html[data-theme="dark"] .paradigm-card--streaming dl div:last-child dd {
+  color: #8bd9cf;
+}
+
+html[data-theme="dark"] .sf-stage-list,
+html[data-theme="dark"] .sf-stage-switcher.is-enhanced .sf-stage-list,
+html[data-theme="dark"] .sf-stage,
+html[data-theme="dark"] .sf-stage__equation {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .sf-stage__media,
+html[data-theme="dark"] .sf-stage__media-footer,
+html[data-theme="dark"] .clock-comparison {
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .sf-stage__media-footer {
+  background: var(--surface-2);
+}
+
+html[data-theme="dark"] .sf-stage__view,
+html[data-theme="dark"] .clock-comparison span,
+html[data-theme="dark"] .clock-comparison__arrow {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .sf-stage__note {
+  color: #8be0d5;
+  background: #14312f;
+  border-color: #356b66;
+}
+
+html[data-theme="dark"] .sf-stage-tab {
+  color: #b7c4d4;
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .sf-stage-tab:hover {
+  color: var(--blue-deep);
+  background: var(--surface-2);
+  border-color: #4a6078;
+}
+
+html[data-theme="dark"] .sf-stage-tab.is-active,
+html[data-theme="dark"] .sf-stage-tab[aria-selected="true"] {
+  color: #ffffff;
+  background: #2f6fca;
+  border-color: #4c8ce3;
+}
+
+html[data-theme="dark"] .plain-language-goal,
+html[data-theme="dark"] .impact-callout,
+html[data-theme="dark"] .why-work-callout,
+html[data-theme="dark"] .method-mse-note,
+html[data-theme="dark"] .derivation-note,
+html[data-theme="dark"] .method-technical-note,
+html[data-theme="dark"] .bifurcation-model-comparison__intro {
+  color: var(--ink-2) !important;
+  background: var(--surface-1);
+  border-color: #53647a;
+}
+
+html[data-theme="dark"] .bifurcation-figure-card,
+html[data-theme="dark"] .training-card,
+html[data-theme="dark"] .inference-card,
+html[data-theme="dark"] .results-panel,
+html[data-theme="dark"] .paper-figure {
+  color: var(--ink-2);
+  background: var(--surface-1);
+  border-color: var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+html[data-theme="dark"] .training-card {
+  background: #17281f;
+  border-color: #355544;
+}
+
+html[data-theme="dark"] .inference-card {
+  background: #252136;
+  border-color: #504663;
+}
+
+html[data-theme="dark"] .training-card h3 {
+  background: #315a43;
+}
+
+html[data-theme="dark"] .inference-card h3 {
+  background: #594d73;
+}
+
+html[data-theme="dark"] .method-card p,
+html[data-theme="dark"] .method-mse-note p,
+html[data-theme="dark"] .derivation-note,
+html[data-theme="dark"] .method-technical-note,
+html[data-theme="dark"] .bifurcation-model-comparison__intro {
+  color: var(--ink-2) !important;
+}
+
+html[data-theme="dark"] .bifurcation-figure-card .research-figure figcaption,
+html[data-theme="dark"] .bifurcation-posterior-inset,
+html[data-theme="dark"] .bifurcation-technical-details[open] > summary,
+html[data-theme="dark"] .bifurcation-model__result + .bifurcation-model__result {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .bifurcation-figure-card .bifurcation-control--shared,
+html[data-theme="dark"] .bifurcation-figure-card .bifurcation-control--segments,
+html[data-theme="dark"] .bifurcation-control--shared,
+html[data-theme="dark"] .energy-alpha-control {
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .bifurcation-control__derived,
+html[data-theme="dark"] .bifurcation-model__result dt,
+html[data-theme="dark"] .bifurcation-model__conclusion,
+html[data-theme="dark"] .bifurcation-model__live,
+html[data-theme="dark"] .alignment-example__calculation {
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .bifurcation-segments {
+  background: var(--surface-3);
+}
+
+html[data-theme="dark"] .bifurcation-segments label {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .bifurcation-segments input:checked + label {
+  color: var(--ink);
+  background: var(--surface-1);
+}
+
+html[data-theme="dark"] .bifurcation-figure-card .bifurcation-readout {
+  background: var(--line);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .bifurcation-figure-card .bifurcation-readout > div {
+  background: var(--surface-2);
+}
+
+html[data-theme="dark"] .bifurcation-figure-card .bifurcation-readout dt,
+html[data-theme="dark"] .bifurcation-model__result dt small,
+html[data-theme="dark"] .bifurcation-model__caveat,
+html[data-theme="dark"] .bifurcation-model__header > p:last-child,
+html[data-theme="dark"] .bifurcation-model__conclusion p {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .bifurcation-model__results {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .bifurcation-model__result dt strong {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .proposition {
+  --proposition-background: #17283a;
+  --proposition-border: #3b5874;
+  --proposition-accent: #83c4fa;
+}
+
+html[data-theme="dark"] .proposition--energy {
+  --proposition-background: #162a24;
+  --proposition-border: #3a6658;
+  --proposition-accent: #7cd3ad;
+}
+
+html[data-theme="dark"] .proposition p,
+html[data-theme="dark"] .alignment-example p,
+html[data-theme="dark"] .alignment-example li {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .energy-prediction-switch > div {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .energy-prediction-switch button {
+  color: var(--ink-2);
+  background: var(--surface-1);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .energy-prediction-switch button:hover {
+  background: var(--surface-3);
+}
+
+html[data-theme="dark"] .energy-prediction-switch button[aria-pressed="true"] {
+  color: var(--blue-deep);
+  background: #1a3550;
+}
+
+html[data-theme="dark"] .energy-alpha-control__label-row,
+html[data-theme="dark"] .energy-prediction-switch__label,
+html[data-theme="dark"] .energy-alpha-control__ticks,
+html[data-theme="dark"] .energy-alpha-control__readout,
+html[data-theme="dark"] .energy-alpha-control > p,
+html[data-theme="dark"] .energy-bound-figure figcaption,
+html[data-theme="dark"] .energy-alpha-figure figcaption,
+html[data-theme="dark"] .energy-figure-heading p {
+  color: var(--muted);
+}
+
+html[data-theme="dark"] .energy-alpha-control__readout [data-energy-alpha-regime],
+html[data-theme="dark"] .energy-alpha-control__readout output {
+  color: var(--ink);
+}
+
+html[data-theme="dark"] .forecast-table-block + .forecast-table-block,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td,
+html[data-theme="dark"] .forecast-dataset-row,
+html[data-theme="dark"] .forecast-gallery {
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] thead th,
+html[data-theme="dark"] .forecast-table thead th:first-child,
+html[data-theme="dark"] .world-model-results-table .world-model-task-header {
+  color: var(--ink-2);
+  background: var(--surface-2);
+}
+
+html[data-theme="dark"] tbody th,
+html[data-theme="dark"] .forecast-table tbody th {
+  color: var(--ink-2);
+  background: var(--surface-1);
+  box-shadow: 1px 0 0 var(--line);
+}
+
+html[data-theme="dark"] .forecast-table tbody td {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .forecast-table .system-header--pendulum,
+html[data-theme="dark"] .forecast-table .system-column--pendulum {
+  background: #1a2d45;
+}
+
+html[data-theme="dark"] .forecast-table .system-header--rossler,
+html[data-theme="dark"] .forecast-table .system-column--rossler {
+  background: #1a312a;
+}
+
+html[data-theme="dark"] .forecast-table .system-header--lorenz,
+html[data-theme="dark"] .forecast-table .system-column--lorenz {
+  background: #38291f;
+}
+
+html[data-theme="dark"] .ours-row th,
+html[data-theme="dark"] .ours-row td,
+html[data-theme="dark"] .forecast-table .ours-row th {
+  background: #173653;
+}
+
+html[data-theme="dark"] .dataset-jump,
+html[data-theme="dark"] .figure-selector {
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .dataset-jump[aria-selected="true"],
+html[data-theme="dark"] .figure-selector button[aria-pressed="true"] {
+  color: #ffffff;
+  background: var(--dataset-color, #2f6fca);
+  border-color: var(--dataset-color, #2f6fca);
+}
+
+html[data-theme="dark"] .figure-selector button {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .citation-card {
+  color: #d8e3f2;
+  background: #09111b;
+  border-color: #31475f;
+  box-shadow: var(--shadow-lg);
+}
+
+html[data-theme="dark"] .citation-toolbar {
+  background: #101c2b;
+}
+
+html[data-theme="dark"] .citation-card code {
+  color: #d7e4f3;
+}
+
+/* Scientific media keep their authored light plotting canvas in both themes. */
+.paradigm-media,
+.paradigm-media > img,
+.hero-result-media,
+.hero-result-media > img,
+.hero-result-media > video,
+.rollout-video-card video,
+.sf-stage__media img,
+.forecast-panel__image,
+.bifurcation-plot,
+.energy-bound-plot,
+.energy-alpha-plot {
+  background: var(--figure-paper);
+  filter: none;
+}
+
+@media (max-width: 780px) {
+  .header-actions {
+    gap: 4px;
+  }
+
+  html[data-theme="dark"] .site-nav {
+    background: rgba(15, 22, 32, 0.99);
+  }
+
+  html[data-theme="dark"] .rollout-video-card + .rollout-video-card,
+  html[data-theme="dark"] .hero-result-showcase .rollout-video-card + .rollout-video-card {
+    border-top-color: var(--line);
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 360px) {
+  .brand span {
+    max-width: 145px;
+  }
+}
+
+@media print {
+  .theme-toggle {
+    display: none;
+  }
+
+  html[data-theme="dark"] {
+    --ink: #172033;
+    --ink-2: #303a4b;
+    --muted: #687386;
+    --line: #d9dee6;
+    --section-base: #ffffff;
+    --section-alt: #f6f7f8;
+    --surface-1: #ffffff;
+    --surface-2: #f2f4f7;
+    --surface-3: #e9edf2;
+    color-scheme: light;
+  }
+}
+
 @media (max-width: 420px) {
   .bifurcation-plot .plot-paper-explanation,
   .bifurcation-plot .plot-tube-label {
@@ -2879,7 +3638,7 @@ body {
 
 /* Text-first paper hero */
 .hero {
-  padding: 116px 0 64px;
+  padding: 116px 0 44px;
   background: var(--paper);
 }
 
@@ -3894,7 +4653,7 @@ body {
   }
 
   .hero {
-    padding: 98px 0 54px;
+    padding: 98px 0 40px;
   }
 
   .hero h1 {
@@ -4811,6 +5570,22 @@ body {
   line-height: 1.62;
 }
 
+.alignment-example__steps {
+  display: grid;
+  gap: 5px;
+  margin: 9px 0 0;
+  padding-left: 1.15rem;
+  color: #505c6d;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.88rem;
+  line-height: 1.52;
+}
+
+.alignment-example__steps strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
 .alignment-example__calculation {
   min-width: 0;
   padding: 0;
@@ -4826,14 +5601,6 @@ body {
 .alignment-example__calculation .katex-display,
 .alignment-example__calculation .katex-display > .katex {
   text-align: center;
-}
-
-.alignment-example__calculation p {
-  margin: 5px 0 0;
-  color: #505c6d;
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 0.84rem;
-  line-height: 1.58;
 }
 
 @media (max-width: 900px) {
@@ -6496,8 +7263,38 @@ body {
   }
 }
 
-/* Advisor-led motivation narrative -------------------------------------- */
-.section-why-vsf,
+/* Top-level paper narrative --------------------------------------------- */
+.section-abstract {
+  padding: 54px 0 58px;
+  background: #f7f6f2;
+  border-top: 1px solid #e5e0d7;
+  border-bottom: 1px solid #e5e0d7;
+}
+
+.section-abstract .section-heading h2 {
+  font-size: clamp(1.95rem, 3vw, 2.35rem);
+}
+
+.section-abstract .abstract-copy {
+  margin-top: 20px;
+}
+
+.section-why-vsf {
+  padding: 64px 0 74px;
+  background: #fff;
+  border-top: 0;
+  border-bottom: 1px solid #e3e6ea;
+}
+
+.section-why-vsf .hero-result-showcase {
+  margin-top: 0;
+}
+
+.section-why-vsf .vsf-value-grid,
+.section-why-vsf .hero-rollout-comparison {
+  background: #fff;
+}
+
 .section-streaming-flow {
   background: #fff;
   border-top: 1px solid #e3e6ea;
@@ -7097,131 +7894,194 @@ body {
   font-weight: 700;
 }
 
-.sf-explainer {
-  display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.82fr);
-  gap: 48px;
-  align-items: start;
+.sf-stage-list {
+  border-top: 1px solid #dce1e6;
 }
 
-.sf-step-list {
+.sf-stage-switcher.is-enhanced .sf-stage-list {
+  border-bottom: 1px solid #dce1e6;
+}
+
+.sf-stage {
+  display: grid;
   margin: 0;
-  padding: 0;
-  list-style: none;
+  padding: 26px 0;
+  border-bottom: 1px solid #dce1e6;
+  grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.75fr);
+  gap: 30px;
+  align-items: center;
 }
 
-.sf-step-list li {
-  position: relative;
-  display: grid;
-  min-height: 94px;
-  padding: 0 0 25px;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: 17px;
+.sf-stage-switcher.is-enhanced .sf-stage {
+  border-bottom: 0;
 }
 
-.sf-step-list li:not(:last-child)::after {
-  position: absolute;
-  top: 36px;
-  bottom: 5px;
-  left: 17px;
-  width: 1px;
-  background: #cbd6e0;
-  content: "";
+.sf-stage[hidden] {
+  display: none;
 }
 
-.sf-step-list li > span {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  width: 35px;
-  height: 35px;
-  color: #fff;
-  background: var(--blue-deep);
-  border-radius: 50%;
-  font-size: 0.72rem;
-  font-weight: 750;
-  place-items: center;
-}
-
-.sf-step-list h3 {
-  margin: 1px 0 0;
-  color: var(--ink);
-  font-family: "Source Serif 4", Georgia, serif;
-  font-size: 1.22rem;
-  font-weight: 600;
-  letter-spacing: -0.014em;
-  line-height: 1.3;
-}
-
-.sf-step-list p {
-  margin: 7px 0 0;
-  color: #5b6678;
-  font-size: 0.86rem;
-  line-height: 1.6;
-}
-
-.sf-equation-card {
-  padding: 27px 28px 25px;
-  background: #f2f6fa;
-  border: 1px solid #ccd9e5;
-  border-top: 3px solid var(--blue-deep);
-}
-
-.sf-equation-card > p {
-  margin: 0 0 15px;
-  color: var(--blue-deep);
-  font-size: 0.66rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.sf-equation-card > .math-display {
+.sf-stage__media {
   min-width: 0;
   margin: 0;
-  padding: 15px 0 18px;
-  overflow-x: auto;
-  color: var(--ink);
-  font-size: 1rem;
-  text-align: center;
+  overflow: hidden;
+  background: #fbfcfe;
+  border: 1px solid #ccd9e5;
 }
 
-.sf-equation-card dl {
-  display: grid;
-  margin: 0;
-  padding: 16px 0;
-  border-top: 1px solid #d4dee7;
-  border-bottom: 1px solid #d4dee7;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 22px;
-}
-
-.sf-equation-card dt,
-.sf-equation-card dd {
-  margin: 0;
-}
-
-.sf-equation-card dt {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.sf-equation-card dd {
-  margin-top: 3px;
-  color: #596477;
-  font-size: 0.66rem;
-  line-height: 1.42;
-}
-
-.sf-equation-card > strong {
+.sf-stage__media img {
   display: block;
-  margin-top: 17px;
-  color: #176b64;
-  font-size: 0.76rem;
+  width: 100%;
+  height: auto;
+}
+
+.sf-stage__media-footer {
+  display: flex;
+  min-height: 34px;
+  margin: 0;
+  padding: 4px 8px;
+  background: #fff;
+  border-top: 1px solid #e1e7ee;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sf-stage__view {
+  display: inline-flex;
+  min-height: 28px;
+  padding: 4px 7px;
+  color: #536175;
+  border-radius: 5px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.sf-stage__view:hover {
+  color: var(--blue-deep);
+  background: #f0f4f8;
+}
+
+.sf-stage__view:focus-visible {
+  color: var(--blue-deep);
+  background: #f0f4f8;
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.sf-stage__copy {
+  min-width: 0;
+  padding-right: 4px;
+}
+
+.sf-stage__copy h3 {
+  margin: 0 0 9px;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1.32rem;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  line-height: 1.22;
+}
+
+.sf-stage__copy > p {
+  margin: 0;
+  color: #596477;
+  font-size: 0.88rem;
+  line-height: 1.58;
+}
+
+.sf-stage__equation {
+  min-width: 0;
+  margin: 15px 0 0;
+  padding-top: 12px;
+  overflow-x: auto;
+  border-top: 1px solid #dce4ec;
+  color: var(--ink);
+  font-size: clamp(1rem, 1.5vw, 1.04rem);
+  text-align: left;
+}
+
+.sf-stage__equation .katex-display,
+.sf-stage__equation .katex-display > .katex {
+  margin: 0;
+  text-align: left;
+}
+
+.sf-stage__note {
+  display: inline-flex;
+  margin-top: 14px;
+  padding: 10px 12px;
+  color: #155f59;
+  background: #eef8f6;
+  border: 1px solid #c7e5df;
+  border-left: 3px solid var(--teal);
+  border-radius: 0 5px 5px 0;
+  font-size: 0.78rem;
   font-weight: 750;
-  letter-spacing: 0.035em;
-  text-align: center;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  text-transform: none;
+  align-items: center;
+}
+
+.sf-stage-tabs {
+  display: none;
+}
+
+.sf-stage-switcher.is-enhanced .sf-stage-tabs {
+  display: grid;
+  margin-top: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.sf-stage-tab {
+  display: flex;
+  min-height: 46px;
+  padding: 10px 16px;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  color: #5d6d83;
+  background: #edf2f8;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+.sf-stage-tab span {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sf-stage-tab:hover {
+  color: var(--blue-deep);
+  background: #e5edf7;
+  border-color: #cad7e7;
+}
+
+.sf-stage-tab.is-active,
+.sf-stage-tab[aria-selected="true"] {
+  color: #fff;
+  background: #2b67d1;
+  border-color: #2b67d1;
+}
+
+.sf-stage-tab:focus-visible {
+  outline: 3px solid rgba(43, 103, 209, 0.25);
+  outline-offset: 2px;
 }
 
 .clock-comparison {
@@ -7321,12 +8181,10 @@ body {
     border-left: 0;
   }
 
-  .sf-explainer {
+  .sf-stage {
     grid-template-columns: 1fr;
-  }
-
-  .sf-explainer {
-    gap: 22px;
+    gap: 15px;
+    padding: 22px 0;
   }
 
 }
@@ -7399,11 +8257,6 @@ body {
     padding: 12px 13px;
   }
 
-  .sf-equation-card dl {
-    grid-template-columns: 1fr;
-    gap: 11px;
-  }
-
   .paradigm-card dl {
     padding: 12px 13px 14px;
   }
@@ -7412,8 +8265,23 @@ body {
     padding-left: 12px;
   }
 
-  .sf-equation-card {
-    padding: 23px 18px 21px;
+  .sf-stage__copy {
+    padding: 0 2px;
+  }
+
+  .sf-stage__note {
+    display: flex;
+    width: 100%;
+  }
+
+  .sf-stage-tab {
+    padding: 9px 8px;
+    gap: 7px;
+    font-size: 0.72rem;
+  }
+
+  .sf-stage-tab span {
+    font-size: 0.64rem;
   }
 
   .clock-comparison {
@@ -7425,4 +8293,42 @@ body {
     transform: rotate(90deg);
   }
 
+}
+
+/* Keep the major-section rhythm authoritative over legacy section rules. */
+.hero,
+.section-why-vsf,
+.section-streaming-flow,
+#method,
+#world-model {
+  background: var(--section-base);
+}
+
+.section-abstract,
+.section-paradigms,
+.section-motivation,
+.section-results,
+.citation-section {
+  background: var(--section-alt);
+}
+
+.section-abstract,
+.section-why-vsf,
+.section-paradigms,
+.section-streaming-flow,
+.section-motivation,
+.section-results,
+#world-model,
+.citation-section {
+  border-color: var(--theme-border);
+}
+
+html[data-theme="dark"] .bifurcation-model__result dt > span:first-child {
+  color: #0f1620;
+}
+
+html[data-theme="dark"] .forecast-dataset-row h5 {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-color: var(--dataset-color);
 }

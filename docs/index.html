@@ -5,21 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Variational Streaming Flow enables probabilistic forecasting with latent-conditioned dynamics directly in physical time.">
   <meta name="keywords" content="variational streaming flow, probabilistic forecasting, physical-time flow, dynamical systems, world models">
-  <meta name="theme-color" content="#102a56">
+  <meta name="theme-color" content="#fdfdfc">
+  <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="Variational Streaming Flow">
   <meta property="og:description" content="A latent-variable extension of Streaming Flow for probabilistic forecasting directly in physical time.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/figures/vsf-motivation.png">
   <title>Variational Streaming Flow — Probabilistic Forecasting in Physical Time</title>
 
+  <script>
+    (() => {
+      const storageKey = "vsf-theme";
+      let savedTheme = null;
+
+      try {
+        savedTheme = window.localStorage.getItem(storageKey);
+      } catch {}
+
+      const theme = savedTheme === "light" || savedTheme === "dark"
+        ? savedTheme
+        : window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.style.colorScheme = theme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute(
+        "content",
+        theme === "dark" ? "#0f1620" : "#fdfdfc",
+      );
+    })();
+  </script>
+
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=forecast-media-5">
+  <link rel="stylesheet" href="static/css/site.css?v=theme-1">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=forecast-media-5" defer></script>
+  <script src="static/js/site.js?v=theme-1" defer></script>
 </head>
 
 <body>
@@ -41,19 +66,31 @@
         <span>Variational Streaming Flow</span>
       </a>
 
-      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-        <span class="sr-only">Toggle navigation</span>
-        <span></span><span></span>
-      </button>
+      <div class="header-actions">
+        <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
+          <a href="#why-vsf">Why VSF?</a>
+          <a href="#forecasting-paradigms">Forecasting today</a>
+          <a href="#streaming-flow">Streaming Flow</a>
+          <a href="#motivation">Motivation</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
+        </nav>
 
-      <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
-        <a href="#motivation">Why VSF?</a>
-        <a href="#forecasting-paradigms">Forecasting today</a>
-        <a href="#streaming-flow">Streaming Flow</a>
-        <a href="#sf-limitation">Motivation</a>
-        <a href="#method">Method</a>
-        <a href="#results">Results</a>
-      </nav>
+        <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" data-theme-toggle>
+          <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 15.4A8.5 8.5 0 0 1 8.6 3.5 8.5 8.5 0 1 0 20.5 15.4Z"/>
+          </svg>
+          <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3.5"/>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/>
+          </svg>
+        </button>
+
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+          <span class="sr-only">Toggle navigation</span>
+          <span></span><span></span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -93,8 +130,23 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
           </a>
         </div>
+      </div>
+    </section>
 
-        <section class="hero-result-showcase" aria-labelledby="hero-results-heading">
+    <section class="section section-abstract" id="abstract">
+      <div class="container narrow">
+        <header class="section-heading article-heading">
+          <h2>Abstract</h2>
+        </header>
+        <div class="abstract-copy">
+          <p>Streaming Flow models temporal evolution directly in physical time, but its standard non-latent formulation produces a single trajectory from a fixed observed history. We introduce <strong>Variational Streaming Flow (VSF)</strong>, which conditions the physical-time velocity field on a variational latent variable inferred from local dynamics during training and sampled from a prior at inference. VSF is trained with a generalized energy reconstruction for latent-conditioned velocities. Under aggregate posterior–prior alignment, its population counterpart controls the energy distance between the prior-predictive and true conditional velocity laws. Across deterministic and partially observed stochastic systems, VSF improves long-horizon forecasting and, as a JEPA world-model predictor, improves goal-directed planning.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-why-vsf" id="why-vsf" aria-labelledby="hero-results-heading">
+      <div class="container">
+        <div class="hero-result-showcase">
           <header class="hero-result-showcase__heading">
             <h2 id="hero-results-heading">Why Variational Streaming Flow (VSF)?</h2>
             <!-- <span>One example shows probabilistic forecasting in a partially observed dynamical system; the other shows goal-directed planning with a learned world model.</span> -->
@@ -103,8 +155,8 @@
           <div class="vsf-value-grid">
             <article class="vsf-value-card">
               <span>01</span>
-              <h3>Fast trajectory generation</h3>
-              <p>VSF generates trajectories directly in physical time, using one velocity-field evaluation per forecast step and achieving up to a 11× speedup over autoregressive diffusion..</p>
+              <h3>1 NFE per forecast step</h3>
+              <p>VSF advances each forecast step with one velocity-field evaluation (<strong>NFE = 1</strong>), avoiding iterative denoising and achieving up to an 11× speedup over autoregressive diffusion.</p>
             </article>
             <article class="vsf-value-card">
               <span>02</span>
@@ -167,20 +219,10 @@
             </div>
           </article>
           </div>
-        </section>
+        </div>
       </div>
     </section>
 
-    <!-- <section class="section section-intro" id="abstract">
-      <div class="container narrow">
-        <div class="section-heading article-heading">
-          <h2>Abstract</h2>
-        </div>
-        <div class="abstract-copy">
-          <p>Streaming Flow models temporal evolution directly in physical time, but its standard non-latent formulation produces a single trajectory from a fixed observed history. We introduce <strong>Variational Streaming Flow (VSF)</strong>, which conditions the physical-time velocity field on a variational latent variable inferred from local dynamics during training and sampled from a prior at inference. VSF is trained with a generalized energy reconstruction for latent-conditioned velocities. Under aggregate posterior–prior alignment, its population counterpart controls the energy distance between the prior-predictive and true conditional velocity laws. Across deterministic and partially observed stochastic systems, VSF improves long-horizon forecasting and, as a JEPA world-model predictor, improves goal-directed planning.</p>
-        </div>
-      </div>
-    </section> -->
 
     <section class="section section-soft section-paradigms" id="forecasting-paradigms">
       <div class="container article-container">
@@ -258,29 +300,62 @@
     <section class="section section-streaming-flow" id="streaming-flow">
       <div class="container article-container">
         <header class="section-heading article-heading narrative-heading">
-          <p class="section-number">2 · What is Streaming Flow?</p>
-          <h2>The rollout clock is the real clock</h2>
+          <p class="section-number">2 · Physical-time flow</p>
+          <h2>What is Streaming Flow?</h2>
           <p>Diffusion-style forecasting uses an inner generation process to create states at physical times. Streaming Flow removes that extra clock: advancing the learned dynamics advances the forecast itself.</p>
         </header>
 
-        <div class="sf-explainer">
-          <ol class="sf-step-list">
-            <li><span>1</span><div><h3>Start from what was last observed</h3><p>The latest state and its recent history anchor the forecast.</p></div></li>
-            <li><span>2</span><div><h3>Ask how the state should move now</h3><p>A learned velocity field reads the current state, physical time, and history, then returns a direction of motion.</p></div></li>
-            <li><span>3</span><div><h3>Move forward and repeat</h3><p>The update becomes the next predicted state, is added to the rolling history, and can be extended for as long as needed.</p></div></li>
-          </ol>
+        <div class="sf-stage-switcher" data-sf-stage-switcher>
+          <div class="sf-stage-list">
+            <article class="sf-stage" id="sf-stage-noise" role="tabpanel" aria-labelledby="sf-stage-tab-noise" data-sf-stage-panel>
+              <figure class="sf-stage__media">
+                <img src="assets/figures/streaming_flow_noise.gif" alt="Noisy training states narrow around the reference trajectory as physical time advances." width="840" height="411" loading="lazy" decoding="async">
+                <figcaption class="sf-stage__media-footer">
+                  <a class="sf-stage__view" href="assets/figures/streaming_flow_noise.gif" target="_blank" rel="noopener" aria-label="View the full-size conditional-flow construction animation; opens in a new tab">View full size <span aria-hidden="true">↗</span></a>
+                </figcaption>
+              </figure>
+              <div class="sf-stage__copy">
+                <h3>Noise contracts in physical time</h3>
+                <p>Construct noisy states around a clean trajectory. Their spread shrinks with physical time, so later states approach the path.</p>
+                <div class="sf-stage__equation math-display" data-tex-display data-tex="Y_s=\xi(s)+\sigma(s)\epsilon,\qquad \sigma(s)=\sigma_0e^{-\kappa s}">Ys = ξ(s) + σ(s)ε, σ(s) = σ0e−κs</div>
+              </div>
+            </article>
 
-          <aside class="sf-equation-card" aria-label="Streaming Flow update equation">
-            <p>One physical-time update</p>
-            <div class="math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
-            <dl>
-              <div><dt><span class="math-inline" data-tex="\widehat{x}_k">x̂k</span></dt><dd>current predicted state</dd></div>
-              <div><dt><span class="math-inline" data-tex="s_k">sk</span></dt><dd>normalized physical time at step k</dd></div>
-              <div><dt><span class="math-inline" data-tex="h">h</span></dt><dd>observed and rolling history</dd></div>
-              <div><dt><span class="math-inline" data-tex="v_\theta">vθ</span></dt><dd>learned physical-time velocity</dd></div>
-            </dl>
-            <strong>Forward Euler: 1 NFE per transition</strong>
-          </aside>
+            <article class="sf-stage" id="sf-stage-field" role="tabpanel" aria-labelledby="sf-stage-tab-field" data-sf-stage-panel>
+              <figure class="sf-stage__media">
+                <img src="assets/figures/streaming_flow_field.gif" alt="A learned physical-time velocity field aligns with the trajectory and points nearby states back toward it." width="840" height="411" loading="lazy" decoding="async">
+                <figcaption class="sf-stage__media-footer">
+                  <a class="sf-stage__view" href="assets/figures/streaming_flow_field.gif" target="_blank" rel="noopener" aria-label="View the full-size learned Streaming Flow field animation; opens in a new tab">View full size <span aria-hidden="true">↗</span></a>
+                </figcaption>
+              </figure>
+              <div class="sf-stage__copy">
+                <h3>Learn one physical-time field</h3>
+                <p>Fit the velocity field to local motion targets. It follows the trajectory while pulling nearby states back toward it.</p>
+                <div class="sf-stage__equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{SF}}=\mathbb E\,\lVert v_\theta-g_\xi\rVert_2^2">LSF = E‖vθ − gξ‖²</div>
+              </div>
+            </article>
+
+            <article class="sf-stage" id="sf-stage-forecast" role="tabpanel" aria-labelledby="sf-stage-tab-forecast" data-sf-stage-panel>
+              <figure class="sf-stage__media">
+                <img src="assets/figures/streaming_flow_forecast.gif" alt="One deterministic Streaming Flow forecast rolls forward from the latest observed state." width="840" height="411" loading="lazy" decoding="async">
+                <figcaption class="sf-stage__media-footer">
+                  <a class="sf-stage__view" href="assets/figures/streaming_flow_forecast.gif" target="_blank" rel="noopener" aria-label="View the full-size deterministic Streaming Flow forecast animation; opens in a new tab">View full size <span aria-hidden="true">↗</span></a>
+                </figcaption>
+              </figure>
+              <div class="sf-stage__copy">
+                <h3>Roll forward one step at a time</h3>
+                <p>Start from the latest observation. At step <span class="math-inline" data-tex="k">k</span>, the field reads normalized physical time <span class="math-inline" data-tex="s_k">sk</span> and the observed and rolling history <span class="math-inline" data-tex="h">h</span>, then advances the state directly.</p>
+                <div class="sf-stage__equation math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
+                <strong class="sf-stage__note">1 velocity-field evaluation per transition</strong>
+              </div>
+            </article>
+          </div>
+
+          <div class="sf-stage-tabs" role="tablist" aria-label="Streaming Flow stages">
+            <button class="sf-stage-tab is-active" id="sf-stage-tab-noise" type="button" role="tab" aria-controls="sf-stage-noise" aria-selected="true" data-sf-stage-tab><span>1</span> Construct the conditional flow</button>
+            <button class="sf-stage-tab" id="sf-stage-tab-field" type="button" role="tab" aria-controls="sf-stage-field" aria-selected="false" tabindex="-1" data-sf-stage-tab><span>2</span> Fit the velocity field</button>
+            <button class="sf-stage-tab" id="sf-stage-tab-forecast" type="button" role="tab" aria-controls="sf-stage-forecast" aria-selected="false" tabindex="-1" data-sf-stage-tab><span>3</span> Roll out the forecast</button>
+          </div>
         </div>
 
         <div class="clock-comparison" aria-label="Comparison of diffusion and Streaming Flow clocks">
@@ -288,14 +363,16 @@
           <div class="clock-comparison__arrow" aria-hidden="true">→</div>
           <div><span>Streaming Flow</span><p>Physical time only</p></div>
         </div>
+
+        <p class="section-transition">Streaming Flow removes the denoising loop, but standard SF still maps the same state and history to only one future.</p>
       </div>
     </section>
 
-    <section class="section section-motivation" id="sf-limitation">
+    <section class="section section-motivation" id="motivation">
       <div class="container article-container">
         <header class="section-heading article-heading motivation-heading">
-          <p class="section-number">3 · Motivation of Variational Streaming Flow</p>
-          <h2>Fast, but only one future per history</h2>
+          <p class="section-number">3 · Bifurcation example</p>
+          <h2>Motivation of Variational Streaming Flow</h2>
           <p>Standard non-latent Streaming Flow assigns one direction to each state and observed history, so the same input always produces one trajectory. In a bifurcation example, it must encode the future choice in tiny physical-state differences; making those differences smaller makes the rollout more sensitive to perturbations.</p>
         </header>
 
@@ -304,6 +381,8 @@
           <article><h3>Bifurcation example</h3><p>Standard SF separates branches through small state differences, which can amplify small rollout errors in bifurcation.</p></article>
           <article><h3>How VSF solves it</h3><p>One sampled code can select a continuation while both futures begin from the same physical state.</p></article>
         </div>
+
+        <p class="section-transition section-transition--lead">The top row shows the desired branching behavior; the bottom row shows why standard SF achieves it only by becoming sensitive to small state errors.</p>
 
         <div class="bifurcation-demo" data-bifurcation-demo>
           <figure class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
@@ -416,6 +495,8 @@
           </div>
 
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
+
+          <p class="section-transition section-transition--before-details">We next explain how VSF learns latent codes from observed velocity field in the next section.</p>
 
           <details class="bifurcation-technical-details" data-technical-details>
             <summary>
@@ -582,6 +663,8 @@
           <p class="objective-explanation">The first term rewards accuracy against the observed velocity; the pairwise term accounts for the spread among samples. The full objective adds KL regularization to keep the training-time codes close to the prior used for forecasting:</p>
           <div class="training-objective-equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{VSF}}=\mathbb E\!\left[\mathcal L_{\mathrm{ES}}(s)+\beta_{\mathrm{KL}}\operatorname{KL}\!\left(q_\phi(z\mid u_s,x_s,s,h)\,\Vert\,p(z)\right)\right]">LVSF = E[LES(s) + βKL KL(qφ(z | us, xs, s, h) ‖ p(z))]</div>
 
+          <p class="section-transition section-transition--lead">The plots below show how the training objective scores exact, symmetric, and biased predictions.</p>
+
           <div class="energy-interactive">
             <div class="energy-alpha-control">
               <div class="energy-alpha-control__label-row">
@@ -648,18 +731,22 @@
                 <div class="proposition__label">Proposition C.1 · Paper result</div>
                 <h4 id="energy-control-heading">Prior-predictive energy-distance control</h4>
                 <p>Fix <span class="math-inline" data-tex="c=(x_s,s,h)">c = (xs, s, h)</span>. Assume <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, the required <span class="math-inline" data-tex="\alpha">α</span>-power expectations are finite, and the aggregate posterior equals the inference prior, <span class="math-inline" data-tex="\overline q_\phi(\cdot\mid c)=p">q̄φ(· | c) = p</span>. Then</p>
-                <div class="proposition__equation math-display" data-tex-display data-tex="\frac12D_\alpha(\widetilde U,U)\leq\mathbb E_U\!\left[S_\alpha(U)\right]">½Dα(Ũ, U) ≤ EU[Sα(U)]</div>
-                <p>The expected generalized energy reconstruction upper-bounds one-half of the energy distance between the prior-predictive and true conditional velocity laws.</p>
+                <div class="proposition__equation math-display" data-tex-display data-tex="\underbrace{\frac12D_\alpha(\widetilde U,U)}_{\substack{\text{prediction--truth}\\\text{mismatch}}}\leq\underbrace{\mathbb E_U\!\left[S_\alpha(U)\right]}_{\substack{\text{training reconstruction loss}\\\text{(population form)}}}">Prediction–truth mismatch: ½Dα(Ũ, U) ≤ EU[Sα(U)]: population training reconstruction loss</div>
+                <p>Under the proposition’s assumptions, the right term upper-bounds the left.</p>
               </aside>
 
               <section class="alignment-example" aria-labelledby="alignment-example-heading">
-                <h5 id="alignment-example-heading">How the example satisfies aggregate alignment</h5>
-                <p><span class="math-inline" data-tex="U=-1">U = −1</span> and <span class="math-inline" data-tex="U=+1">U = +1</span> are equally likely. For either target, the encoder assigns probability <span class="math-inline" data-tex="0.85">0.85</span> to the matching latent branch and <span class="math-inline" data-tex="0.15">0.15</span> to the other. Hence</p>
+                <h5 id="alignment-example-heading">What does aggregate posterior matching mean?</h5>
+                <p>We construct a two-branch example to make <span class="math-inline" data-tex="\overline q_\phi(z\mid c)=p(z)">q̄φ(z | c) = p(z)</span> concrete:</p>
+                <ul class="alignment-example__steps">
+                  <li><strong>Inference prior:</strong> <span class="math-inline" data-tex="p(z)=(0.50,0.50)">p(z) = (0.50, 0.50)</span>, so either branch is sampled with equal probability.</li>
+                  <li><strong>Training posteriors:</strong> the encoder assigns <span class="math-inline" data-tex="(0.85,0.15)">(0.85, 0.15)</span> for <span class="math-inline" data-tex="U=-1">U = −1</span> and <span class="math-inline" data-tex="(0.15,0.85)">(0.15, 0.85)</span> for <span class="math-inline" data-tex="U=+1">U = +1</span>, ordered as <span class="math-inline" data-tex="\bigl(P(Z=-1),P(Z=+1)\bigr)">(P(Z = −1), P(Z = +1))</span>.</li>
+                  <li><strong>Aggregate posterior:</strong> averaging over the two equally likely targets recovers the inference prior.</li>
+                </ul>
                 <div class="alignment-example__calculation">
-                  <div class="math-display math-display--compact" data-tex-display data-tex="\overline q_\phi(\cdot\mid c)=\tfrac12(0.85,0.15)+\tfrac12(0.15,0.85)=(0.50,0.50)=p">
-                    q̄φ(· | c) = ½(0.85, 0.15) + ½(0.15, 0.85) = (0.50, 0.50) = p
+                  <div class="math-display math-display--compact" data-tex-display data-tex="\overline q_\phi(z\mid c)=\tfrac12(0.85,0.15)+\tfrac12(0.15,0.85)=(0.50,0.50)=p(z)">
+                    q̄φ(z | c) = ½(0.85, 0.15) + ½(0.15, 0.85) = (0.50, 0.50) = p(z).
                   </div>
-                  <p>Both displayed prediction pairs use these encoder weights; changing their decoded values does not change the equality.</p>
                 </div>
               </section>
 
@@ -679,9 +766,11 @@
           <p>We evaluate 1,000-step forecasts on fully observed deterministic systems and partially observed stochastic systems.</p>
         </header>
 
+        <p class="section-transition section-transition--lead section-transition--after-heading">The tables summarize average errors; the animations show how each forecasting method advances along individual rollouts.</p>
+
         <section class="forecast-subsection" aria-labelledby="deterministic-forecasting-heading">
           <header class="forecast-subsection__heading">
-            <p class="subsection-number">6.1</p>
+            <p class="subsection-number">5.1</p>
             <h3 id="deterministic-forecasting-heading">Deterministic forecasting</h3>
             <p>All state variables are observed. We report pointwise forecast accuracy and compare complete long-horizon trajectories.</p>
           </header>
@@ -811,7 +900,7 @@
 
         <section class="forecast-subsection" aria-labelledby="stochastic-forecasting-heading">
           <header class="forecast-subsection__heading">
-            <p class="subsection-number">6.2</p>
+            <p class="subsection-number">5.2</p>
             <h3 id="stochastic-forecasting-heading">Stochastic forecasting</h3>
             <p>Rössler and Lorenz are partially observed parameter-mixture systems. We evaluate the conditional distribution of complete future trajectories.</p>
           </header>
@@ -976,9 +1065,9 @@
     <section class="section section-soft" id="world-model">
       <div class="container article-container">
         <header class="section-heading article-heading results-heading">
-          <p class="section-number">7 · Results</p>
+          <p class="section-number">6 · World-model planning</p>
           <h2>World-model prediction</h2>
-          <p>We replace the deterministic autoregressive predictor in a frozen JEPA world model with action-conditioned VSF. For each candidate action sequence, the Cross-Entropy Method (CEM) evaluates the predicted physical-time trajectory and selects the plan whose terminal state best matches the encoded goal.</p>
+          <p>Forecast quality matters for control when a planner uses imagined trajectories to compare actions. We next test VSF inside a JEPA world model.We replace the deterministic autoregressive predictor in a frozen JEPA world model with action-conditioned VSF. For each candidate action sequence, the Cross-Entropy Method (CEM) evaluates the predicted physical-time trajectory and selects the plan whose terminal state best matches the encoded goal.</p>
         </header>
 
         <figure class="paper-figure wide-figure world-model-figure">
@@ -1047,7 +1136,7 @@
 
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
-            <!-- <p class="subsection-number">7.1 · Rollout visualizations</p> -->
+            <!-- <p class="subsection-number">6.1 · Rollout visualizations</p> -->
             <h3 id="world-model-rollouts-heading">World model visualizations</h3>
             <p class="world-model-plan-intro">Plan 1 and Plan 2 are two successive planning rounds toward the same goal.</p>
             <ol class="world-model-plan-list">
@@ -1136,15 +1225,15 @@
                 <figure class="rollout-video-card">
                   <figcaption><strong>AR predictor</strong><span class="rollout-outcome rollout-outcome--failure">Failure</span></figcaption>
                   <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="AR predictor latent trajectory and physical rollout for Reacher">
-                    <source src="assets/figures/videos/reacher_task_042_arp_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_042_arp_latent_trajectory.mp4">Open the AR predictor clip for Reacher.</a>
+                    <source src="assets/figures/videos/reacher_task_022_arp_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_022_arp_latent_trajectory.mp4">Open the AR predictor clip for Reacher.</a>
                   </video>
                 </figure>
                 <figure class="rollout-video-card">
                   <figcaption><strong>VSF predictor</strong><span class="rollout-outcome rollout-outcome--success">Success</span></figcaption>
                   <video controls muted playsinline preload="auto" width="2220" height="792" aria-label="VSF predictor latent trajectory and physical rollout for Reacher">
-                    <source src="assets/figures/videos/reacher_task_042_vsf_latent_trajectory.mp4" type="video/mp4">
-                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_042_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Reacher.</a>
+                    <source src="assets/figures/videos/reacher_task_022_vsf_latent_trajectory.mp4" type="video/mp4">
+                    Your browser cannot play this video. <a href="assets/figures/videos/reacher_task_022_vsf_latent_trajectory.mp4">Open the VSF predictor clip for Reacher.</a>
                   </video>
                 </figure>
               </div>
