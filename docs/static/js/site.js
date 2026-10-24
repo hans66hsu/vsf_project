@@ -231,25 +231,6 @@
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  const paradigmAnimations = [...document.querySelectorAll("[data-paradigm-animation]")];
-
-  const setParadigmAnimation = (root, shouldPlay) => {
-    const image = root.querySelector("img[data-static-src][data-animated-src]");
-    if (!image) return;
-
-    image.src = shouldPlay ? image.dataset.animatedSrc : image.dataset.staticSrc;
-  };
-
-  paradigmAnimations.forEach((root) => {
-    setParadigmAnimation(root, !reducedMotion.matches);
-  });
-
-  reducedMotion.addEventListener?.("change", () => {
-    paradigmAnimations.forEach((root) => {
-      setParadigmAnimation(root, !reducedMotion.matches);
-    });
-  });
-
   const rolloutRestartDelay = 500;
 
   document.querySelectorAll(".rollout-comparison").forEach((comparison) => {
@@ -1600,11 +1581,6 @@
       datasetPanels.forEach((panel) => {
         panel.hidden = panel.id !== selectedPanelId;
       });
-
-      setForecastGalleryAnimation(
-        deterministicGallery,
-        deterministicGallery.dataset.animationRunning === "true",
-      );
 
       if (comparisonScroll) comparisonScroll.scrollLeft = 0;
       if (shouldFocus) selectedTab.focus();

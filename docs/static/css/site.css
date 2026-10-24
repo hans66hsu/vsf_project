@@ -6223,12 +6223,6 @@ body {
   transform: translate(-6.5359%, 6.6667%);
 }
 
-.forecast-gallery--deterministic .forecast-dataset-row--pendulum-one img[data-forecast-media="static"],
-.forecast-gallery--deterministic .forecast-dataset-row--pendulum-two img[data-forecast-media="static"] {
-  transform: scale(0.812);
-}
-
-.forecast-gallery--deterministic .forecast-dataset-row--lorenz img[data-forecast-media="static"],
 .lorenz-sample-gallery img[data-forecast-media="static"] {
   transform: scale(0.82);
 }
