@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=narrative-3">
+  <link rel="stylesheet" href="static/css/site.css?v=narrative-4">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
   <script src="static/js/site.js?v=narrative-2" defer></script>
 </head>
@@ -141,28 +141,6 @@
           <p>Generating these possible futures can be expensive. Diffusion models start from noise and refine it through repeated network evaluations, either for a whole trajectory or for successive states or blocks. A planner that compares many actions must repeat that work many times. Streaming Flow (SF) avoids a separate denoising loop: it learns the state's rate of change and integrates forward in physical time. With Euler integration, one network evaluation advances the forecast by one step. Standard SF, however, produces only one future from a fixed starting state and history. It needs another source of variation to describe alternative futures.</p>
           <p>We introduce Variational Streaming Flow (VSF), which gives the dynamics model an extra input: a randomly sampled latent code. The code stays fixed as the model predicts successive states. Drawing a different code can produce a different trajectory from the same observations. During training, an encoder uses observed transitions to infer codes that explain the motion. At prediction time, we draw the code from a standard normal distribution. The model then updates all state variables together, with one field evaluation per Euler step for each trajectory. We test VSF on 1,000-step forecasts of physical systems and in a visual world model that uses predicted motion to plan actions.</p>
         </div>
-        <details class="paper-abstract">
-          <summary>Read the paper abstract</summary>
-          <div class="abstract-copy">
-          <p>Probabilistic forecasting is important for predicting complex dynamical systems because
-              intrinsic randomness and incomplete observations can cause the same observed state to evolve
-              into multiple plausible futures. While flow matching is a flexible approach for probabilistic
-              forecasting, it is computationally expensive. Streaming flow (SF) reformulates this approach
-              to model temporal evolution efficiently by learning a continuous velocity field directly in
-              physical time. However, SF learns a deterministic velocity field. Thus, it provides only a
-              single future trajectory for a given fixed initial state and observation history. To overcome
-              this limitation, we introduce Variational Streaming Flow (VSF). Our approach learns a
-              latent distribution that is conditioned on the dynamics of interest. In turn, this enables
-              probabilistic forecasting. Importantly, we retain the computational efficiency of SF by
-              generating in physical time. Across deterministic and stochastic dynamical systems, VSF
-              demonstrates superior predictive accuracy and distributional fidelity. We demonstrate the
-              advantage for both long-horizon rollouts exceeding 1,000 steps, and settings with bifurcating
-              dynamics. Moreover, VSF can be integrated into existing Joint-Embedding Predictive
-              Architecture (JEPA)-based world models as a plug-and-play predictor to improve temporal
-              dynamics and goal-directed success rate in navigation, motion planning, and manipulation.
-          </p>
-          </div>
-        </details>
       </div>
     </section>
 
@@ -170,9 +148,9 @@
       <div class="container">
         <div class="hero-result-showcase">
           <header class="hero-result-showcase__heading">
-            <h2 id="hero-results-heading">What this makes possible</h2>
+            <h2 id="hero-results-heading">From forecasting to planning</h2>
             <div class="section-copy showcase-narrative">
-              <p>Long forecasts give prediction errors time to grow. Once a model starts using its own predictions as inputs, an early mistake can affect every later step. We test VSF over 1,000 steps, measuring whether it follows the system's motion and captures the variation caused by a hidden parameter. We then use its forecasts to choose actions in a visual world model: the planner predicts what each candidate plan will do before selecting one to execute. A misleading forecast can make a bad plan look promising. The chart below shows planning success on four tasks, with the visual encoder, planner, and planning budget held fixed.</p>
+              <p>Long forecasts give prediction errors time to grow. Once a model starts using its own predictions as inputs, an early mistake can affect every later step. This is known as error accumulation in autoregressive prediction. We test VSF over 1,000 steps, measuring whether it follows the system's motion and captures the variation caused by a hidden parameter. We then use its forecasts to choose actions in a visual world model: the planner predicts what each candidate plan will do before selecting one to execute. A misleading forecast can make a bad plan look promising. The chart below shows planning success on four tasks, with the visual encoder, planner, and planning budget held fixed.</p>
             </div>
           </header>
 
@@ -392,7 +370,7 @@
       <div class="container article-container">
         <header class="section-heading article-heading narrative-heading">
           <p class="section-number">1 · Generating a forecast</p>
-          <h2>Two clocks in generative forecasting</h2>
+          <h2>Two clocks in diffusion forecasting</h2>
           <p>Diffusion starts with a noisy guess of the future and refines it through repeated network evaluations. This introduces two clocks: the physical time covered by the forecast, and the progress of denoising. The model can spend many evaluations refining a prediction without advancing physical time. Full-sequence diffusion refines a requested horizon all at once. Block diffusion generates a few future states together, while one-step autoregressive diffusion repeats denoising for every next state. Streaming Flow advances the predicted system directly in physical time. Each integration step produces the next state. The animations below show when predictions become available under each approach.</p>
         </header>
 
