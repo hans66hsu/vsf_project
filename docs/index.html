@@ -137,9 +137,9 @@
     <section class="section section-abstract" id="abstract" aria-label="Overview">
       <div class="container narrow">
         <div class="section-copy overview-copy">
-          <p>Predicting the evolution of a physical system or the consequences of a robot's actions requires a model that remains accurate over an entire trajectory. Small errors can accumulate as the model rolls forward, while partial observations or stochastic dynamics can leave several continuations consistent with the available information. Deterministic predictors return one continuation; probabilistic predictors represent a distribution over possible futures. When distinct motions are plausible, their average may resemble none of them, so a probabilistic forecast should capture variation across futures and dependence between states over time. A separate question is how predictions are generated: one-step autoregressive methods advance one state at a time, full-sequence diffusion jointly denoises a chosen horizon, and block methods generate successive chunks.</p>
-          <p>Diffusion and flow-matching forecasters typically transform noise into predictions through repeated network evaluations along an auxiliary time coordinate. Streaming Flow (SF) integrates directly in physical forecast time. It learns a velocity field that follows observed motion while contracting perturbations around training trajectories, so an Euler step advances the forecast with one field evaluation. Its standard non-latent formulation, however, produces one trajectory from a fixed state and history. Randomizing the starting state introduces variation, but also makes the physical state carry the choice between futures. Near a branch, this can make the field sensitive to small perturbations. A separate latent variable allows different continuations to share the same observed starting state.</p>
-          <p>We introduce Variational Streaming Flow (VSF), a variational latent-variable formulation of physical-time forecasting. During training, an encoder infers latent codes from realized local motion, and the velocity model learns how its predictions depend on those codes. At inference, a single draw from the prior remains fixed throughout the rollout. Repeating the rollout with new codes induces a distribution over complete future trajectories. VSF retains one field evaluation per Euler step for each sample. We evaluate it on long-horizon dynamical-system forecasts and as an action-conditioned predictor in a visual world model.</p>
+          <p>Time series describe how systems change, whether we are studying the weather or controlling a robot arm. These are often multivariate problems: temperature, pressure, and wind evolve together, as do a robot's joint positions and velocities. Forecasts need to capture those relationships. They also need to account for what we do not know. A robot may have to move an object before it knows the object's mass or friction. A single predicted motion can hide that uncertainty. A probabilistic forecast describes the range of motions the robot might encounter.</p>
+          <p>Generating these possible futures can be expensive. Diffusion models start from noise and refine it through repeated network evaluations, either for a whole trajectory or for successive states or blocks. A planner that compares many actions must repeat that work many times. Streaming Flow (SF) avoids a separate denoising loop: it learns the state's rate of change and integrates forward in physical time. With Euler integration, one network evaluation advances the forecast by one step. Standard SF, however, produces only one future from a fixed starting state and history. It needs another source of variation to describe alternative futures.</p>
+          <p>We introduce Variational Streaming Flow (VSF), which gives the dynamics model an extra input: a randomly sampled latent code. The code stays fixed as the model predicts successive states. Drawing a different code can produce a different trajectory from the same observations. During training, an encoder uses observed transitions to infer codes that explain the motion. At prediction time, we draw the code from a standard normal distribution. The model then updates all state variables together, with one field evaluation per Euler step for each trajectory. We test VSF on 1,000-step forecasts of physical systems and in a visual world model that uses predicted motion to plan actions.</p>
         </div>
         <details class="paper-abstract">
           <summary>Read the paper abstract</summary>
@@ -172,7 +172,7 @@
           <header class="hero-result-showcase__heading">
             <h2 id="hero-results-heading">What this makes possible</h2>
             <div class="section-copy showcase-narrative">
-              <p>Long forecasts test how accurately a model can continue the dynamics after its own predictions become the history for later steps. A fully observed deterministic system calls for samples concentrated around the reference trajectory. When a parameter is hidden, those samples should cover the range of continuations supported by the observations. Generating many trajectories also makes computation important, both for estimating uncertainty and for comparing candidate actions. VSF combines one velocity-network evaluation per Euler step for each sample with a latent code held fixed throughout the rollout. We evaluate this combination on 1,000-step physical-system forecasts and four tasks in which a visual world model predicts action outcomes. The chart below compares planning success with the representation, planner, and planning budget held fixed.</p>
+              <p>Long forecasts give prediction errors time to grow. Once a model starts using its own predictions as inputs, an early mistake can affect every later step. We test VSF over 1,000 steps, measuring whether it follows the system's motion and captures the variation caused by a hidden parameter. We then use its forecasts to choose actions in a visual world model: the planner predicts what each candidate plan will do before selecting one to execute. A misleading forecast can make a bad plan look promising. The chart below shows planning success on four tasks, with the visual encoder, planner, and planning budget held fixed.</p>
             </div>
           </header>
 
@@ -180,12 +180,12 @@
             <article class="vsf-value-card">
               <span>01</span>
               <h3>One evaluation per step</h3>
-              <p>Forward Euler uses one velocity-network evaluation (NFE = 1) per forecast step for each sampled trajectory. Ensemble cost still depends on the number of samples.</p>
+              <p>With forward Euler, each forecast step needs one call to the velocity network (NFE = 1). An ensemble requires a separate rollout for each sample.</p>
             </article>
             <article class="vsf-value-card">
               <span>02</span>
               <h3>One code for a complete future</h3>
-              <p>A sampled latent code conditions the entire rollout. Changing the code lets VSF represent different continuations while starting from the same observed state and history.</p>
+              <p>We sample a code at the start of a forecast and keep it until the end. Different codes can produce different futures from the same observations.</p>
             </article>
             <article class="vsf-value-card">
               <span>03</span>
@@ -352,7 +352,7 @@
                 </div>
               </figure>
             </div>
-            <p class="hero-result-note">Each curve is a forecast sample. In this example, VSF produces a range of spiral-shaped paths, while AR diffusion drifts away from the reference dynamics. The full comparison below includes ground truth and other baselines.</p>
+            <p class="hero-result-note">Each curve is one possible future. In this example, VSF generates varied paths around the Rössler spiral, while AR diffusion drifts away from the system's motion. The full comparison below includes the simulator's trajectories and other baselines.</p>
           </article>
 
           <article class="rollout-comparison hero-rollout-comparison hero-rollout-comparison--planning" aria-labelledby="hero-cube-comparison">
@@ -380,7 +380,7 @@
                 </div>
               </figure>
             </div>
-            <p class="hero-result-note">The arm must grasp the cube and place it at the target. These clips show one failure/success comparison; the planning results below measure performance across the evaluated goals.</p>
+            <p class="hero-result-note">The arm must grasp the cube and place it at the target. Here, the plan chosen with the AR predictor fails and the plan chosen with VSF succeeds. The results below show how often each method succeeds across all evaluated goals.</p>
           </article>
           </div>
         </div>
@@ -393,7 +393,7 @@
         <header class="section-heading article-heading narrative-heading">
           <p class="section-number">1 · Generating a forecast</p>
           <h2>Two clocks in generative forecasting</h2>
-          <p>A diffusion forecast has two time coordinates with different roles. Physical time orders the states of the system; generative time indexes the refinement of noise into those states. An autoregressive diffusion model completes this refinement for the next state before moving on. A block model refines several future states together, then conditions the next block on what it has generated. Full-sequence diffusion refines a requested horizon jointly, so temporal interactions can be modeled across that horizon during generation. Streaming Flow instead makes each integration step a step along the forecast itself. The animations below show when each method commits to a future state and which computation must finish before that state becomes available.</p>
+          <p>Diffusion starts with a noisy guess of the future and refines it through repeated network evaluations. This introduces two clocks: the physical time covered by the forecast, and the progress of denoising. The model can spend many evaluations refining a prediction without advancing physical time. Full-sequence diffusion refines a requested horizon all at once. Block diffusion generates a few future states together, while one-step autoregressive diffusion repeats denoising for every next state. Streaming Flow advances the predicted system directly in physical time. Each integration step produces the next state. The animations below show when predictions become available under each approach.</p>
         </header>
 
         <p class="reading-guide">Use the legend to follow each future state as it moves from waiting, to generation, to a completed forecast.</p>
@@ -452,7 +452,7 @@
         </div>
 
         <aside class="paradigm-takeaway">
-          <p>All four approaches generate complete trajectories. Joint generation avoids recursively generating individual physical-time states, but requires a requested horizon to refine together. Block and autoregressive generation can extend the forecast while repeatedly using their own outputs as context. Their refinement cost recurs for each block or state. Streaming Flow removes this inner loop, with one field evaluation per Euler step. Evaluation counts alone do not determine wall-clock speed: a joint pass processes a longer sequence, and architecture, batching, and sample count also matter. The runtime tables report the measured costs in our experiments.</p>
+          <p>These choices affect how a forecast can be used. A joint model needs a forecast horizon up front, while block and one-step models can extend the forecast using their earlier predictions. SF can also continue its rollout, with one field evaluation per Euler step. This count explains where it saves computation, but the cost of a network evaluation differs across architectures. Refining a whole sequence is a different amount of work from updating one state. We therefore report measured runtimes alongside forecasting accuracy below.</p>
         </aside>
 
       </div>
@@ -463,7 +463,7 @@
         <header class="section-heading article-heading narrative-heading">
           <p class="section-number">2 · Physical-time flow</p>
           <h2>What is Streaming Flow?</h2>
-          <p>Streaming Flow learns the rate of change of a state and integrates that rate forward from the latest observation. Here, a velocity is the derivative of the modeled state; the state may contain physical variables or learned visual features. Training only on points along an observed trajectory would leave the field's behavior at nearby states unspecified, even though a forecast will visit such states as errors accumulate. SF therefore constructs a contracting tube around each training path. Its velocity target combines the motion along the path with a correction that pulls nearby states toward it. The learned field is trained on these local targets, and numerical integration turns the field into a complete forecast.</p>
+          <p>To forecast directly in physical time, SF learns how fast each variable in a system's state changes. For our double pendulum, the state contains the positions and velocities of both masses; in the robot experiments, it contains visual features. The model predicts their rates of change together, and integrating those rates produces a trajectory. Even a small prediction error can put the forecast at a state that never appeared in the training data. SF defines training targets around each observed path so the model can learn what to do there. These targets combine motion along the path with a correction toward it.</p>
         </header>
 
         <div class="sf-stage-switcher" data-sf-stage-switcher>
@@ -477,7 +477,7 @@
               </figure>
               <div class="sf-stage__copy">
                 <h3>Build training examples around a path</h3>
-                <p>Start with an observed trajectory, <span class="math-inline" data-tex="\xi(s)">ξ(s)</span>, and add Gaussian perturbations around it. Their scale decreases as physical time advances, defining a tube of nearby training states. The model must learn motion within this neighborhood as well as on the reference path. The tube is a training construction around one realization; its shrinking width does not imply that uncertainty between future realizations should disappear.</p>
+                <p>Start with an observed trajectory, <span class="math-inline" data-tex="\xi(s)">ξ(s)</span>, and add Gaussian noise around it. This gives the model examples of states slightly away from the path. The noise decreases over physical time, so these examples form a narrowing tube. Each tube belongs to one observed trajectory. Its width controls the training perturbations; variation between possible future trajectories is a separate question.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="Y_s=\xi(s)+\sigma(s)\epsilon,\qquad \sigma(s)=\sigma_0e^{-\kappa s}">Ys = ξ(s) + σ(s)ε, σ(s) = σ0e−κs</div>
               </div>
             </article>
@@ -491,7 +491,7 @@
               </figure>
               <div class="sf-stage__copy">
                 <h3>Learn one physical-time field</h3>
-                <p>The target field combines the reference velocity with a restoring correction, <span class="math-inline" data-tex="g_\xi(x,s)=\dot\xi(s)-\kappa(x-\xi(s))">gξ(x, s) = ξ̇(s) − κ(x − ξ(s))</span>. On the path, the correction vanishes. Away from it, the target contracts the displacement while continuing to move forward in physical time. Standard SF fits a neural field to these targets by squared-error regression.</p>
+                <p>At each training state, the target combines the observed velocity with a correction, <span class="math-inline" data-tex="g_\xi(x,s)=\dot\xi(s)-\kappa(x-\xi(s))">gξ(x, s) = ξ̇(s) − κ(x − ξ(s))</span>. The correction is zero on the path. Away from it, the correction points back toward the path while the reference velocity carries the state forward. Standard SF learns these targets by squared-error regression.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{SF}}=\mathbb E\,\lVert v_\theta-g_\xi\rVert_2^2">LSF = E‖vθ − gξ‖²</div>
               </div>
             </article>
@@ -505,7 +505,7 @@
               </figure>
               <div class="sf-stage__copy">
                 <h3>Roll forward one step at a time</h3>
-                <p>At inference, start from the latest observation and evaluate the learned field at the current predicted state. The field also receives normalized physical time <span class="math-inline" data-tex="s_k">sk</span> and a history representation <span class="math-inline" data-tex="h">h</span>. An Euler update advances the forecast directly, and generated states supply the rolling history for later updates. For a fixed starting state and history, this non-latent procedure produces one continuation.</p>
+                <p>Start from the latest observation and ask the learned field how the state should change. An Euler update uses that prediction to advance one step. Repeat from the new state, adding generated states to the rolling history. The field receives the current state, normalized physical time <span class="math-inline" data-tex="s_k">sk</span>, and a history representation <span class="math-inline" data-tex="h">h</span>. With the same starting state and history, standard non-latent SF produces the same trajectory.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
                 <strong class="sf-stage__note">1 velocity-field evaluation per Euler step</strong>
               </div>
@@ -525,7 +525,7 @@
           <div><span>Streaming Flow</span><p>Physical time only</p></div>
         </div>
 
-        <p class="section-transition">Adding noise to the initial state lets standard SF generate different trajectories. The next example examines what happens when those small physical-state differences must also distinguish different future branches.</p>
+        <p class="section-transition">Adding noise to the starting state gives standard SF a way to produce different futures. The next example shows why relying on small state differences can be difficult when those futures separate sharply.</p>
       </div>
     </section>
 
@@ -534,21 +534,21 @@
         <header class="section-heading article-heading motivation-heading">
           <p class="section-number">3 · Bifurcation example</p>
           <h2>How a latent code separates futures</h2>
-          <p>The paper uses a two-branch construction to isolate a difficulty in representing uncertainty through the physical state alone. Two trajectories share the same past and separate after a specified time; the observed history contains no information about the branch. A non-latent field has only the current state, time, and history on which to base its prediction. It can separate branches by responding to small state perturbations, but those perturbations must remain distinguishable as the training tube contracts. In this example, improving fidelity to the shared path therefore increases sensitivity near the separator. A latent-conditioned field can assign the branch choice to a separate coordinate, allowing the physical starting state to remain the same for both continuations.</p>
+          <p>We use a single-variable example to see why a separate code helps. Two futures follow the same path until a branch point and then move in opposite directions. The shared past gives no clue about which branch will follow. Standard SF can send forecasts toward either branch by starting slightly to either side of the split state. Making those perturbations smaller improves the fit at the split, but asks the field to send nearly identical states in different directions. In this example, that makes the field increasingly sensitive to small state errors. A latent code can choose the branch while both forecasts begin at exactly the same physical state.</p>
         </header>
 
         <div class="limitation-summary limitation-summary--overview" aria-label="How latent conditioning separates future branches">
-          <article><h3>A shared past</h3><p>Without an additional source of randomness, the same state and history produce one deterministic SF rollout.</p></article>
-          <article><h3>Small state differences</h3><p>In this example, SF can select branches through physical-state perturbations. Resolving smaller perturbations requires a more sensitive field.</p></article>
-          <article><h3>A separate branch code</h3><p>A latent-conditioned field can use the code to select a continuation while the physical starting state stays the same.</p></article>
+          <article><h3>A shared past</h3><p>Before the split, the observed trajectories are identical. A forecast cannot infer which branch will follow.</p></article>
+          <article><h3>Small state differences</h3><p>Standard SF uses small differences in the starting state to send forecasts toward different branches.</p></article>
+          <article><h3>A separate branch code</h3><p>The code chooses the branch, so each forecast can start from the same physical state.</p></article>
         </div>
 
-        <p class="section-transition section-transition--lead">This analytic example compares an ideal latent construction with the population-optimal SF field. The top row shows the reference branches and the latent construction. In the bottom row, reduce the tube width to see the trade-off between closely matching the shared path and sensitivity to small state errors. The trained models are evaluated in the results section.</p>
+        <p class="section-transition section-transition--lead">The plots below use exact formulas for both fields. The top row shows the reference paths and an ideal field with a branch code. In the bottom row, reduce the tube width. Standard SF fits the shared state more closely, but becomes more sensitive to small errors around it. The technical panel gives the population-optimal SF field and the proof; the results section evaluates trained neural networks.</p>
 
         <div class="bifurcation-demo" data-bifurcation-demo>
           <figure class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
             <img src="assets/figures/bifurcation.png" alt="Bifurcation analysis showing the ground truth, standard Streaming Flow, an ideal latent construction, and the fidelity-sensitivity tradeoff." width="2235" height="572" loading="lazy">
-            <figcaption><strong>Bifurcation example.</strong> Better physical-state fidelity makes standard SF increasingly sensitive near the separator; a latent branch code removes this particular bottleneck.</figcaption>
+            <figcaption><strong>Bifurcation example.</strong> As standard SF fits the shared state more closely, it becomes more sensitive to small state differences near the split. Giving the branch choice to a latent code avoids this trade-off in the example.</figcaption>
           </figure>
 
           <div class="bifurcation-demo__interactive" data-bifurcation-interactive hidden>
@@ -605,7 +605,7 @@
                   <div class="bifurcation-posterior-inset" aria-label="Posterior branch-mean inset">
                     <svg class="bifurcation-plot bifurcation-posterior-plot" viewBox="0 0 280 180" role="img" aria-labelledby="bifurcation-posterior-title bifurcation-posterior-desc" data-bifurcation-plot="posterior"></svg>
                   </div>
-                  <figcaption>The solid paths start slightly to either side of the branch separator at <span class="math-inline" data-tex="x=0">x = 0</span>. The inset shows how the preferred branch changes near that separator. The sensitivity panel measures the response to an infinitesimal perturbation at the separator.</figcaption>
+                  <figcaption>The solid paths start just to either side of <span class="math-inline" data-tex="x=0">x = 0</span>. The inset shows how the chosen branch changes across this point. The sensitivity panel measures how strongly an infinitesimal change in the starting state affects the later state.</figcaption>
                 </figure>
               </li>
 
@@ -648,7 +648,7 @@
                     <span>1.40</span>
                     <span>1.80</span>
                   </div>
-                  <p id="sf-tube-help">Narrower tubes improve fidelity but raise sensitivity.</p>
+                  <p id="sf-tube-help">Narrow the tube to improve the fit at the split and see sensitivity rise.</p>
                 </div>
               </li>
 
@@ -657,7 +657,7 @@
 
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
 
-          <p class="section-transition section-transition--before-details">We next learn latent-conditioned dynamics from observed motion.</p>
+          <p class="section-transition section-transition--before-details">In this example, we chose what the code means by hand. For real data, we need to learn how codes affect the dynamics.</p>
 
           <details class="bifurcation-technical-details" data-technical-details>
             <summary>
@@ -765,7 +765,7 @@
         <header class="section-heading article-heading method-heading">
           <p class="section-number">4 · Method</p>
           <h2>Variational Streaming Flow</h2>
-          <p>VSF jointly trains a variational encoder and a latent-conditioned velocity field. The encoder infers codes from realized local motion; the velocity network combines a sampled code with the current state, time, and history. A Kullback–Leibler (KL) penalty encourages the encoder's distributions to remain close to the fixed standard-normal prior, <span class="math-inline" data-tex="p(z)=\mathcal N(0,I)">p(z) = N(0, I)</span>. At inference, when the future motion is unknown, we draw one code from this prior and retain it as the predicted state and history evolve. The paper discusses how this variational formulation relates to earlier SF extensions with auxiliary latents.</p>
+          <p>We train an encoder and a velocity network together. The encoder sees an observed transition and proposes latent codes that help the velocity network explain its motion. The network learns how each code changes its prediction, given the current state, time, and history. When forecasting, the future motion is unknown, so we draw a code from a fixed standard-normal prior, <span class="math-inline" data-tex="p(z)=\mathcal N(0,I)">p(z) = N(0, I)</span>, and keep it throughout the rollout. A Kullback–Leibler (KL) penalty encourages the encoder's distributions to stay close to this prior. This helps match the codes used during training to those drawn when forecasting. The paper also relates this variational approach to earlier SF extensions with auxiliary latents.</p>
         </header>
 
         <div class="method-overview" aria-label="VSF training and inference overview">
@@ -779,11 +779,11 @@
             <article class="method-card training-card">
               <h3>Training</h3>
               <div class="method-card__body">
-                <p>Sample a transition from an observed training trajectory to obtain a local state and physical velocity <span class="math-inline" data-tex="(x_s,u_s)">(xs, us)</span>. An encoder infers codes that explain this motion.</p>
+                <p>Take a transition from a training trajectory and compute its local state and velocity <span class="math-inline" data-tex="(x_s,u_s)">(xs, us)</span>. The encoder proposes codes that could explain this movement.</p>
                 <div class="method-card__equation math-display" data-tex-display data-tex="z^{(1:M)}\overset{\mathrm{iid}}{\sim}q_\phi(\,\cdot\mid u_s,x_s,s,h)">z(1:M) iid∼ qφ(· | us, xs, s, h)</div>
-                <p>Evaluate the corresponding physical-time velocities.</p>
+                <p>For each code, predict the velocity at this state and time.</p>
                 <div class="method-card__equation math-display" data-tex-display data-tex="\widehat{u}_s^{(1:M)}=v_\theta(x_s,s,h,z^{(1:M)})">ûs(1:M) = vθ(xs, s, h, z(1:M))</div>
-                <p>Optimize generalized energy reconstruction together with KL regularization toward <span class="math-inline" data-tex="p(z)">p(z)</span>.</p>
+                <p>Train both networks with the energy reconstruction loss below and a KL penalty toward <span class="math-inline" data-tex="p(z)">p(z)</span>.</p>
               </div>
             </article>
 
@@ -800,40 +800,40 @@
         </div>
 
         <div class="path-explanation" aria-labelledby="complete-forecast-heading">
-          <h3 id="complete-forecast-heading">Local supervision, complete forecasts</h3>
-          <p>Training and generation operate at different scales. A training example supplies local motion from an observed trajectory, which supervises the velocity network at a state, time, and history. During generation, that network is repeatedly evaluated at its own predicted states. Each prediction affects the next state and, through the rolling history, later predictions. The same latent code conditions every update. For a fixed history and code, this procedure produces one complete path; drawing new codes induces a distribution over paths:</p>
+          <h3 id="complete-forecast-heading">How local predictions become complete trajectories</h3>
+          <p>Each training example tells the network how the state moves over a short interval. To generate a forecast, we start from the last observation, predict its rate of change, and update the state. We then evaluate the network at this new state and repeat. Generated states enter the rolling history, and the same latent code stays in use as that history is refreshed. This gives one complete trajectory from the observed history and code. Drawing a new code and rerunning the forecast can give another future:</p>
           <div class="math-display" data-tex-display data-tex="z\sim p(z),\qquad \widehat{x}_{m+1:T}=\operatorname{Rollout}_{\theta}(x_{a:m},z)">z ∼ p(z), x̂m+1:T = Rolloutθ(xa:m, z)</div>
-          <p>The code remains fixed when the history representation is refreshed at segment boundaries. The theoretical result below concerns velocity distributions at a fixed local context. The stochastic experiments evaluate how these learned dynamics compose over time, using metrics on complete generated trajectories.</p>
+          <p>We evaluate this distribution using full trajectories in the stochastic experiments. The theorem below addresses the local velocity distributions used to build those trajectories.</p>
         </div>
 
         <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
           <header class="method-subheading">
             <h3 id="velocity-evidence-heading">Latent velocity model</h3>
-            <p>At one physical time, let <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span> collect the state, time, and history. The model assigns a distribution to the velocity <span class="math-inline" data-tex="u_s">us</span> by integrating over latent codes. The training encoder approximates which codes could explain a realized velocity, making this latent-variable model tractable to train. It is used only when the target motion is available; inference samples from the prior and follows the learned field.</p>
+            <p>Let <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span> collect the state, time, and history, and let <span class="math-inline" data-tex="u_s">us</span> be the observed velocity. Each code defines a conditional velocity distribution at this same context. Combining these distributions according to the prior probabilities of their codes gives the model's conditional velocity distribution:</p>
           </header>
 
           <div class="derivation-equation math-display" data-tex-display data-tex="\max_\theta\ \log p_\theta(u_s\mid c_s),\qquad p_\theta(u_s\mid c_s)=\int p_\theta(u_s\mid c_s,z)\,p(z)\,\mathrm dz">maximize log pθ(us | cs), where pθ(us | cs) = ∫ pθ(us | cs, z)p(z) dz</div>
 
-          <p class="section-copy">The paper first derives an evidence lower bound (ELBO) for this conditional velocity likelihood. A Gaussian reconstruction model leads to a squared-error term plus a KL penalty. This derivation explains the roles of the encoder and prior. The final objective below replaces the Gaussian reconstruction with a distributional energy term and retains the KL regularizer.</p>
+          <p class="section-copy">The encoder makes this model practical to train by proposing codes from the motion observed in the training data. The paper first derives an evidence lower bound (ELBO): with a Gaussian reconstruction model, this gives squared error plus a KL penalty. We then replace the squared-error reconstruction with the energy term below. The final loss is a KL-regularized distributional objective.</p>
 
         </section>
 
         <section class="objective-panel" aria-labelledby="energy-objective-heading" data-energy-demo>
           <header class="method-subheading">
             <h3 id="energy-objective-heading">Learning a distribution of local motion</h3>
-            <p>A latent input can represent different continuations, but the reconstruction objective determines how those continuations are learned. For each observed transition, the encoder proposes <span class="math-inline" data-tex="M">M</span> codes, and the velocity network produces an ensemble of predicted velocities. We train with a generalized energy reconstruction term that evaluates these samples together, using both their agreement with the observed motion and the variation among predictions.</p>
+            <p>When a system can move in several ways, we want the samples to reproduce those motions in the right proportions. We therefore train the predicted velocities together as a distribution. For each observed transition, we draw <span class="math-inline" data-tex="M">M</span> codes from the encoder's distribution and predict a velocity for each. The generalized energy reconstruction loss scores these velocities using both their distance to the observed motion and their differences from one another.</p>
           </header>
 
           <div class="method-mse-note">
             <h4>Why not use MSE alone?</h4>
-            <p>For a fixed context and code, the optimal squared-error predictor is <span class="math-inline" data-tex="v^\star(c,z)=\mathbb E[U\mid C=c,Z=z]">v*(c, z) = E[U | C = c, Z = z]</span>. A sufficiently informative code can resolve that ambiguity, but unresolved variation is averaged. This is why adding a latent input and choosing a distributional training objective are separate design choices.</p>
+            <p>Suppose velocities −1 and +1 remain equally likely at the same context and code. Squared error favors their average, 0. An informative code can separate the two directions. Any uncertainty left after conditioning is still averaged: <span class="math-inline" data-tex="v^\star(c,z)=\mathbb E[U\mid C=c,Z=z]">v*(c, z) = E[U | C = c, Z = z]</span>. This motivates training the predicted velocities as a distribution.</p>
           </div>
 
           <div class="objective-equation math-display" data-tex-display data-tex="\mathcal{L}_{\mathrm{ES}}(s)=\frac{1}{M}\sum_{i=1}^{M}\left\lVert\widehat{u}_s^{(i)}-u_s\right\rVert_2^\alpha-\frac{1}{2M^2}\sum_{i,j=1}^{M}\left\lVert\widehat{u}_s^{(i)}-\widehat{u}_s^{(j)}\right\rVert_2^\alpha,\qquad 0&lt;\alpha&lt;2">LES(s) = (1/M) Σi ‖ûs(i) − us‖₂α − (1/2M²) Σi,j ‖ûs(i) − ûs(j)‖₂α, 0 &lt; α &lt; 2</div>
-          <p class="objective-explanation">In the paper's formulation above, the first term measures distance to the observed velocity, and the subtracted pairwise term accounts for diversity among samples. Increasing spread alone does not minimize the objective: samples that move too far from the target also increase the first term. The exponent controls how distances are weighted. The full loss retains KL regularization to encourage compatibility between the training posteriors and the prior used for forecasting:</p>
+          <p class="objective-explanation">In the paper's formulation above, the first term pulls predictions toward the observed velocity. The subtracted term rewards differences among predictions. The two terms work together: spreading samples too far apart also increases their distance from the observation. The exponent sets how strongly large distances count. We add the KL penalty to encourage codes inferred during training to remain close in distribution to the prior used for forecasting:</p>
           <div class="training-objective-equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{VSF}}=\mathbb E\!\left[\mathcal L_{\mathrm{ES}}(s)+\beta_{\mathrm{KL}}\operatorname{KL}\!\left(q_\phi(z\mid u_s,x_s,s,h)\,\Vert\,p(z)\right)\right]">LVSF = E[LES(s) + βKL KL(qφ(z | us, xs, s, h) ‖ p(z))]</div>
 
-          <p class="section-transition section-transition--lead">The interactive example below considers a scalar velocity with two equally likely values, −1 and +1. Choose a predicted pair and vary the exponent to see how distributional mismatch changes. The left plot also shows the population reconstruction term for the illustrative encoder; the right plot shows the mismatch itself.</p>
+          <p class="section-transition section-transition--lead">The example below makes this distinction visible. The true velocity is equally likely to be −1 or +1. Choose a predicted pair, then increase the exponent toward 2. At 2, two different distributions can have zero mismatch just because their means agree. The left plot also shows the population reconstruction term for the example's encoder; the right plot maps the prediction–truth mismatch.</p>
 
           <div class="energy-interactive">
             <div class="energy-alpha-control">
@@ -932,19 +932,19 @@
       <div class="container article-container">
         <header class="section-heading article-heading results-heading results-heading--standalone">
           <p class="section-number">5 · Results</p>
-          <h2>Dynamical-system forecasting</h2>
-          <p>A long forecast exposes errors that are difficult to see in a single transition. For autoregressive and physical-time models, each predicted state influences the next prediction, so an early error can alter the rest of the rollout. We evaluate this accumulated effect over 1,000 steps on the double pendulum, Rössler, and Lorenz systems. The experiments separate two questions: how accurately a model follows a unique continuation when the full state is observed, and how well it represents uncertainty when a dynamical parameter is hidden. A probabilistic model should concentrate around the reference trajectory in the first setting and recover the distribution of continuations in the second.</p>
+          <h2>Forecasting dynamical systems</h2>
+          <p>A model can predict the next step well and still lose track of the motion over a longer forecast. Once it starts using its own predictions, an early mistake changes the states it encounters later. We test this over 1,000 steps on the double pendulum, Rössler, and Lorenz systems. All three require multivariate prediction: the pendulum has eight state variables, and Rössler and Lorenz each have three. We first test deterministic systems with the full state observed, so there is one correct future to follow. We then hide a parameter in the Rössler and Lorenz systems and test whether the models predict the resulting range of futures.</p>
         </header>
 
         <div class="section-copy results-context">
-          <p>The comparison includes diffusion and rectified-flow forecasters, the recurrent probabilistic model DeepAR, standard SF, and the pretrained time-series model Chronos-2. SF and VSF share the same U-Net backbone. The SF (perturb.) baseline adds Gaussian noise to the initial state at inference, testing whether perturbing the physical state is sufficient to produce useful forecast variation. Chronos-2 remains frozen; the calibrated variant applies a post-hoc correction to its predictive quantiles. The tables summarize performance across the test data, while the animations expose the behavior of selected rollouts.</p>
+          <p>We compare VSF with diffusion and rectified-flow forecasters, DeepAR, standard SF, and the pretrained time-series model Chronos-2. SF and VSF use the same U-Net backbone. We also test SF with noise added to its starting state, labeled SF (perturb.), to see how much this simple source of variation helps. Chronos-2 is frozen; its calibrated variant corrects the predicted quantiles after forecasting. The tables cover the test data, and the animations show selected forecasts in more detail.</p>
         </div>
 
         <section class="forecast-subsection" aria-labelledby="deterministic-forecasting-heading">
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.1</p>
             <h3 id="deterministic-forecasting-heading">Tracking a single future</h3>
-            <p>Fully observed deterministic dynamics define one future for each initial condition. Chaotic behavior refers to sensitivity to small perturbations; it does not introduce randomness into the simulator. A probabilistic forecaster should therefore produce samples concentrated around the unique reference trajectory. Maintaining that concentration over 1,000 steps requires accurate local motion and a rollout that remains close to the true dynamics. We use the continuous ranked probability score (CRPS) to evaluate the forecast ensemble, and RMSE and MAE to evaluate its mean. Looking at both matters because an accurate ensemble average can conceal individual samples that follow the wrong motion.</p>
+            <p>We begin with deterministic systems whose full state is observed. Their future is fixed by the initial condition. Chaos makes that future sensitive to small errors, but the simulator does not draw a new outcome each time it runs. We therefore want a probabilistic model's samples to stay close to the same reference path. We score the samples with the continuous ranked probability score (CRPS), separately at each time and state coordinate. Root mean square error (RMSE) and mean absolute error (MAE) measure errors in their mean. We report both because averaging can hide errors: several poor paths can have a better-looking mean.</p>
           </header>
 
           <figure class="results-panel results-table-figure" aria-labelledby="deterministic-table-caption">
@@ -995,7 +995,7 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
-          <p class="section-copy results-interpretation">The comparison with SF is informative because both models advance directly in physical time. VSF's lower errors show that its gains extend to settings with a unique target trajectory. Adding initial-state noise to SF reduces some errors, but does not close the gap in these experiments. Frozen Chronos-2 receives only 10 context steps here, while the learned baselines are trained on these systems.</p>
+          <p class="section-copy results-interpretation">VSF improves on SF even when there is only one future to predict. Since both models advance directly in physical time, this comparison tests the benefit of the variational formulation within the same forecasting approach. Adding noise to SF's starting state helps on some metrics, but leaves a gap to VSF. Chronos-2 has a different setup: it is frozen and receives only 10 context steps, while the other models are trained on these systems.</p>
 
           <figure class="forecast-gallery forecast-gallery--deterministic" data-deterministic-gallery>
             <div class="forecast-gallery__header">
@@ -1014,8 +1014,8 @@
             </div>
 
             <div class="reading-guide">
-              <p>The double-pendulum tabs show two trajectories from the same benchmark. They illustrate how the difficulty of a long forecast can depend on the trajectory, even within one system. In the first example, the displayed methods remain in close agreement; in the second, their errors separate more visibly. Rössler and Lorenz add another diagnostic: preserving the familiar shape of a trajectory can still leave substantial error in when the system reaches each part of that shape.</p>
-              <p>The reference panel shows the complete path; forecast paths unfold over time. Each sample panel contains ten trajectories, which may overlap almost completely. The VSF ensemble mean averages their states at each time. Compare the individual paths with that average to distinguish accurate, concentrated samples from a plausible-looking mean that conceals disagreement.</p>
+              <p>The two pendulum tabs show trajectories from the same benchmark. In the first, VSF, SF, and block diffusion track the motion closely. In the second, their errors become easier to see. Comparing the two helps explain why a method that works on one trajectory can struggle on another. Rössler and Lorenz show a further source of error: a forecast can trace the right shape while reaching each part of it at the wrong time.</p>
+              <p>The reference panel shows the full path, while the forecasts unfold over time. Each sample panel contains ten trajectories; when the model is accurate, they can overlap almost completely. The VSF mean is shown separately. Compare it with the individual samples to check whether they all track the motion or merely average to a plausible path.</p>
             </div>
 
             <p class="table-scroll-hint">Scroll horizontally to compare all methods.</p>
@@ -1029,7 +1029,7 @@
                   <span>Block diffusion</span>
                 </div>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel data-caption="In the first pendulum example, VSF, Standard SF, and block diffusion all follow the reference motion closely. The VSF samples form a tight bundle and their mean follows the same path. This is the desired behavior here: the system has one correct future, so additional sample spread would represent forecasting error.">
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel data-caption="VSF, Standard SF, and block diffusion follow the reference closely in this first pendulum rollout. The ten VSF samples largely overlap, and their mean traces the same motion. Since the simulated future is fixed, this narrow bundle is what we want.">
                   <h5 id="deterministic-pendulum-one-label">Double pendulum 1</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
@@ -1040,7 +1040,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel data-caption="The second pendulum example is harder for the displayed forecasts. Standard SF gradually departs from the reference motion as errors accumulate. VSF's individual samples and their mean remain closer to the reference over the shown interval. Together, the two examples show why sustained agreement matters beyond the first few forecast steps." hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel data-caption="In the second pendulum rollout, Standard SF gradually departs from the reference as errors accumulate. VSF's samples and their mean stay closer over the displayed interval. The difference grows as the forecasts continue, which is why we evaluate the full 1,000-step horizon." hidden>
                   <h5 id="deterministic-pendulum-two-label">Double pendulum 2</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
@@ -1051,7 +1051,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel data-caption="Rössler traces a spiral in state space. VSF and Standard SF both preserve its overall geometry in this example, while block diffusion introduces small deviations along the path. Inspect the shape of the loops as the animation advances. The errors in Table 1 also account for timing: a similar-looking curve can still be traversed at the wrong pace." hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel data-caption="Rössler traces a spiral. VSF and Standard SF follow its overall shape in this example, while block diffusion shows small deviations along the path. Watch when each forecast completes its loops: matching their shape is only part of the task. The errors in Table 1 also penalize getting the timing wrong." hidden>
                   <h5 id="deterministic-rossler-label">Rössler</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Rössler trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -1062,7 +1062,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel data-caption="For this Lorenz example, VSF and block diffusion produce concentrated forecasts close to the reference path. Standard SF makes extra rotations around the lobe. This is a timing error: the forecast moves out of step with the reference even while remaining in a similar part of state space. An accurate continuation must capture both where the system goes and when it gets there." hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel data-caption="VSF and block diffusion stay close to the reference in this Lorenz example. Standard SF makes extra rotations around the lobe, so its forecast falls out of step with the observed motion. A path can remain in the right part of state space and still predict the wrong state at a given time." hidden>
                   <h5 id="deterministic-lorenz-label">Lorenz</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Lorenz trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -1074,20 +1074,20 @@
                 </section>
               </div>
             </div>
-            <figcaption><span data-deterministic-caption aria-live="polite">In the first pendulum example, VSF, Standard SF, and block diffusion all follow the reference motion closely. The VSF samples form a tight bundle and their mean follows the same path. This is the desired behavior here: the system has one correct future, so additional sample spread would represent forecasting error.</span></figcaption>
+            <figcaption><span data-deterministic-caption aria-live="polite">VSF, Standard SF, and block diffusion follow the reference closely in this first pendulum rollout. The ten VSF samples largely overlap, and their mean traces the same motion. Since the simulated future is fixed, this narrow bundle is what we want.</span></figcaption>
           </figure>
         </section>
 
         <section class="forecast-subsection" aria-labelledby="stochastic-forecasting-heading">
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.2</p>
-            <h3 id="stochastic-forecasting-heading">Forecasting with unresolved dynamics</h3>
-            <p>Here uncertainty has a known source: a dynamical parameter is withheld from the forecaster. For each initial state, we draw that parameter independently for each reference trajectory and hold it fixed during the simulation. The resulting motion is deterministic once the parameter is specified, but different values can produce closely aligned observed histories followed by different futures. This construction lets us compare forecast samples with an ensemble generated by the simulator. It tests whether a code held fixed across a rollout can represent uncertainty about a parameter that is also fixed throughout the trajectory.</p>
+            <h3 id="stochastic-forecasting-heading">Forecasting when a parameter is hidden</h3>
+            <p>For the next experiment, we hide one parameter of the Rössler or Lorenz equations from the forecaster. We draw a value for each simulated trajectory and keep it fixed until the end. Starting from the same initial state, these trajectories look almost identical over the short observed history but later separate. The model must now predict a range of futures. Because we know how the data were generated, we can compare that range with many futures from the simulator.</p>
           </header>
 
           <div class="section-copy stochastic-metrics-guide">
-            <p>A useful forecast must recover the range of plausible motion while respecting the system's dynamics. Samples that all follow one continuation miss uncertainty; samples that spread by drifting away from the dynamics also give a poor distribution. Conditional mean error (CME) and conditional standard-deviation error (CSE) measure whether the ensemble has the right center and spread at each forecast time. Standard SF has CSE equal to one here because its repeated forecasts from a fixed input have zero spread while the reference ensemble varies.</p>
-            <p>Matching these time-local summaries does not determine how states are connected across a trajectory. For that reason, the table also reports Wasserstein distance (W1) and energy distance (ED), treating each complete rollout as one ordered vector. These comparisons retain cross-time dependence and assess the distribution of complete future paths. They connect the local velocity model to the trajectories it produces when run forward.</p>
+            <p>The samples should cover the same range of motion as the simulator's futures. We first compare the center and spread of the two ensembles at each forecast time, using conditional mean error (CME) and conditional standard-deviation error (CSE). Standard SF produces the same path each time from a fixed input. Its zero spread gives a CSE of one in this experiment.</p>
+            <p>Two ensembles can have similar means and spreads at each time yet connect those states into different paths. To check the paths themselves, we also report Wasserstein distance (W1) and energy distance (ED). For these scores, we stack every state in a rollout into one vector, in time order, and compare the resulting distributions. The scores therefore assess the full trajectories generated by the model, including how their states depend on one another over time.</p>
           </div>
 
           <figure class="results-panel results-table-figure" aria-labelledby="stochastic-table-caption">
@@ -1135,7 +1135,7 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
-          <p class="reading-guide">The galleries let us inspect why a distributional score changes. Compare the extent and geometry of the generated paths with the reference ensemble, and look for samples that collapse onto one continuation or drift away from the system. Each model draw is a possible continuation of the observed history; it is not paired with a particular simulator draw in the neighboring panel. The displayed paths are a small selection, while Table 2 evaluates distributions across the test data.</p>
+          <p class="reading-guide">The galleries show what these scores are measuring. Compare the spread and shape of each model's paths with the simulator's ensemble. Look for samples that all repeat one motion, or that separate by drifting away from the system. A model sample is a possible future, so it need not match the neighboring simulator sample point for point. These are selected examples; Table 2 summarizes the test data.</p>
 
           <figure class="forecast-gallery">
             <div class="forecast-gallery__header">
@@ -1154,7 +1154,7 @@
                 <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.gif" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
               </div>
             </div>
-            <figcaption>Ten trajectories are overlaid in each panel. The reference bundle shows variation caused by the hidden parameter; compare its spread and shape with the generated samples. VSF captures a range of paths around the reference spiral. Standard SF produces a single continuation, and block diffusion shows a narrower range in this example. AR diffusion produces variation but also drifts away from the reference dynamics.</figcaption>
+            <figcaption>Each panel overlays ten trajectories. The hidden parameter gives the reference spiral a spread of possible paths, which VSF broadly reproduces. Standard SF repeats one path, and block diffusion covers a narrower range in this example. AR diffusion produces varied paths, but some drift away from the reference motion.</figcaption>
           </figure>
 
           <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery data-forecast-animation-gallery>
@@ -1245,7 +1245,7 @@
                 </section>
               </div>
             </div>
-            <figcaption>Use the selector to inspect five examples, or choose See all to compare them together. Each panel contains one trajectory. Across these draws, VSF captures motion around and between the two Lorenz lobes. Standard SF repeats one deterministic continuation; block diffusion covers a smaller range of behavior, while some AR diffusion samples drift away from the reference geometry. Draw numbers organize the display and do not imply a pointwise match between neighboring samples.</figcaption>
+            <figcaption>Each panel shows one trajectory. Use the selector to view five draws, or choose See all. VSF generates motion around and between the two Lorenz lobes. Standard SF repeats one path; block diffusion shows a smaller range of behavior, and some AR diffusion paths drift away from the reference shape. Corresponding draw numbers do not pair a model sample with a particular simulator sample.</figcaption>
           </figure>
         </section>
       </div>
@@ -1256,12 +1256,12 @@
         <header class="section-heading article-heading results-heading">
           <p class="section-number">6 · World-model planning</p>
           <h2>Planning with predicted futures</h2>
-          <p>Forecast errors matter differently when predictions determine which actions a planner takes. The planner simulates candidate action sequences, scores their predicted outcomes, and executes the plan it prefers. A prediction error can change which plan appears best, even when average forecast error is small. The predictor is therefore evaluated on actions selected using its own forecasts, and the search may require many rollouts before a single action is taken. We test whether VSF improves goal-directed behavior with the visual representation, planner, and planning budget held fixed.</p>
+          <p>A robot uses a forecast to choose what to do next. Before moving, a planner can try many action sequences in the model and select one that appears to reach the goal. If the predicted motion is wrong, a promising plan may fail when executed. Planning therefore tests whether the forecasts lead to useful decisions. It also makes speed matter: the model may simulate many candidate plans before the robot takes a step. We test VSF in this setting with the visual representation, planner, and planning budget held fixed.</p>
         </header>
 
         <div class="section-copy world-model-introduction">
-          <p>We use LeWM, a world model built on a joint-embedding predictive architecture (JEPA). Its encoder maps images of the current state and goal into a learned feature space. The predictor receives the current state features and a candidate action sequence, then forecasts how the features evolve under those actions. The planning cost measures the distance between the predicted endpoint and the encoded goal. The Cross-Entropy Method (CEM) repeatedly samples action sequences, retains the best candidates, and updates its sampling distribution before choosing a plan.</p>
-          <p>We freeze the pretrained representation and compare LeWM's autoregressive predictor with SF and VSF predictors trained on offline observation–action trajectories. The encoder, CEM planner, evaluation tasks, and planning budget remain fixed. In VSF, the evolving state features and the sampled uncertainty code have separate roles: the state records the predicted visual configuration, while the code conditions one complete rollout. Each imagined transition uses one velocity-field evaluation. Success rate measures whether the resulting actions reach the goal; prediction RMSE measures agreement with the observed feature trajectory along the selected actions.</p>
+          <p>We use LeWM, a visual world model whose pretrained encoder turns each image into a 192-dimensional feature vector. We encode the current scene and the goal in the same way. The predictor forecasts how the current scene's features change under a proposed action sequence. The planner compares the predicted endpoint with the goal's feature vector. To find a plan, it uses the Cross-Entropy Method (CEM): sample action sequences, keep the best candidates, and use them to improve the next round of samples.</p>
+          <p>With the encoder frozen, we compare LeWM's autoregressive predictor with SF and VSF predictors trained on offline observation–action trajectories. The CEM planner, tasks, and planning budget stay the same. In VSF, the visual feature vector changes at every step, while the sampled code stays fixed throughout the imagined trajectory. Each transition uses one velocity-field evaluation. We measure both whether the chosen actions reach the goal and how closely the predicted feature trajectory matches the observations collected along those actions.</p>
         </div>
 
         <figure class="paper-figure wide-figure world-model-figure">
@@ -1330,19 +1330,19 @@
 
         <p class="results-table-note world-model-table-note" id="world-model-table-note">Values are mean ± population standard deviation over three seeds, with 50 goals per seed. Success is the percentage of goals reached within a 50-step execution budget. RMSE measures error in the predicted visual state representations along the action sequence selected by CEM. Higher success and lower RMSE are better.</p>
 
-        <p class="section-copy results-interpretation">Replacing the dynamics predictor improves task success with the encoder and search procedure held fixed. Success and prediction error still measure different things: on Cube, SF has slightly lower RMSE, while VSF reaches more goals. Because RMSE is measured along the action sequence each planner selects, the methods need not be evaluated on identical trajectories. The examples below show where predicted and executed outcomes diverge.</p>
+        <p class="section-copy results-interpretation">The planner succeeds only if its chosen actions actually reach the goal. This is a different test from prediction RMSE: on Cube, SF has slightly lower RMSE, while VSF reaches more goals. The predictors also lead the planner to choose different action sequences, so their RMSE values need not describe the same physical trajectories. The clips below let us compare the forecast with what happened when a plan was executed.</p>
 
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
             <!-- <p class="subsection-number">6.1 · Rollout visualizations</p> -->
             <h3 id="world-model-rollouts-heading">From prediction to action</h3>
-            <p class="world-model-plan-intro">The clips connect the model's internal forecast to the motion that actually occurs. Each clip pairs the executed task with predicted and observed visual-state trajectories. Solid curves show the forecast; dashed curves show the states obtained by encoding the actual observations. The curves are projected into two dimensions with PCA, so these axes describe variation in the learned representation.</p>
-            <p>The projected curves show where forecasts visibly depart from the observed evolution. RMSE in Table 3 measures error in the full representation, including directions outside this two-dimensional view. The physical rollout alongside the plot shows whether the selected actions reach the goal.</p>
+            <p class="world-model-plan-intro">Each clip pairs the executed task with the model's forecast. Solid curves show predicted visual-state features; dashed curves show features extracted from the actual observations. We project these features into two dimensions with PCA so the paths can be plotted. The axes describe the learned representation, rather than positions in the physical scene.</p>
+            <p>When the curves separate, the prediction is drifting from the observed motion. PCA can hide differences outside the displayed plane, so Table 3 measures RMSE in the full feature space. The physical rollout alongside the plot shows whether the robot reaches its goal.</p>
             <ol class="world-model-plan-list">
               <li>Plan 1 (blue) starts from the initial observation. The agent executes the chosen actions for 25 environment steps.</li>
               <li>Plan 2 (red) starts from the new observation if the goal has not yet been reached. The planner chooses another action sequence toward the same goal.</li>
             </ol>
-            <p class="world-model-plan-takeaway">These selected examples pair an AR forecast that departs from the observed evolution and ends in failure with a closer VSF forecast that ends in success. Table 3 reports performance across all evaluated goals.</p>
+            <p class="world-model-plan-takeaway">We selected examples where the AR predictor leads to failure and VSF leads to success. They show how a forecast can look promising to the planner but fail when its actions are executed. Table 3 reports success across all evaluated goals.</p>
             <!-- <p>Each example places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
           </header>
 
@@ -1350,7 +1350,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>PushT</h4>
-                <p>The goal specifies both the T-shaped block's pose and the pusher's position. The predictor must account for how contact with the pusher changes the block's motion.</p>
+                <p>The pusher must move the T-shaped block into the target pose and finish at its own target position. Predicting the block's motion requires the model to account for contact with the pusher.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1373,7 +1373,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>Cube</h4>
-                <p>The arm must grasp the cube and place its center at the target. Compare the imagined motion with the executed grasp and placement to see whether the predicted outcome is realized.</p>
+                <p>The arm must grasp the cube and place its center at the target. Compare the predicted outcome with the grasp and placement that actually happen.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1396,7 +1396,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>TwoRoom</h4>
-                <p>The red agent must pass through the doorway to reach a target in the other room. The forecast needs to respect this route as the planner chooses actions toward the goal.</p>
+                <p>The red agent must reach a target in the other room. Its path has to pass through the doorway, so a useful forecast must capture that constraint.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1450,10 +1450,9 @@
           <h2 id="outlook-heading">What comes next</h2>
         </header>
         <div class="section-copy outlook-copy">
-          <p>The current experiments use adjacent observations to learn local motion and a persistent code to condition a complete rollout. Extending this formulation to abrupt events, disturbances that arrive during evolution, and decisions that depend on rare outcomes raises different questions about model structure and computational cost.</p>
-          <p>Physical-time learning works most directly when adjacent observations resolve the system's local motion. An impact, a contact transition, or strong observation noise can make that motion difficult to estimate. Hybrid dynamics that combine continuous evolution with explicit jumps could address abrupt events. Higher-order or adaptive solvers offer a separate way to reduce integration error when the learned field changes rapidly. Such solvers require additional field evaluations, so their value should be measured through the accuracy they achieve for a given computational budget.</p>
-          <p>The hidden-parameter experiments study uncertainty that persists throughout a trajectory. Other systems also receive new disturbances as they evolve. A model could retain one code for persistent uncertainty and introduce new random inputs during the rollout. Updating the forecast distribution as observations arrive would also let it account for information gained through interaction.</p>
-          <p>For planning, the next question is how to use the forecast distribution when selecting an action. Evaluating several continuations for each candidate would allow a planner to assess the variability of its outcome as well as its expected cost. A useful experiment would compare such a planner with the current goal-matching procedure under equal computational budgets, including tasks where a rare failure is much more costly than a small average error.</p>
+          <p>Our hidden-parameter experiments study uncertainty that lasts for a whole trajectory. Many systems also face new disturbances as they evolve. One extension would keep the current code for persistent uncertainty and add new random inputs during the rollout. New observations could then update the forecast as the robot or system reveals more about its dynamics.</p>
+          <p>Impacts and contact changes raise a different problem: motion can change abruptly between observations. A model that combines continuous evolution with explicit jumps could handle these events more directly. For rapidly changing but continuous motion, adaptive or higher-order solvers could reduce integration error. They require extra field evaluations, so the comparison should measure how much accuracy they buy for a given computation budget.</p>
+          <p>We also want to test how a planner should use the range of futures VSF predicts. Generating several futures for each candidate plan would let it estimate both expected performance and the chance of failure. This could matter when occasional failures are costly, even if average prediction error is small. The next experiment would compare that planner with the current goal-matching procedure under the same computation budget.</p>
         </div>
       </div>
     </section>
