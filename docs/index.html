@@ -483,7 +483,7 @@
               </figure>
               <div class="sf-stage__copy">
                 <h3>Roll forward one step at a time</h3>
-                <p>Start from the latest observation and ask the learned field how the state should change. An Euler update uses that prediction to advance one step. Repeat from the new state, adding generated states to the rolling history. The field receives the current state, normalized physical time <span class="math-inline" data-tex="s_k">sk</span>, and a history representation <span class="math-inline" data-tex="h">h</span>. With the same starting state and history, standard non-latent SF produces the same trajectory.</p>
+                <p>Start from the latest observation and ask the learned field how the state should change. An Euler update uses that prediction to advance one step. Repeat from the new state, adding generated states to the rolling history. These updates are autoregressive: each predicted state helps determine the next. The field receives the current state, normalized physical time <span class="math-inline" data-tex="s_k">sk</span>, and a history representation <span class="math-inline" data-tex="h">h</span>. With the same starting state and history, standard non-latent SF produces the same trajectory.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
                 <strong class="sf-stage__note">1 velocity-field evaluation per Euler step</strong>
               </div>
@@ -635,7 +635,7 @@
 
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
 
-          <p class="section-transition section-transition--before-details">In this example, we chose what the code means by hand. For real data, we need to learn how codes affect the dynamics.</p>
+          <p class="section-transition section-transition--before-details">In this example, we chose what the code means by hand. For real data, the encoder learns to associate codes with observed motion, without branch labels.</p>
 
           <details class="bifurcation-technical-details" data-technical-details>
             <summary>
@@ -781,18 +781,18 @@
           <h3 id="complete-forecast-heading">How local predictions become complete trajectories</h3>
           <p>Each training example tells the network how the state moves over a short interval. To generate a forecast, we start from the last observation, predict its rate of change, and update the state. We then evaluate the network at this new state and repeat. Generated states enter the rolling history, and the same latent code stays in use as that history is refreshed. This gives one complete trajectory from the observed history and code. Drawing a new code and rerunning the forecast can give another future:</p>
           <div class="math-display" data-tex-display data-tex="z\sim p(z),\qquad \widehat{x}_{m+1:T}=\operatorname{Rollout}_{\theta}(x_{a:m},z)">z ∼ p(z), x̂m+1:T = Rolloutθ(xa:m, z)</div>
-          <p>We evaluate this distribution using full trajectories in the stochastic experiments. The theorem below addresses the local velocity distributions used to build those trajectories.</p>
+          <p>We evaluate this distribution using full trajectories in the stochastic experiments. In the <a href="https://arxiv.org/pdf/2610.00976" target="_blank" rel="noreferrer">ablation in Figure 11</a>, keeping the code fixed gives more accurate long forecasts than resampling it at every step. The theorem below addresses the local velocity distributions used to build those trajectories.</p>
         </div>
 
         <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
           <header class="method-subheading">
             <h3 id="velocity-evidence-heading">Latent velocity model</h3>
-            <p>Let <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span> collect the state, time, and history, and let <span class="math-inline" data-tex="u_s">us</span> be the observed velocity. Each code defines a conditional velocity distribution at this same context. Combining these distributions according to the prior probabilities of their codes gives the model's conditional velocity distribution:</p>
+            <p>Let <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span> collect the state, time, and history, and let <span class="math-inline" data-tex="u_s">us</span> be the observed velocity. For the training derivation, we place a Gaussian distribution around the velocity predicted for each code at this context. Averaging these distributions over the prior gives the conditional velocity likelihood:</p>
           </header>
 
           <div class="derivation-equation math-display" data-tex-display data-tex="\max_\theta\ \log p_\theta(u_s\mid c_s),\qquad p_\theta(u_s\mid c_s)=\int p_\theta(u_s\mid c_s,z)\,p(z)\,\mathrm dz">maximize log pθ(us | cs), where pθ(us | cs) = ∫ pθ(us | cs, z)p(z) dz</div>
 
-          <p class="section-copy">The encoder makes this model practical to train by proposing codes from the motion observed in the training data. The paper first derives an evidence lower bound (ELBO): with a Gaussian reconstruction model, this gives squared error plus a KL penalty. We then replace the squared-error reconstruction with the energy term below. The final loss is a KL-regularized distributional objective.</p>
+          <p class="section-copy">The encoder makes this model practical to train by proposing codes from the motion observed in the training data. The paper first derives an evidence lower bound (ELBO): with a Gaussian reconstruction model, this gives squared error plus a KL penalty. We then replace the squared-error reconstruction with the energy term below. The final loss is a KL-regularized distributional objective. At inference, the network returns a single velocity for the sampled code and current context.</p>
 
         </section>
 
@@ -880,7 +880,7 @@
                 <h4 id="energy-control-heading">Prior-predictive energy-distance control</h4>
                 <p>Fix <span class="math-inline" data-tex="c=(x_s,s,h)">c = (xs, s, h)</span>. Assume <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, the required <span class="math-inline" data-tex="\alpha">α</span>-power expectations are finite, and the aggregate posterior equals the inference prior, <span class="math-inline" data-tex="\overline q_\phi(\cdot\mid c)=p">q̄φ(· | c) = p</span>. Then</p>
                 <div class="proposition__equation math-display" data-tex-display data-tex="\underbrace{\frac12D_\alpha(\widetilde U,U)}_{\substack{\text{prediction--truth}\\\text{mismatch}}}\leq\underbrace{\mathbb E_U\!\left[S_\alpha(U)\right]}_{\substack{\text{training reconstruction loss}\\\text{(population form)}}}">Prediction–truth mismatch: ½Dα(Ũ, U) ≤ EU[Sα(U)]: population training reconstruction loss</div>
-                <p>Under these assumptions, the population reconstruction term bounds the discrepancy between velocity distributions at this local context. This is a local velocity guarantee. The quality of complete generated trajectories is assessed separately in the forecasting experiments.</p>
+                <p>Under these assumptions, the population reconstruction term bounds the discrepancy between velocity distributions at this local context. The KL penalty encourages posterior–prior alignment, but does not guarantee the exact equality assumed here. This is a local velocity guarantee. The quality of complete generated trajectories is assessed separately in the forecasting experiments.</p>
               </aside>
 
               <section class="alignment-example" aria-labelledby="alignment-example-heading">
@@ -1060,7 +1060,7 @@
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.2</p>
             <h3 id="stochastic-forecasting-heading">Forecasting when a parameter is hidden</h3>
-            <p>For the next experiment, we hide one parameter of the Rössler or Lorenz equations from the forecaster. We draw a value for each simulated trajectory and keep it fixed until the end. Starting from the same initial state, these trajectories look almost identical over the short observed history but later separate. The model must now predict a range of futures. Because we know how the data were generated, we can compare that range with many futures from the simulator.</p>
+            <p>For the next experiment, we hide one parameter of the Rössler or Lorenz equations from the forecaster. We draw a value for each simulated trajectory and keep it fixed until the end. Once that value is set, the trajectory follows deterministic equations. Starting from the same initial state, these trajectories look almost identical over the short observed history but later separate. The model must now predict a range of futures. Because we know how the data were generated, we can compare that range with many futures from the simulator.</p>
           </header>
 
           <div class="section-copy stochastic-metrics-guide">
