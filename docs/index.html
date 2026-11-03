@@ -134,18 +134,12 @@
       </div>
     </section>
 
-    <section class="section section-abstract" id="abstract">
+    <section class="section section-abstract" id="abstract" aria-label="Overview">
       <div class="container narrow">
-        <header class="section-heading article-heading">
-          <h2>A generative model of future dynamics</h2>
-        </header>
         <div class="section-copy overview-copy">
-          <p>Learned dynamics models can forecast the evolution of a physical system or predict the consequences of actions before a robot executes them. In both settings, the prediction must remain meaningful over an entire trajectory. Small errors can accumulate as a model rolls forward, and partial observations or stochastic dynamics can leave several continuations consistent with the available information. The modeling problem is to capture this temporal evolution together with its uncertainty.</p>
-          <p>Forecasting methods differ in both what they predict and how they generate it. A deterministic predictor returns one continuation; a probabilistic predictor represents a conditional distribution over continuations. Either can operate autoregressively. Among generative approaches, autoregressive diffusion samples the next state from the evolving history, full-sequence diffusion jointly denoises a chosen future horizon, and block methods generate successive chunks of the future. These approaches organize temporal dependence and computation differently, even when they target the same forecasting distribution.</p>
-          <p>Probabilistic prediction matters when the observations do not determine a unique outcome. An unobserved dynamical parameter, for example, can produce distinct future motions even when the recent visible histories are closely aligned. Averaging those motions can yield a path unlike any likely realization. A useful generative model should therefore capture both the range of outcomes and their dependence across time: each sample should describe a complete continuation of the system.</p>
-          <p>Diffusion and flow-matching forecasters typically generate samples along an auxiliary time coordinate, with repeated network evaluations to transform noise into a prediction. Streaming Flow (SF) makes a different choice: its integration time is the physical forecast time. It learns a velocity field that follows observed motion while contracting perturbations around training trajectories. Integrating this field directly advances the forecast, so forward Euler requires one velocity-network evaluation per step. The denoising construction and temporal evolution share one clock.</p>
-          <p>The standard non-latent formulation still produces one trajectory from a fixed state and history. Randomizing the starting state can create different paths, but then the physical state also has to encode unresolved future variation. Near a branch, separating those futures through small state differences can make the field sensitive to perturbations. This motivates a separate variable that conditions the dynamics while leaving the observed starting state unchanged.</p>
-          <p>We introduce Variational Streaming Flow (VSF), a variational latent-variable formulation of physical-time forecasting. During training, an encoder infers latent codes from realized local motion, and the velocity model learns how its predictions depend on those codes. At inference, a single draw from the prior conditions the entire rollout. Repeated state updates then define a distribution over complete future trajectories, with one field evaluation per Euler step for each sample. We study this formulation on long-horizon dynamical-system forecasts and as an action-conditioned predictor in a visual world model.</p>
+          <p>Predicting the evolution of a physical system or the consequences of a robot's actions requires a model that remains accurate over an entire trajectory. Small errors can accumulate as the model rolls forward, while partial observations or stochastic dynamics can leave several continuations consistent with the available information. Deterministic predictors return one continuation; probabilistic predictors represent a distribution over possible futures. When distinct motions are plausible, their average may resemble none of them, so a probabilistic forecast should capture variation across futures and dependence between states over time. A separate question is how predictions are generated: one-step autoregressive methods advance one state at a time, full-sequence diffusion jointly denoises a chosen horizon, and block methods generate successive chunks.</p>
+          <p>Diffusion and flow-matching forecasters typically transform noise into predictions through repeated network evaluations along an auxiliary time coordinate. Streaming Flow (SF) integrates directly in physical forecast time. It learns a velocity field that follows observed motion while contracting perturbations around training trajectories, so an Euler step advances the forecast with one field evaluation. Its standard non-latent formulation, however, produces one trajectory from a fixed state and history. Randomizing the starting state introduces variation, but also makes the physical state carry the choice between futures. Near a branch, this can make the field sensitive to small perturbations. A separate latent variable allows different continuations to share the same observed starting state.</p>
+          <p>We introduce Variational Streaming Flow (VSF), a variational latent-variable formulation of physical-time forecasting. During training, an encoder infers latent codes from realized local motion, and the velocity model learns how its predictions depend on those codes. At inference, a single draw from the prior remains fixed throughout the rollout. Repeating the rollout with new codes induces a distribution over complete future trajectories. VSF retains one field evaluation per Euler step for each sample. We evaluate it on long-horizon dynamical-system forecasts and as an action-conditioned predictor in a visual world model.</p>
         </div>
         <details class="paper-abstract">
           <summary>Read the paper abstract</summary>
@@ -178,7 +172,7 @@
           <header class="hero-result-showcase__heading">
             <h2 id="hero-results-heading">What this makes possible</h2>
             <div class="section-copy showcase-narrative">
-              <p>A forecasting model has to preserve meaningful dynamics as its own predictions become the context for later steps. For deterministic systems, this means tracking the reference trajectory as small errors accumulate. When a parameter is hidden, it means generating the range of continuations supported by the observations. The computational cost becomes consequential when a model generates many such paths, either to estimate a distribution or to evaluate candidate actions. VSF uses one velocity-network evaluation per Euler step for each sample, while a persistent latent code conditions the full continuation. We evaluate this combination on 1,000-step physical-system forecasts and on four tasks in which a visual world model predicts action outcomes. The chart below shows planning success with the representation, planner, and planning budget held fixed; the later sections examine forecast errors and the trajectories behind them.</p>
+              <p>Long forecasts test how accurately a model can continue the dynamics after its own predictions become the history for later steps. A fully observed deterministic system calls for samples concentrated around the reference trajectory. When a parameter is hidden, those samples should cover the range of continuations supported by the observations. Generating many trajectories also makes computation important, both for estimating uncertainty and for comparing candidate actions. VSF combines one velocity-network evaluation per Euler step for each sample with a latent code held fixed throughout the rollout. We evaluate this combination on 1,000-step physical-system forecasts and four tasks in which a visual world model predicts action outcomes. The chart below compares planning success with the representation, planner, and planning budget held fixed.</p>
             </div>
           </header>
 
@@ -531,7 +525,7 @@
           <div><span>Streaming Flow</span><p>Physical time only</p></div>
         </div>
 
-        <p class="section-transition">Physical-time integration provides an efficient generation procedure, but a deterministic field cannot choose among several continuations from exactly the same input. Initial-state noise can supply variation; the next example examines the sensitivity that results when the physical state must also carry the branch choice.</p>
+        <p class="section-transition">Adding noise to the initial state lets standard SF generate different trajectories. The next example examines what happens when those small physical-state differences must also distinguish different future branches.</p>
       </div>
     </section>
 
@@ -543,7 +537,7 @@
           <p>The paper uses a two-branch construction to isolate a difficulty in representing uncertainty through the physical state alone. Two trajectories share the same past and separate after a specified time; the observed history contains no information about the branch. A non-latent field has only the current state, time, and history on which to base its prediction. It can separate branches by responding to small state perturbations, but those perturbations must remain distinguishable as the training tube contracts. In this example, improving fidelity to the shared path therefore increases sensitivity near the separator. A latent-conditioned field can assign the branch choice to a separate coordinate, allowing the physical starting state to remain the same for both continuations.</p>
         </header>
 
-        <div class="limitation-summary limitation-summary--overview" aria-label="Why standard Streaming Flow needs a latent variable">
+        <div class="limitation-summary limitation-summary--overview" aria-label="How latent conditioning separates future branches">
           <article><h3>A shared past</h3><p>Without an additional source of randomness, the same state and history produce one deterministic SF rollout.</p></article>
           <article><h3>Small state differences</h3><p>In this example, SF can select branches through physical-state perturbations. Resolving smaller perturbations requires a more sensitive field.</p></article>
           <article><h3>A separate branch code</h3><p>A latent-conditioned field can use the code to select a continuation while the physical starting state stays the same.</p></article>
@@ -677,7 +671,7 @@
             <div class="bifurcation-technical-details__body">
               <section class="bifurcation-technical-section" aria-labelledby="bifurcation-setup-heading">
                 <header class="bifurcation-technical-section__header">
-                  <p>Setup and Notation</p>
+                  <p>Setup and notation</p>
                   <h3 id="bifurcation-setup-heading">Bifurcation example</h3>
                 </header>
                 <div class="ground-truth-copy">
@@ -771,7 +765,7 @@
         <header class="section-heading article-heading method-heading">
           <p class="section-number">4 · Method</p>
           <h2>Variational Streaming Flow</h2>
-          <p>VSF trains a variational encoder to infer latent codes from realized local motion, then learns a velocity field conditioned on those codes. The velocity network receives the sampled code together with the current state, time, and history. KL regularization encourages the inferred codes to remain close to the prior available at forecast time, when the future motion is unknown. Inference uses that prior directly: we draw one code and retain it as the predicted state and history evolve. The contribution is this variational learning formulation for physical-time forecasting; auxiliary-latent extensions of Streaming Flow also exist, as discussed in the paper.</p>
+          <p>VSF jointly trains a variational encoder and a latent-conditioned velocity field. The encoder infers codes from realized local motion; the velocity network combines a sampled code with the current state, time, and history. A Kullback–Leibler (KL) penalty encourages the encoder's distributions to remain close to the fixed standard-normal prior, <span class="math-inline" data-tex="p(z)=\mathcal N(0,I)">p(z) = N(0, I)</span>. At inference, when the future motion is unknown, we draw one code from this prior and retain it as the predicted state and history evolve. The paper discusses how this variational formulation relates to earlier SF extensions with auxiliary latents.</p>
         </header>
 
         <div class="method-overview" aria-label="VSF training and inference overview">
@@ -809,7 +803,7 @@
           <h3 id="complete-forecast-heading">Local supervision, complete forecasts</h3>
           <p>Training and generation operate at different scales. A training example supplies local motion from an observed trajectory, which supervises the velocity network at a state, time, and history. During generation, that network is repeatedly evaluated at its own predicted states. Each prediction affects the next state and, through the rolling history, later predictions. The same latent code conditions every update. For a fixed history and code, this procedure produces one complete path; drawing new codes induces a distribution over paths:</p>
           <div class="math-display" data-tex-display data-tex="z\sim p(z),\qquad \widehat{x}_{m+1:T}=\operatorname{Rollout}_{\theta}(x_{a:m},z)">z ∼ p(z), x̂m+1:T = Rolloutθ(xa:m, z)</div>
-          <p>The code is retained across segment boundaries, including updates to the history representation. This makes the rollout a model of complete future trajectories, even though its training targets are local velocities. The quality of that path distribution still has to be established: accurate local distributions alone do not prove that the generated joint distribution across time is correct. We evaluate complete rollouts in the stochastic experiments, while the theoretical result below concerns velocity distributions at a fixed local context.</p>
+          <p>The code remains fixed when the history representation is refreshed at segment boundaries. The theoretical result below concerns velocity distributions at a fixed local context. The stochastic experiments evaluate how these learned dynamics compose over time, using metrics on complete generated trajectories.</p>
         </div>
 
         <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
@@ -827,7 +821,7 @@
         <section class="objective-panel" aria-labelledby="energy-objective-heading" data-energy-demo>
           <header class="method-subheading">
             <h3 id="energy-objective-heading">Learning a distribution of local motion</h3>
-            <p>At each sampled transition, the encoder proposes several codes and the velocity network produces a corresponding ensemble. Generalized energy reconstruction evaluates these <span class="math-inline" data-tex="M">M</span> velocity samples together. Its two terms balance agreement with the observed target against the distances between predictions. Repeated over training examples, this provides a distributional learning signal. The choice of reconstruction term matters when a code leaves some variation in motion unresolved.</p>
+            <p>A latent input can represent different continuations, but the reconstruction objective determines how those continuations are learned. For each observed transition, the encoder proposes <span class="math-inline" data-tex="M">M</span> codes, and the velocity network produces an ensemble of predicted velocities. We train with a generalized energy reconstruction term that evaluates these samples together, using both their agreement with the observed motion and the variation among predictions.</p>
           </header>
 
           <div class="method-mse-note">
@@ -1001,7 +995,7 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
-          <p class="section-copy results-interpretation">The comparison with SF is informative because both models advance directly in physical time. VSF's lower errors show that its gains extend to settings with a unique target trajectory. Adding initial-state noise to SF reduces some errors, but does not close the gap in these experiments. The Chronos-2 results describe performance with the short forecasting context used here; this is a comparison within that setup.</p>
+          <p class="section-copy results-interpretation">The comparison with SF is informative because both models advance directly in physical time. VSF's lower errors show that its gains extend to settings with a unique target trajectory. Adding initial-state noise to SF reduces some errors, but does not close the gap in these experiments. Frozen Chronos-2 receives only 10 context steps here, while the learned baselines are trained on these systems.</p>
 
           <figure class="forecast-gallery forecast-gallery--deterministic" data-deterministic-gallery>
             <div class="forecast-gallery__header">
@@ -1088,7 +1082,7 @@
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.2</p>
             <h3 id="stochastic-forecasting-heading">Forecasting with unresolved dynamics</h3>
-            <p>Here uncertainty has a known source: a dynamical parameter is withheld from the forecaster. For each initial state, we draw that parameter independently for each reference trajectory and hold it fixed during the simulation. The resulting motion is deterministic once the parameter is specified, but different values can produce closely aligned observed histories followed by different futures. This construction lets us compare forecast samples with an ensemble generated by the simulator. It also gives the persistent latent code a concrete role: a sampled continuation should retain a consistent dynamical character as it evolves.</p>
+            <p>Here uncertainty has a known source: a dynamical parameter is withheld from the forecaster. For each initial state, we draw that parameter independently for each reference trajectory and hold it fixed during the simulation. The resulting motion is deterministic once the parameter is specified, but different values can produce closely aligned observed histories followed by different futures. This construction lets us compare forecast samples with an ensemble generated by the simulator. It tests whether a code held fixed across a rollout can represent uncertainty about a parameter that is also fixed throughout the trajectory.</p>
           </header>
 
           <div class="section-copy stochastic-metrics-guide">
@@ -1262,7 +1256,7 @@
         <header class="section-heading article-heading results-heading">
           <p class="section-number">6 · World-model planning</p>
           <h2>Planning with predicted futures</h2>
-          <p>In model-based control, a forecast is part of the decision procedure. The planner predicts the consequences of candidate actions, assigns a cost to each predicted outcome, and executes the plan it prefers. Errors in that prediction can change which action appears best, even when average forecasting error is small. This makes planning a different test from reproducing a held-out trajectory: the predictor is evaluated on action sequences selected using its own forecasts. It also makes inference cost consequential, because the search repeats these predictions many times before acting. We test whether VSF improves goal-directed behavior under the same visual representation and planning budget as the existing world model.</p>
+          <p>Forecast errors matter differently when predictions determine which actions a planner takes. The planner simulates candidate action sequences, scores their predicted outcomes, and executes the plan it prefers. A prediction error can change which plan appears best, even when average forecast error is small. The predictor is therefore evaluated on actions selected using its own forecasts, and the search may require many rollouts before a single action is taken. We test whether VSF improves goal-directed behavior with the visual representation, planner, and planning budget held fixed.</p>
         </header>
 
         <div class="section-copy world-model-introduction">
@@ -1336,14 +1330,14 @@
 
         <p class="results-table-note world-model-table-note" id="world-model-table-note">Values are mean ± population standard deviation over three seeds, with 50 goals per seed. Success is the percentage of goals reached within a 50-step execution budget. RMSE measures error in the predicted visual state representations along the action sequence selected by CEM. Higher success and lower RMSE are better.</p>
 
-        <p class="section-copy results-interpretation">These results show that replacing the dynamics predictor can improve decisions without changing the encoder or search procedure. Prediction error and success remain different measurements: on Cube, SF has slightly lower RMSE, while VSF reaches more goals. RMSE is measured along the action sequence each planner selects, so the methods need not be evaluated on identical trajectories. The aggregate comparison measures the effect of the predictor change; the examples below help us inspect where imagined and executed outcomes separate.</p>
+        <p class="section-copy results-interpretation">Replacing the dynamics predictor improves task success with the encoder and search procedure held fixed. Success and prediction error still measure different things: on Cube, SF has slightly lower RMSE, while VSF reaches more goals. Because RMSE is measured along the action sequence each planner selects, the methods need not be evaluated on identical trajectories. The examples below show where predicted and executed outcomes diverge.</p>
 
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
             <!-- <p class="subsection-number">6.1 · Rollout visualizations</p> -->
             <h3 id="world-model-rollouts-heading">From prediction to action</h3>
-            <p class="world-model-plan-intro">The clips connect the model's internal forecast to the motion that actually occurs. Each pairs the executed task with predicted and observed visual-state trajectories. Solid curves show the forecast; dashed curves show the states obtained by encoding the actual observations. The curves are projected into two dimensions with PCA, so these axes describe variation in the learned representation.</p>
-            <p>Agreement between a solid curve and its dashed reference shows agreement in the displayed projection; projection can hide errors in other feature directions. RMSE in Table 3 measures error in the full representation. A visible separation helps locate where imagined and observed outcomes diverge, while the physical rollout alongside the plot shows whether the object or agent reaches its target.</p>
+            <p class="world-model-plan-intro">The clips connect the model's internal forecast to the motion that actually occurs. Each clip pairs the executed task with predicted and observed visual-state trajectories. Solid curves show the forecast; dashed curves show the states obtained by encoding the actual observations. The curves are projected into two dimensions with PCA, so these axes describe variation in the learned representation.</p>
+            <p>The projected curves show where forecasts visibly depart from the observed evolution. RMSE in Table 3 measures error in the full representation, including directions outside this two-dimensional view. The physical rollout alongside the plot shows whether the selected actions reach the goal.</p>
             <ol class="world-model-plan-list">
               <li>Plan 1 (blue) starts from the initial observation. The agent executes the chosen actions for 25 environment steps.</li>
               <li>Plan 2 (red) starts from the new observation if the goal has not yet been reached. The planner chooses another action sequence toward the same goal.</li>
@@ -1457,8 +1451,8 @@
         </header>
         <div class="section-copy outlook-copy">
           <p>The current experiments use adjacent observations to learn local motion and a persistent code to condition a complete rollout. Extending this formulation to abrupt events, disturbances that arrive during evolution, and decisions that depend on rare outcomes raises different questions about model structure and computational cost.</p>
-          <p>Physical-time learning works most directly when adjacent states resolve a meaningful local direction. An impact, a contact transition, or strong observation noise can make that direction difficult to estimate. Hybrid dynamics that combine continuous evolution with explicit jumps could address abrupt events. Higher-order or adaptive solvers offer a separate way to reduce integration error when the learned field changes rapidly. Such solvers require additional field evaluations, so their value should be measured through the accuracy they achieve for a given computational budget.</p>
-          <p>The hidden-parameter experiments study uncertainty that persists throughout a trajectory. Other systems also receive new disturbances during evolution. Combining a persistent code with stochastic innovations would make both sources of variation explicit. Updating the forecast distribution as new observations arrive is another extension, especially when an agent can reduce its uncertainty by interacting with the system.</p>
+          <p>Physical-time learning works most directly when adjacent observations resolve the system's local motion. An impact, a contact transition, or strong observation noise can make that motion difficult to estimate. Hybrid dynamics that combine continuous evolution with explicit jumps could address abrupt events. Higher-order or adaptive solvers offer a separate way to reduce integration error when the learned field changes rapidly. Such solvers require additional field evaluations, so their value should be measured through the accuracy they achieve for a given computational budget.</p>
+          <p>The hidden-parameter experiments study uncertainty that persists throughout a trajectory. Other systems also receive new disturbances as they evolve. A model could retain one code for persistent uncertainty and introduce new random inputs during the rollout. Updating the forecast distribution as observations arrive would also let it account for information gained through interaction.</p>
           <p>For planning, the next question is how to use the forecast distribution when selecting an action. Evaluating several continuations for each candidate would allow a planner to assess the variability of its outcome as well as its expected cost. A useful experiment would compare such a planner with the current goal-matching procedure under equal computational budgets, including tasks where a rare failure is much more costly than a small average error.</p>
         </div>
       </div>
