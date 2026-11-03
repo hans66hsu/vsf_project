@@ -8469,3 +8469,248 @@ html[data-theme="dark"] .forecast-dataset-row h5 {
     padding-block: 20px;
   }
 }
+
+/* Shared-scale planning results, with the reported seed variability. */
+.planning-success-figure {
+  --chart-bar: #8a919b;
+  --chart-accent: #e6572f;
+  --chart-accent-text: #bd3d1c;
+  margin: 34px 0 38px;
+  padding: 28px 0 24px;
+  border-block: 1px solid var(--theme-border);
+  color: var(--ink-2);
+}
+
+.planning-success-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.planning-success-heading h3 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.3rem, 2.2vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.planning-success-heading p {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--muted);
+  font-family: "Inter", sans-serif;
+  font-size: 0.78rem;
+}
+
+.planning-success-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(28px, 5vw, 64px);
+  row-gap: 28px;
+}
+
+.planning-success-panel {
+  min-width: 0;
+}
+
+.planning-success-panel h4 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.planning-success-rows {
+  margin: 0;
+}
+
+.planning-success-row,
+.planning-success-axis {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 92px;
+  column-gap: 12px;
+  align-items: center;
+  font-family: "Inter", sans-serif;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.planning-success-row dt,
+.planning-success-row dd {
+  margin: 0;
+}
+
+.planning-success-row dt {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.planning-success-row--ours dt,
+.planning-success-row--ours .planning-success-value {
+  color: var(--chart-accent-text);
+  font-weight: 700;
+}
+
+.planning-success-track {
+  position: relative;
+  height: 34px;
+  border-right: 1px solid var(--theme-border);
+  background-image: linear-gradient(to right, var(--theme-border) 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+.planning-success-bar {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: var(--mean);
+  height: 18px;
+  background: var(--chart-bar);
+}
+
+.planning-success-row--ours .planning-success-bar {
+  background: var(--chart-accent);
+}
+
+.planning-success-whisker {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: var(--lower);
+  width: var(--spread);
+  height: 10px;
+  border-inline: 1px solid var(--ink);
+}
+
+.planning-success-whisker::after {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  left: 0;
+  border-top: 1px solid var(--ink);
+  content: "";
+}
+
+.planning-success-value {
+  color: var(--ink-2);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.planning-success-axis {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.planning-success-ticks {
+  position: relative;
+  grid-column: 2;
+  height: 14px;
+}
+
+.planning-success-ticks span {
+  position: absolute;
+  top: 0;
+}
+
+.planning-success-ticks span:first-child { left: 0; }
+.planning-success-ticks span:nth-child(2) { left: 50%; transform: translateX(-50%); }
+.planning-success-ticks span:last-child { right: 0; }
+
+.planning-success-figure > figcaption {
+  max-width: 100ch;
+  margin-top: 24px;
+  color: var(--muted);
+  font-family: "Inter", sans-serif;
+  font-size: 0.79rem;
+  line-height: 1.65;
+}
+
+.planning-success-figure > figcaption a {
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.planning-success-figure > figcaption a:hover {
+  color: var(--chart-accent-text);
+}
+
+html[data-theme="dark"] .planning-success-figure {
+  --chart-bar: #7f8c9c;
+  --chart-accent: #f47a50;
+  --chart-accent-text: #ff966f;
+}
+
+@media (max-width: 760px) {
+  .planning-success-heading {
+    display: block;
+    margin-bottom: 24px;
+  }
+
+  .planning-success-heading p {
+    margin-top: 8px;
+  }
+
+  .planning-success-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 24px;
+  }
+}
+
+@media (max-width: 400px) {
+  .planning-success-row,
+  .planning-success-axis {
+    grid-template-columns: 32px minmax(0, 1fr) 84px;
+    column-gap: 9px;
+    font-size: 0.74rem;
+  }
+
+  .planning-success-axis { font-size: 0.66rem; }
+}
+
+/* Long-form explanations keep a comfortable reading measure. */
+.article-heading > p:not(.section-number),
+.forecast-subsection__heading > p:not(.subsection-number),
+.method-subheading > p {
+  max-width: 82ch;
+  color: var(--ink-2);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.hero-result-showcase__heading {
+  max-width: 880px;
+}
+
+.showcase-narrative {
+  margin-top: 18px;
+}
+
+.hero-result-showcase > .planning-success-figure {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-block: 8px 20px;
+}
+
+.results-context,
+.stochastic-metrics-guide,
+.results-interpretation {
+  margin: 0 0 34px;
+}
+
+.world-model-introduction {
+  margin-top: -8px;
+}
+
+.forecast-subsection__heading > .world-model-plan-intro + p {
+  margin-top: 16px;
+}
