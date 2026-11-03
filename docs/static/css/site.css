@@ -3279,7 +3279,7 @@ html[data-theme="dark"] .bifurcation-figure-card .bifurcation-readout > div {
 html[data-theme="dark"] .bifurcation-figure-card .bifurcation-readout dt,
 html[data-theme="dark"] .bifurcation-model__result dt small,
 html[data-theme="dark"] .bifurcation-model__caveat,
-html[data-theme="dark"] .bifurcation-model__header > p:last-child,
+html[data-theme="dark"] .bifurcation-model__header > p:not(:first-child),
 html[data-theme="dark"] .bifurcation-model__conclusion p {
   color: var(--muted);
 }
@@ -6780,6 +6780,10 @@ body {
   margin-bottom: 22px;
 }
 
+.bifurcation-technical-section .ground-truth-copy > p + p {
+  margin-top: 14px;
+}
+
 .bifurcation-technical-section__header > p {
   margin: 0 0 4px;
   color: var(--blue-deep);
@@ -6863,6 +6867,14 @@ body {
   line-height: 1.65;
 }
 
+.bifurcation-model-comparison__intro > p {
+  margin: 0;
+}
+
+.bifurcation-model-comparison__intro > p + p {
+  margin-top: 12px;
+}
+
 .bifurcation-model {
   --model-accent: #315f91;
   --model-soft: #f3f7fb;
@@ -6900,8 +6912,8 @@ body {
   line-height: 1.2;
 }
 
-.bifurcation-model__header > p:last-child {
-  max-width: 810px;
+.bifurcation-model__header > p:not(:first-child) {
+  max-width: 920px;
   margin: 12px 0 0;
   color: #4c5869;
   font-family: "Source Serif 4", Georgia, serif;
@@ -6929,7 +6941,7 @@ body {
 .bifurcation-model__result {
   display: grid;
   min-width: 0;
-  grid-template-columns: 210px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
 }
 
@@ -6991,8 +7003,22 @@ body {
 
 .bifurcation-model__result dd {
   display: grid;
-  padding: 12px 22px;
+  padding: 18px 22px 20px;
   align-content: center;
+  gap: 14px;
+}
+
+.bifurcation-model__result dd > p,
+.bifurcation-model__scope {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.96rem;
+  line-height: 1.72;
+}
+
+.bifurcation-model__scope {
+  margin-top: 22px;
 }
 
 .bifurcation-model__result .math-display {
@@ -7060,6 +7086,10 @@ body {
   font-family: "Source Serif 4", Georgia, serif;
   font-size: 0.92rem;
   line-height: 1.65;
+}
+
+.bifurcation-model__conclusion .math-display + p {
+  margin-top: 14px;
 }
 
 .bifurcation-model__conclusion .math-display {
@@ -7229,7 +7259,7 @@ body {
     font-size: 0.87rem;
   }
 
-  .bifurcation-model__header > p:last-child {
+  .bifurcation-model__header > p:not(:first-child) {
     font-size: 0.9rem;
   }
 
