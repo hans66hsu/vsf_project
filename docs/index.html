@@ -42,7 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=narrative-4">
+  <link rel="stylesheet" href="static/css/site.css?v=narrative-5">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
   <script src="static/js/site.js?v=narrative-2" defer></script>
 </head>
@@ -653,9 +653,10 @@
                   <h3 id="bifurcation-setup-heading">Bifurcation example</h3>
                 </header>
                 <div class="ground-truth-copy">
-                  <p>Start with two equally likely futures that are mirror images of one another. Both remain at the same state until a chosen time, then separate symmetrically. This lets us compare two things: how closely each model matches the state at the split, and how much it amplifies small state errors afterward.</p>
-                  <p>Let <span class="math-inline" data-tex="B\in\{-1,+1\}">B ∈ {−1,+1}</span> index the two futures. Both trajectories remain at <span class="math-inline" data-tex="x=0">x = 0</span> through the bifurcation time <span class="math-inline" data-tex="\tau">τ</span>; for <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span>, <span class="math-inline" data-tex="B=-1">B = −1</span> and <span class="math-inline" data-tex="B=+1">B = +1</span> select the negative and positive branches:</p>
+                  <p>At the split, the present state is known exactly, but the future branch is still uncertain. We want a forecast to respect both facts: every sample should agree with the observed state, and the samples should cover both futures. This example lets us calculate how two ways of representing that uncertainty behave.</p>
+                  <p>Let <span class="math-inline" data-tex="B\in\{-1,+1\}">B ∈ {−1,+1}</span> index the two equally likely futures. Both trajectories remain at <span class="math-inline" data-tex="x=0">x = 0</span> through the bifurcation time <span class="math-inline" data-tex="\tau">τ</span>; for <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span>, <span class="math-inline" data-tex="B=-1">B = −1</span> and <span class="math-inline" data-tex="B=+1">B = +1</span> select the negative and positive branches:</p>
                   <div class="motivation-equation math-display" data-tex-display data-tex="\xi_B(t)=B\,m(t),\qquad m(t)=0\ \text{for}\ t\le\tau,\qquad m(t)&gt;0\ \text{for}\ t&gt;\tau">ξB(t) = Bm(t), with m(t) = 0 before τ and positive after τ</div>
+                  <p>The sign selects the branch; the displacement function determines how far it moves from zero. Before the split, this displacement is zero for both signs. Even the entire observed history therefore provides no way to choose between the two futures.</p>
                   <dl class="notation-list" aria-label="Bifurcation notation">
                     <div><dt><span class="math-inline" data-tex="B">B</span></dt><dd>future branch label</dd></div>
                     <div><dt><span class="math-inline" data-tex="m(t)">m(t)</span></dt><dd>distance of either branch from zero</dd></div>
@@ -668,40 +669,57 @@
               </section>
 
               <div class="bifurcation-model-comparison" aria-label="Standard and latent Streaming Flow constructions">
-                <p class="bifurcation-model-comparison__intro">For both constructions, let <span class="math-inline" data-tex="q(t)=\dot m(t)+km(t)">q(t) = ṁ(t) + km(t)</span> and <span class="math-inline" data-tex="\sigma_t=\sigma_0e^{-kt}">σt = σ₀e−kt</span>. The quantity <span class="math-inline" data-tex="J_{\tau,t}">Jτ,t</span> is the derivative of the corresponding flow map with respect to its physical state at the split.</p>
+                <div class="bifurcation-model-comparison__intro">
+                  <p>If the branch were known, its field would follow the reference motion and correct deviations toward that path. Both constructions use <span class="math-inline" data-tex="q(t)=\dot m(t)+km(t)">q(t) = ṁ(t) + km(t)</span> to combine these terms. The dot denotes a time derivative. Standard SF also uses a Gaussian training tube with width <span class="math-inline" data-tex="\sigma_t=\sigma_0e^{-kt}">σt = σ₀e−kt</span>, which shrinks over time.</p>
+                  <p>For each model, we examine three quantities. The velocity field is the update rule. Fidelity measures agreement with the state at the split. Sensitivity measures how much a small error in that state changes the later forecast. The last two need to be considered together: a close fit is less useful if a tiny perturbation can substantially change the prediction.</p>
+                </div>
 
                 <section class="bifurcation-model bifurcation-model--standard" aria-labelledby="standard-sf-technical-heading">
                   <header class="bifurcation-model__header">
                     <p>Standard Streaming Flow</p>
                     <h3 id="standard-sf-technical-heading">Why physical-state fidelity raises sensitivity</h3>
-                    <p>At the population optimum, Standard SF must infer branch identity from the physical state <span class="math-inline" data-tex="x">x</span>. For the complete assumptions and proof, see <a href="https://arxiv.org/abs/2610.00976" target="_blank" rel="noopener">Proposition A.1 in the paper <span aria-hidden="true">↗</span></a>.</p>
+                    <p>Standard SF has no separate input for the branch. At a given time, forecasts with the same state and history receive the same update. To generate both futures, this construction varies the physical starting state <span class="math-inline" data-tex="x">x</span>. Small differences in that state must then determine which future a forecast follows.</p>
+                    <p>We study the population optimum: the field that minimizes the expected SF training loss exactly. This removes imperfect fitting from the comparison and isolates a limitation of the formulation in this example. The calculation and its assumptions are given in <a href="https://arxiv.org/abs/2610.00976" target="_blank" rel="noopener">Proposition A.1 in the paper <span aria-hidden="true">↗</span></a>.</p>
                   </header>
 
                   <dl class="bifurcation-model__results">
                     <div class="bifurcation-model__result">
                       <dt><span>01</span><span><strong>Velocity field</strong><small>Population-optimal</small></span></dt>
-                      <dd><div class="math-display" data-tex-display data-tex="v_{\mathrm{SF}}^\star(x,t)=-kx+q(t)\tanh\!\left(\frac{x\,m(t)}{\sigma_t^2}\right)">v⋆SF(x,t) = −kx + q(t)tanh(xm(t)/σt²)</div></dd>
+                      <dd>
+                        <p>Squared-error training averages the two branch-specific target velocities according to how likely each branch is at the current state. For this symmetric Gaussian construction, the average has an exact expression:</p>
+                        <div class="math-display" data-tex-display data-tex="v_{\mathrm{SF}}^\star(x,t)=-kx+q(t)\tanh\!\left(\frac{x\,m(t)}{\sigma_t^2}\right)">v⋆SF(x,t) = −kx + q(t)tanh(xm(t)/σt²)</div>
+                        <p>The tanh factor is a smooth average of the branch sign, taking values between −1 and +1. Once the branches separate, positive states put more weight on the positive branch, while negative states favor the negative branch. At zero, the branches have equal weight and their velocities cancel.</p>
+                        <p>A forecast started exactly at zero therefore stays at zero, even after the reference paths separate. Starting slightly to either side lets the field produce different futures. A narrower tube makes the change between the branch weights sharper near zero.</p>
+                      </dd>
                     </div>
                     <div class="bifurcation-model__result">
                       <dt><span>02</span><span><strong>Split-time fidelity error</strong><small>Distance to the data marginal</small></span></dt>
                       <dd>
+                        <p>At the split, every reference trajectory is exactly at zero. In this construction, standard SF starts from a Gaussian distribution and contracts it toward zero before the branches separate. A Gaussian spread remains at the split. The two distributions below describe these physical states, and the Wasserstein distance measures their discrepancy:</p>
                         <div class="math-display" data-tex-display data-tex="\varepsilon_\tau:=W_2\!\left(P_\tau^{\mathrm{SF}},P_\tau^{\mathrm{data}}\right)=\sigma_\tau=\sigma_0e^{-k\tau}">ετ := W₂(PτSF, Pτdata) = στ = σ₀e−kτ</div>
                         <div class="bifurcation-model__live" aria-label="Current values from the tube-scale slider">
                           <span>Current slider setting</span>
                           <strong><span class="math-inline" data-tex="\sigma_0">σ₀</span> = <output for="sf-tube-width" data-bifurcation-sigma0-output>0.340</output> <i aria-hidden="true">→</i> <span class="math-inline" data-tex="\varepsilon_\tau">ετ</span> ≈ <output for="sf-tube-width" data-bifurcation-fidelity-output>0.194</output></strong>
                         </div>
+                        <p>Here, the 2-Wasserstein distance is simply the root-mean-square distance of SF's sampled states from zero. It equals the tube's standard deviation. Reducing the tube scale with the slider improves this fit, but also brings the states that must eventually follow different branches closer together.</p>
                       </dd>
                     </div>
                     <div class="bifurcation-model__result">
                       <dt><span>03</span><span><strong>Flow-map sensitivity</strong><small>For fixed t &gt; τ, at x = 0</small></span></dt>
-                      <dd><div class="math-display" data-tex-display data-tex="J_{\tau,t}^{\mathrm{SF}}=\exp\!\left[-k(t-\tau)+\frac{m(t)^2e^{2k(t-\tau)}}{2\varepsilon_\tau^2}\right]">JSFτ,t = exp[−k(t−τ) + m(t)²e2k(t−τ)/(2ετ²)]</div></dd>
+                      <dd>
+                        <p>Now perturb the state slightly at the split and integrate to the same later time. The flow map takes the starting state to that later state; its derivative <span class="math-inline" data-tex="J_{\tau,t}">Jτ,t</span> measures the local amplification of the perturbation. We evaluate it along the central trajectory, where the two branches have equal weight:</p>
+                        <div class="math-display" data-tex-display data-tex="J_{\tau,t}^{\mathrm{SF}}=\exp\!\left[-k(t-\tau)+\frac{m(t)^2e^{2k(t-\tau)}}{2\varepsilon_\tau^2}\right]">JSFτ,t = exp[−k(t−τ) + m(t)²e2k(t−τ)/(2ετ²)]</div>
+                        <p>A sensitivity of ten means a sufficiently small state error at the split becomes roughly ten times larger later. The negative term in the exponent comes from contraction toward the reference paths. The positive term comes from separating the branches.</p>
+                        <p>The squared fidelity error sits in the denominator of that positive term. With the branch motion and later time fixed, reducing this error increases sensitivity. The model fits the split more closely, but becomes more responsive to small state errors around zero.</p>
+                      </dd>
                     </div>
                   </dl>
 
                   <div class="bifurcation-model__conclusion">
                     <span class="bifurcation-model__conclusion-label">The issue</span>
-                    <p>For fixed <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span> with <span class="math-inline" data-tex="m(t)&gt;0">m(t) &gt; 0</span>, improving split-time fidelity forces the physical-state sensitivity to diverge:</p>
+                    <p>The physical state is doing two jobs: matching the observed present and carrying the future branch choice. Keep the branch motion and contraction rate fixed. For any fixed later time <span class="math-inline" data-tex="t&gt;\tau">t &gt; τ</span> with <span class="math-inline" data-tex="m(t)&gt;0">m(t) &gt; 0</span>, making the fit arbitrarily precise forces the local sensitivity to grow without bound:</p>
                     <div class="math-display" data-tex-display data-tex="\varepsilon_\tau\downarrow0\quad\Longrightarrow\quad J_{\tau,t}^{\mathrm{SF}}\to\infty">ετ ↓ 0 implies JSFτ,t → ∞</div>
+                    <p>For every positive tube width, the sensitivity is finite. The limit concerns how strongly an infinitesimal error at zero changes the later state. It exposes the cost of encoding the branch choice in ever-smaller physical-state differences.</p>
                   </div>
                 </section>
 
@@ -709,28 +727,42 @@
                   <header class="bifurcation-model__header">
                     <p>Ideal latent construction</p>
                     <h3 id="latent-technical-heading">How conditioning removes the toy bottleneck</h3>
-                    <p>Let <span class="math-inline" data-tex="Z\sim\mathcal N(0,1)">Z ∼ N(0,1)</span>, with <span class="math-inline" data-tex="b(Z)=+1">b(Z) = +1</span> for <span class="math-inline" data-tex="Z\ge0">Z ≥ 0</span> and <span class="math-inline" data-tex="b(Z)=-1">b(Z) = −1</span> for <span class="math-inline" data-tex="Z&lt;0">Z &lt; 0</span>. The latent code supplies the branch while both futures start from <span class="math-inline" data-tex="x_\tau=0">xτ = 0</span>.</p>
+                    <p>Now give the branch choice its own variable. We sample a code once and keep it fixed throughout the trajectory. Two forecasts can then start from the same observed physical state and receive different updates because their codes differ. Sampling chooses one possible future; it does not reveal which future will actually occur.</p>
+                    <p>Let <span class="math-inline" data-tex="Z\sim\mathcal N(0,1)">Z ∼ N(0,1)</span>, with <span class="math-inline" data-tex="b(Z)=+1">b(Z) = +1</span> for <span class="math-inline" data-tex="Z\ge0">Z ≥ 0</span> and <span class="math-inline" data-tex="b(Z)=-1">b(Z) = −1</span> for <span class="math-inline" data-tex="Z&lt;0">Z &lt; 0</span>. The two signs have equal probability, so each future is selected half the time. Both forecasts start from <span class="math-inline" data-tex="x_\tau=0">xτ = 0</span>.</p>
                   </header>
 
                   <dl class="bifurcation-model__results">
                     <div class="bifurcation-model__result">
                       <dt><span>01</span><span><strong>Velocity field</strong><small>Ideal latent-conditioned</small></span></dt>
-                      <dd><div class="math-display" data-tex-display data-tex="v_{\mathrm{ideal}}(x,t,Z)=-kx+b(Z)q(t)">videal(x,t,Z) = −kx + b(Z)q(t)</div></dd>
+                      <dd>
+                        <p>The code now supplies the branch sign directly. Replacing the averaged branch sign in standard SF with this chosen sign gives:</p>
+                        <div class="math-display" data-tex-display data-tex="v_{\mathrm{ideal}}(x,t,Z)=-kx+b(Z)q(t)">videal(x,t,Z) = −kx + b(Z)q(t)</div>
+                        <p>Expanding <span class="math-inline" data-tex="q(t)">q(t)</span> writes the field as <span class="math-inline" data-tex="b(Z)\dot m(t)-k[x-b(Z)m(t)]">b(Z)ṁ(t) − k[x − b(Z)m(t)]</span>: the selected branch's velocity plus a correction toward its position. On the path, the correction is zero and the velocity matches the reference motion. The physical state can track the path while the code retains the branch choice.</p>
+                      </dd>
                     </div>
                     <div class="bifurcation-model__result">
                       <dt><span>02</span><span><strong>Split-time fidelity error</strong><small>Distance to the data marginal</small></span></dt>
-                      <dd><div class="math-display" data-tex-display data-tex="W_2\!\left(P_\tau^{\mathrm{ideal}},P_\tau^{\mathrm{data}}\right)=0">W₂(Pτideal, Pτdata) = 0</div></dd>
+                      <dd>
+                        <p>Every generated trajectory starts from zero at the split, whatever its code. The model's distribution of physical states therefore matches the data distribution exactly:</p>
+                        <div class="math-display" data-tex-display data-tex="W_2\!\left(P_\tau^{\mathrm{ideal}},P_\tau^{\mathrm{data}}\right)=0">W₂(Pτideal, Pτdata) = 0</div>
+                        <p>The forecast can be certain about the present state and still uncertain about the future. That uncertainty is represented by the code, which preserves both future branches with equal probability.</p>
+                      </dd>
                     </div>
                     <div class="bifurcation-model__result">
                       <dt><span>03</span><span><strong>Flow-map sensitivity</strong><small>For fixed latent code Z</small></span></dt>
-                      <dd><div class="math-display" data-tex-display data-tex="J_{\tau,t}^{\mathrm{ideal}}=\frac{\partial\Phi_{\tau,t}^{\mathrm{ideal}}(x,Z)}{\partial x}=e^{-k(t-\tau)}">Jidealτ,t = ∂Φidealτ,t(x,Z)/∂x = e−k(t−τ)</div></dd>
+                      <dd>
+                        <p>Finally, perturb only the physical state and keep the code fixed. This tests whether a state error grows while the selected future stays the same:</p>
+                        <div class="math-display" data-tex-display data-tex="J_{\tau,t}^{\mathrm{ideal}}=\frac{\partial\Phi_{\tau,t}^{\mathrm{ideal}}(x,Z)}{\partial x}=e^{-k(t-\tau)}">Jidealτ,t = ∂Φidealτ,t(x,Z)/∂x = e−k(t−τ)</div>
+                        <p>Because the contraction rate is positive, this factor is below one and decreases with time. Small state errors shrink toward the selected path. A different code can still select a different future; that intended variation is separate from sensitivity to errors in the physical state.</p>
+                      </dd>
                     </div>
                   </dl>
 
                   <div class="bifurcation-model__conclusion bifurcation-model__conclusion--latent">
                     <span class="bifurcation-model__conclusion-label">What changes</span>
-                    <p>The construction is exact at the split and contracts physical-state perturbations because branch identity is carried by <span class="math-inline" data-tex="Z">Z</span>, not by tiny differences in <span class="math-inline" data-tex="x">x</span>.</p>
+                    <p>The variable <span class="math-inline" data-tex="Z">Z</span> carries the future choice, while <span class="math-inline" data-tex="x">x</span> can match the shared observed state exactly. For a fixed code, this constructed field also contracts small state errors. This is why separating future variation from the physical state helps in this example.</p>
                   </div>
+                  <p class="bifurcation-model__scope">The calculation constructs an ideal field by hand. It shows what a separate latent variable makes possible, without establishing the same contraction for a trained VSF network. In VSF, the encoder and velocity network must learn how codes affect motion from data. The next section explains how we learn that relationship; the forecasting experiments test the resulting trajectories.</p>
                 </section>
               </div>
             </div>
