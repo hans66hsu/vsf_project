@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Variational Streaming Flow enables probabilistic forecasting with latent-conditioned dynamics directly in physical time.">
+  <meta name="description" content="Variational Streaming Flow generates complete possible futures in physical time. Explore how one persistent latent code supports forecasting and world-model planning.">
   <meta name="keywords" content="variational streaming flow, probabilistic forecasting, physical-time flow, dynamical systems, world models">
   <meta name="theme-color" content="#fdfdfc">
   <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="Variational Streaming Flow">
-  <meta property="og:description" content="A latent-variable extension of Streaming Flow for probabilistic forecasting directly in physical time.">
+  <meta property="og:description" content="Forecast complete possible futures in physical time, with one sampled latent code retained throughout each rollout.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/figures/vsf-motivation.png">
-  <title>Variational Streaming Flow — Probabilistic Forecasting in Physical Time</title>
+  <title>Variational Streaming Flow: Probabilistic Forecasting in Physical Time</title>
 
   <script>
     (() => {
@@ -42,9 +42,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/vendor/katex/katex-swap.min.css?v=0.19.0">
-  <link rel="stylesheet" href="static/css/site.css?v=theme-1">
+  <link rel="stylesheet" href="static/css/site.css?v=narrative-2">
   <script src="static/vendor/katex/katex.min.js?v=0.19.0" defer></script>
-  <script src="static/js/site.js?v=theme-1" defer></script>
+  <script src="static/js/site.js?v=narrative-2" defer></script>
 </head>
 
 <body>
@@ -68,12 +68,13 @@
 
       <div class="header-actions">
         <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
-          <a href="#why-vsf">Why VSF?</a>
-          <a href="#forecasting-paradigms">Forecasting today</a>
-          <a href="#streaming-flow">Streaming Flow</a>
-          <a href="#motivation">Motivation</a>
+          <a href="#abstract">Overview</a>
+          <a href="#forecasting-paradigms">Physical time</a>
+          <a href="#motivation">Why a latent?</a>
           <a href="#method">Method</a>
           <a href="#results">Results</a>
+          <a href="#world-model">Planning</a>
+          <a href="#outlook">Next steps</a>
         </nav>
 
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" data-theme-toggle>
@@ -136,9 +137,16 @@
     <section class="section section-abstract" id="abstract">
       <div class="container narrow">
         <header class="section-heading article-heading">
-          <h2>Abstract</h2>
+          <h2>Forecasting when several futures are possible</h2>
         </header>
-        <div class="abstract-copy">
+        <div class="section-copy overview-copy">
+          <p>Forecasting often begins with incomplete information. We may observe a system's recent motion without knowing all the parameters that govern it. Several futures can then fit the observed history. A planner needs forecasts that capture those alternatives, and it needs them quickly enough to compare many possible actions.</p>
+          <p>Variational Streaming Flow (VSF) generates future trajectories by advancing a learned dynamical model directly in physical time. We sample a latent code once for each forecast and keep it fixed as the state evolves. Different codes can produce different continuations from the same observations.</p>
+          <p>We test whether these forecasts stay accurate over 1,000 steps, capture uncertainty when a dynamical parameter is hidden, and help a world-model planner reach its goals.</p>
+        </div>
+        <details class="paper-abstract">
+          <summary>Read the paper abstract</summary>
+          <div class="abstract-copy">
           <p>Probabilistic forecasting is important for predicting complex dynamical systems because
               intrinsic randomness and incomplete observations can cause the same observed state to evolve
               into multiple plausible futures. While flow matching is a flexible approach for probabilistic
@@ -156,7 +164,8 @@
               Architecture (JEPA)-based world models as a plug-and-play predictor to improve temporal
               dynamics and goal-directed success rate in navigation, motion planning, and manipulation.
           </p>
-        </div>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -164,25 +173,25 @@
       <div class="container">
         <div class="hero-result-showcase">
           <header class="hero-result-showcase__heading">
-            <h2 id="hero-results-heading">Why Variational Streaming Flow (VSF)?</h2>
-            <!-- <span>One example shows probabilistic forecasting in a partially observed dynamical system; the other shows goal-directed planning with a learned world model.</span> -->
+            <h2 id="hero-results-heading">What this makes possible</h2>
+            <span>A forecast must be useful as a complete path, and affordable to generate repeatedly. These are the two demands behind VSF.</span>
           </header>
 
           <div class="vsf-value-grid">
             <article class="vsf-value-card">
               <span>01</span>
-              <h3>1 NFE per forecast step</h3>
-              <p>VSF advances each forecast step with one velocity-field evaluation (<strong>NFE = 1</strong>), avoiding iterative denoising and achieving up to a 7× speedup over autoregressive diffusion.</p>
+              <h3>One evaluation per step</h3>
+              <p>With forward Euler integration, each forecast step uses one evaluation of the velocity network (NFE = 1). There is no iterative denoising loop inside a step.</p>
             </article>
             <article class="vsf-value-card">
               <span>02</span>
-              <h3>Multiple plausible futures</h3>
-              <p> Different latent codes let VSF generate multiple plausible futures from the same observed history. Holding each code fixed throughout a rollout helps preserve coherence as the dynamics branch.</p>
+              <h3>One code for a complete future</h3>
+              <p>A sampled latent code conditions the entire rollout. Changing the code lets VSF represent different continuations while starting from the same observed state and history.</p>
             </article>
             <article class="vsf-value-card">
               <span>03</span>
-              <h3>Accurate long-horizon rollouts</h3>
-              <p>VSF mitigates error accumulation over 1,000-step chaotic-system forecasts. Its accurate imagined rollouts support JEPA world model planning, improving average success by 7.34% across robotics tasks.</p>
+              <h3>Forecasts that help a planner</h3>
+              <p>Replacing the autoregressive world-model predictor with VSF improves average task success by about 7.3 percentage points across four tasks, with the encoder and planner held fixed.</p>
             </article>
           </div>
 
@@ -190,7 +199,7 @@
           <article class="rollout-comparison hero-rollout-comparison" aria-labelledby="hero-rossler-comparison">
             <header class="rollout-comparison__header">
               <h3 id="hero-rossler-comparison">Probabilistic forecasting</h3>
-              <p>Stochastic Rössler forecasting</p>
+              <p>Possible futures when a dynamical parameter is hidden</p>
             </header>
             <div class="rollout-comparison__grid">
               <figure class="rollout-video-card rollout-image-card">
@@ -206,12 +215,13 @@
                 </div>
               </figure>
             </div>
+            <p class="hero-result-note">Each curve is a forecast sample. In this example, VSF produces a range of spiral-shaped paths, while AR diffusion drifts away from the reference dynamics. The full comparison below includes ground truth and other baselines.</p>
           </article>
 
           <article class="rollout-comparison hero-rollout-comparison hero-rollout-comparison--planning" aria-labelledby="hero-cube-comparison">
             <header class="rollout-comparison__header">
-              <h3 id="hero-cube-comparison">World Model Predictor</h3>
-              <p>LeWM Cube planning</p>
+              <h3 id="hero-cube-comparison">Planning with a world model</h3>
+              <p>Predicting action outcomes to move a cube to its target</p>
             </header>
             <div class="rollout-comparison__grid">
               <figure class="rollout-video-card">
@@ -233,6 +243,7 @@
                 </div>
               </figure>
             </div>
+            <p class="hero-result-note">The arm must grasp the cube and place it at the target. These clips show one failure/success comparison; the planning results below measure performance across the evaluated goals.</p>
           </article>
           </div>
         </div>
@@ -243,10 +254,12 @@
     <section class="section section-soft section-paradigms" id="forecasting-paradigms">
       <div class="container article-container">
         <header class="section-heading article-heading narrative-heading">
-          <p class="section-number">1 · Forecasting paradigm</p>
-          <h2>Forecasting paradigm with diffusion/flow models</h2>
-          <p>Diffusion/flow models generate samples by transforming noise into clean samples through a series of iterative steps. For forecasting temporal sequences, this process can generate an entire trajectory at once or advance sequentially. Here we introduce four paradigms for forecasting with diffusion/flow models.</p>
+          <p class="section-number">1 · Generating a forecast</p>
+          <h2>Two clocks in generative forecasting</h2>
+          <p>Many diffusion and flow forecasters refine noise into a prediction through an iterative generation process. That process has its own clock: several network evaluations may be needed to generate states at a given physical time. The animations show how this extra computation is organized across a full trajectory, a block of states, or one state at a time.</p>
         </header>
+
+        <p class="reading-guide">Watch which future states are being generated and when they become available. The first three methods refine a full trajectory, a block, or a state before making that part of the forecast available. Streaming Flow advances the predicted state directly along the physical timeline.</p>
 
         <div class="paradigm-legend" role="list" aria-label="Forecasting paradigm animation legend">
           <span role="listitem"><i class="paradigm-legend__history" aria-hidden="true"></i>Observed history</span>
@@ -297,17 +310,12 @@
             <div class="paradigm-media">
               <img src="assets/figures/concepts/streaming_flow.gif" alt="Streaming Flow moves directly from one physical forecast time to the next without an auxiliary denoising loop." width="1440" height="696" loading="lazy">
             </div>
-            <dl><div><dt>Forecast horizon</dt><dd>Open-ended</dd></div><div><dt>Additional denoising</dt><dd>None — physical time only</dd></div></dl>
+            <dl><div><dt>Forecast horizon</dt><dd>Open-ended</dd></div><div><dt>Additional denoising</dt><dd>None; physical time only</dd></div></dl>
           </figure>
         </div>
 
         <aside class="paradigm-takeaway">
-          <strong>Why streaming flow?</strong>
-          <ul>
-            <li><strong>Full-sequence diffusion:</strong> The prediction horizon must be chosen in advance, so it does not naturally support open-ended forecasting.</li>
-            <li><strong>Block and autoregressive diffusion:</strong> These methods support open-ended forecasting, but each block or state requires an additional diffusion-time denoising process, increasing computation.</li>
-            <li><strong>Streaming Flow:</strong> Generation evolves directly in physical time without an additional denoising loop, enabling one velocity-field evaluation per forecast step.</li>
-          </ul>
+          <p>All four approaches generate future trajectories. Their computational structure differs. Full-sequence diffusion refines a requested horizon together; block and autoregressive diffusion repeat refinement as the forecast grows. Streaming Flow removes that inner loop. With an Euler update, one evaluation of its velocity field advances the forecast by one step.</p>
         </aside>
 
       </div>
@@ -318,7 +326,7 @@
         <header class="section-heading article-heading narrative-heading">
           <p class="section-number">2 · Physical-time flow</p>
           <h2>What is Streaming Flow?</h2>
-          <p>Diffusion-style forecasting uses an inner generation process to create states at physical times. Streaming Flow removes that extra clock: advancing the learned dynamics advances the forecast itself.</p>
+          <p>A velocity field tells a state how to move next. Streaming Flow learns this motion from observed trajectories, then follows the learned field from the latest observation. Advancing the dynamics advances the forecast itself.</p>
         </header>
 
         <div class="sf-stage-switcher" data-sf-stage-switcher>
@@ -331,8 +339,8 @@
                 </figcaption>
               </figure>
               <div class="sf-stage__copy">
-                <h3>Noise contracts in physical time</h3>
-                <p>Construct noisy states around a clean trajectory. Their spread shrinks with physical time, so later states approach the path.</p>
+                <h3>Build training examples around a path</h3>
+                <p>Start with an observed training trajectory and add small perturbations around it. This creates a tube whose width shrinks with physical time. The tube defines a training construction around one path; uncertainty between possible futures is represented separately by VSF's latent code.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="Y_s=\xi(s)+\sigma(s)\epsilon,\qquad \sigma(s)=\sigma_0e^{-\kappa s}">Ys = ξ(s) + σ(s)ε, σ(s) = σ0e−κs</div>
               </div>
             </article>
@@ -346,7 +354,7 @@
               </figure>
               <div class="sf-stage__copy">
                 <h3>Learn one physical-time field</h3>
-                <p>Fit the velocity field to local motion targets. It follows the trajectory while pulling nearby states back toward it.</p>
+                <p>The target velocity follows the observed motion on the path and points nearby states back toward it. Training fits a neural velocity field to these local targets. The animation illustrates the field we want the model to learn.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{SF}}=\mathbb E\,\lVert v_\theta-g_\xi\rVert_2^2">LSF = E‖vθ − gξ‖²</div>
               </div>
             </article>
@@ -362,7 +370,7 @@
                 <h3>Roll forward one step at a time</h3>
                 <p>Start from the latest observation. At step <span class="math-inline" data-tex="k">k</span>, the field reads normalized physical time <span class="math-inline" data-tex="s_k">sk</span> and the observed and rolling history <span class="math-inline" data-tex="h">h</span>, then advances the state directly.</p>
                 <div class="sf-stage__equation math-display" data-tex-display data-tex="\widehat{x}_{k+1}=\widehat{x}_k+\Delta t\,v_\theta(\widehat{x}_k,s_k,h)">x̂k+1 = x̂k + Δt vθ(x̂k, sk, h)</div>
-                <strong class="sf-stage__note">1 velocity-field evaluation per transition</strong>
+                <strong class="sf-stage__note">1 velocity-field evaluation per Euler step</strong>
               </div>
             </article>
           </div>
@@ -380,7 +388,7 @@
           <div><span>Streaming Flow</span><p>Physical time only</p></div>
         </div>
 
-        <p class="section-transition">Streaming Flow removes the denoising loop, but standard SF still maps the same state and history to only one future.</p>
+        <p class="section-transition">This gives an efficient way to generate a trajectory. To represent several continuations from the same state and history, we need a source of variation that can persist through the forecast.</p>
       </div>
     </section>
 
@@ -388,17 +396,17 @@
       <div class="container article-container">
         <header class="section-heading article-heading motivation-heading">
           <p class="section-number">3 · Bifurcation example</p>
-          <h2>Motivation of Variational Streaming Flow</h2>
-          <p>Standard non-latent Streaming Flow assigns one direction to each state and observed history, so the same input always produces one trajectory. In a bifurcation example, it must encode the future choice in tiny physical-state differences; making those differences smaller makes the rollout more sensitive to perturbations.</p>
+          <h2>How a latent code separates futures</h2>
+          <p>Consider two paths that share the same past and then split. We call this a bifurcation. Before the split, the physical state and history do not reveal which branch will follow. A latent code gives that branch choice a separate representation, so both futures can begin at the same physical state.</p>
         </header>
 
         <div class="limitation-summary limitation-summary--overview" aria-label="Why standard Streaming Flow needs a latent variable">
-          <article><h3>Limitation of SF</h3><p>A deterministic velocity field cannot express several future motions from the exact same state and history.</p></article>
-          <article><h3>Bifurcation example</h3><p>Standard SF separates branches through small state differences, which can amplify small rollout errors in bifurcation.</p></article>
-          <article><h3>How VSF solves it</h3><p>One sampled code can select a continuation while both futures begin from the same physical state.</p></article>
+          <article><h3>A shared past</h3><p>Without an additional source of randomness, the same state and history produce one deterministic SF rollout.</p></article>
+          <article><h3>Small state differences</h3><p>In this example, SF can select branches through physical-state perturbations. Resolving smaller perturbations requires a more sensitive field.</p></article>
+          <article><h3>A separate branch code</h3><p>A latent-conditioned field can use the code to select a continuation while the physical starting state stays the same.</p></article>
         </div>
 
-        <p class="section-transition section-transition--lead">The top row shows the desired branching behavior; the bottom row shows why standard SF achieves it only by becoming sensitive to small state errors.</p>
+        <p class="section-transition section-transition--lead">This analytic example compares an ideal latent construction with the population-optimal SF field. The top row shows the reference branches and the latent construction. In the bottom row, reduce the tube width to see the trade-off between closely matching the shared path and sensitivity to small state errors. The trained models are evaluated in the results section.</p>
 
         <div class="bifurcation-demo" data-bifurcation-demo>
           <figure class="paper-figure bifurcation-fallback" data-bifurcation-fallback>
@@ -460,7 +468,7 @@
                   <div class="bifurcation-posterior-inset" aria-label="Posterior branch-mean inset">
                     <svg class="bifurcation-plot bifurcation-posterior-plot" viewBox="0 0 280 180" role="img" aria-labelledby="bifurcation-posterior-title bifurcation-posterior-desc" data-bifurcation-plot="posterior"></svg>
                   </div>
-                  <figcaption>Nearby states encode different branches; the inset shows the sharp switch near <span class="math-inline" data-tex="x=0">x = 0</span>.</figcaption>
+                  <figcaption>The solid paths start slightly to either side of the branch separator at <span class="math-inline" data-tex="x=0">x = 0</span>. The inset shows how the preferred branch changes near that separator. The sensitivity panel measures the response to an infinitesimal perturbation at the separator.</figcaption>
                 </figure>
               </li>
 
@@ -512,7 +520,7 @@
 
           <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-bifurcation-status></p>
 
-          <p class="section-transition section-transition--before-details">We next explain how VSF learns latent codes from observed velocity field in the next section.</p>
+          <p class="section-transition section-transition--before-details">We next learn latent-conditioned dynamics from observed motion.</p>
 
           <details class="bifurcation-technical-details" data-technical-details>
             <summary>
@@ -620,7 +628,7 @@
         <header class="section-heading article-heading method-heading">
           <p class="section-number">4 · Method</p>
           <h2>Variational Streaming Flow</h2>
-          <p>VSF generates future trajectories by evolving the latest observed state through a learned velocity field in physical time. Different latent values allow the model to generate multiple plausible futures from the same observed history. During training, an encoder learns which latent values explain the observed dynamics.</p>
+          <p>VSF adds a latent code to the physical-time velocity field. We draw the code before a forecast and keep it fixed throughout the rollout. The predicted state changes at every step, while the code continues to condition how it moves. A new draw can produce a different complete future from the same observations.</p>
         </header>
 
         <div class="method-overview" aria-label="VSF training and inference overview">
@@ -634,7 +642,7 @@
             <article class="method-card training-card">
               <h3>Training</h3>
               <div class="method-card__body">
-                <p>Construct a local state and physical velocity <span class="math-inline" data-tex="(x_s,u_s)">(xs, us)</span>.</p>
+                <p>Sample a transition from an observed training trajectory to obtain a local state and physical velocity <span class="math-inline" data-tex="(x_s,u_s)">(xs, us)</span>. An encoder infers codes that explain this motion.</p>
                 <div class="method-card__equation math-display" data-tex-display data-tex="z^{(1:M)}\overset{\mathrm{iid}}{\sim}q_\phi(\,\cdot\mid u_s,x_s,s,h)">z(1:M) iid∼ qφ(· | us, xs, s, h)</div>
                 <p>Evaluate the corresponding physical-time velocities.</p>
                 <div class="method-card__equation math-display" data-tex-display data-tex="\widehat{u}_s^{(1:M)}=v_\theta(x_s,s,h,z^{(1:M)})">ûs(1:M) = vθ(xs, s, h, z(1:M))</div>
@@ -654,10 +662,17 @@
           </div>
         </div>
 
+        <div class="path-explanation" aria-labelledby="complete-forecast-heading">
+          <h3 id="complete-forecast-heading">Local supervision, complete forecasts</h3>
+          <p>Local transitions tell the model how a trajectory moves. At inference, we repeatedly apply the learned field to its own predicted states, using the same code at every step. Together, these steps define a distribution over complete future paths:</p>
+          <div class="math-display" data-tex-display data-tex="z\sim p(z),\qquad \widehat{x}_{m+1:T}=\operatorname{Rollout}_{\theta}(x_{a:m},z)">z ∼ p(z), x̂m+1:T = Rolloutθ(xa:m, z)</div>
+          <p>The history representation is refreshed from generated states as the rollout proceeds; the code stays fixed across those updates. We assess the resulting path distribution with the complete-trajectory metrics in the stochastic experiments below.</p>
+        </div>
+
         <section class="method-derivation" aria-labelledby="velocity-evidence-heading">
           <header class="method-subheading">
             <h3 id="velocity-evidence-heading">Latent velocity model</h3>
-            <p>VSF uses a trajectory-level latent code <span class="math-inline" data-tex="z">z</span> so the same context <span class="math-inline" data-tex="c_s">cs</span> can represent different velocities <span class="math-inline" data-tex="u_s">us</span>. It learns their conditional distribution by marginalizing over the latent code:</p>
+            <p>At one physical time, let <span class="math-inline" data-tex="c_s=(x_s,s,h)">cs = (xs, s, h)</span> collect the state, time, and history. The paper formulates a conditional model of the observed velocity <span class="math-inline" data-tex="u_s">us</span>. Integrating over possible codes gives its conditional velocity distribution:</p>
           </header>
 
           <div class="derivation-equation math-display" data-tex-display data-tex="\max_\theta\ \log p_\theta(u_s\mid c_s),\qquad p_\theta(u_s\mid c_s)=\int p_\theta(u_s\mid c_s,z)\,p(z)\,\mathrm dz">maximize log pθ(us | cs), where pθ(us | cs) = ∫ pθ(us | cs, z)p(z) dz</div>
@@ -666,8 +681,8 @@
 
         <section class="objective-panel" aria-labelledby="energy-objective-heading" data-energy-demo>
           <header class="method-subheading">
-            <h3 id="energy-objective-heading">Training objective</h3>
-            <p>VSF evaluates <span class="math-inline" data-tex="M">M</span> latent-conditioned velocity samples together using generalized energy reconstruction:</p>
+            <h3 id="energy-objective-heading">Learning a distribution of local motion</h3>
+            <p>At each sampled transition, we want the predicted velocities to capture the observed motion and its uncertainty. The paper studies a generalized energy reconstruction term that scores <span class="math-inline" data-tex="M">M</span> latent-conditioned velocity samples together:</p>
           </header>
 
           <div class="method-mse-note">
@@ -679,7 +694,7 @@
           <p class="objective-explanation">The first term rewards accuracy against the observed velocity; the pairwise term accounts for the spread among samples. The full objective adds KL regularization to keep the training-time codes close to the prior used for forecasting:</p>
           <div class="training-objective-equation math-display" data-tex-display data-tex="\mathcal L_{\mathrm{VSF}}=\mathbb E\!\left[\mathcal L_{\mathrm{ES}}(s)+\beta_{\mathrm{KL}}\operatorname{KL}\!\left(q_\phi(z\mid u_s,x_s,s,h)\,\Vert\,p(z)\right)\right]">LVSF = E[LES(s) + βKL KL(qφ(z | us, xs, s, h) ‖ p(z))]</div>
 
-          <p class="section-transition section-transition--lead">The plots below show how the training objective scores exact, symmetric, and biased predictions.</p>
+          <p class="section-transition section-transition--lead">The interactive example below considers a scalar velocity with two equally likely values, −1 and +1. Choose a predicted pair and vary the exponent to see how distributional mismatch changes. The left plot also shows the population reconstruction term for the illustrative encoder; the right plot shows the mismatch itself.</p>
 
           <div class="energy-interactive">
             <div class="energy-alpha-control">
@@ -703,7 +718,7 @@
                 <span class="energy-alpha-control__failure-tick" style="left: 100%">2 · mean-only</span>
               </div>
               <div class="energy-alpha-control__readout">
-                <span data-energy-alpha-regime>At α = 1, the loss uses unsquared distances.</span>
+                <span data-energy-alpha-regime>At α = 1, the mismatch uses unsquared distances.</span>
                 <span>Selected pair <output data-energy-selected-pair>{−0.7, +0.7}</output>.</span>
               </div>
               <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-energy-status></p>
@@ -718,7 +733,7 @@
                 <figcaption>
                   <ol class="energy-metric-guide">
                     <li><strong>Prediction–truth mismatch:</strong> the actual distribution error; for <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, <span class="math-inline" data-tex="0">0</span> means an exact match.</li>
-                    <li><strong>Training reconstruction loss <span class="math-inline" data-tex="\mathcal L_{\mathrm{ES}}">LES</span>:</strong> the quantity VSF minimizes; it upper-bounds the mismatch in this example.</li>
+                    <li><strong>Population reconstruction term:</strong> the term in the paper's objective, evaluated with this example's encoder; it upper-bounds the mismatch under the stated alignment assumption.</li>
                   </ol>
                 </figcaption>
               </figure>
@@ -748,7 +763,7 @@
                 <h4 id="energy-control-heading">Prior-predictive energy-distance control</h4>
                 <p>Fix <span class="math-inline" data-tex="c=(x_s,s,h)">c = (xs, s, h)</span>. Assume <span class="math-inline" data-tex="0&lt;\alpha&lt;2">0 &lt; α &lt; 2</span>, the required <span class="math-inline" data-tex="\alpha">α</span>-power expectations are finite, and the aggregate posterior equals the inference prior, <span class="math-inline" data-tex="\overline q_\phi(\cdot\mid c)=p">q̄φ(· | c) = p</span>. Then</p>
                 <div class="proposition__equation math-display" data-tex-display data-tex="\underbrace{\frac12D_\alpha(\widetilde U,U)}_{\substack{\text{prediction--truth}\\\text{mismatch}}}\leq\underbrace{\mathbb E_U\!\left[S_\alpha(U)\right]}_{\substack{\text{training reconstruction loss}\\\text{(population form)}}}">Prediction–truth mismatch: ½Dα(Ũ, U) ≤ EU[Sα(U)]: population training reconstruction loss</div>
-                <p>Under the proposition’s assumptions, the right term upper-bounds the left.</p>
+                <p>Under these assumptions, the population reconstruction term bounds the discrepancy between velocity distributions at this local context. This is a local velocity guarantee. The quality of complete generated trajectories is assessed separately in the forecasting experiments.</p>
               </aside>
 
               <section class="alignment-example" aria-labelledby="alignment-example-heading">
@@ -779,20 +794,20 @@
         <header class="section-heading article-heading results-heading results-heading--standalone">
           <p class="section-number">5 · Results</p>
           <h2>Dynamical-system forecasting</h2>
-          <p>We evaluate the probabilistic forecasting performance of VSF on fully observed deterministic systems and partially observed stochastic systems.</p>
+          <p>We first ask whether VSF can track a single correct future over 1,000 steps. We then hide a dynamical parameter and test whether its samples recover the resulting range of possible futures. These settings call for different behavior: concentrated predictions when the continuation is known, and appropriate variation when it is uncertain.</p>
         </header>
 
-        <p class="section-transition section-transition--lead section-transition--after-heading">The tables summarize average errors; the animations show how each forecasting method advances along individual rollouts.</p>
+        <p class="section-transition section-transition--lead section-transition--after-heading">The tables compare performance across the test data. The animations show selected rollouts so we can inspect how errors develop and how the predicted trajectories differ.</p>
 
         <section class="forecast-subsection" aria-labelledby="deterministic-forecasting-heading">
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.1</p>
-            <h3 id="deterministic-forecasting-heading">Deterministic forecasting</h3>
-            <p>All state variables are observed. We report pointwise forecast accuracy and compare complete long-horizon trajectories.</p>
+            <h3 id="deterministic-forecasting-heading">Tracking a single future</h3>
+            <p>In these deterministic benchmarks, each initial condition has one correct continuation. A probabilistic forecaster should place its samples close to that trajectory. Small prediction errors can grow as a rollout advances, so we evaluate the full 1,000-step forecast to see how well each method maintains agreement with the reference motion.</p>
           </header>
 
           <figure class="results-panel results-table-figure" aria-labelledby="deterministic-table-caption">
-            <figcaption class="results-table-caption" id="deterministic-table-caption"><strong>Table 1, deterministic systems.</strong> Forecasting error over a 1,000-step rollout. CRPS evaluates the forecast ensemble, while RMSE and MAE evaluate its mean. VSF achieves the lowest value for all three metrics on double pendulum, Rössler, and Lorenz, with samples concentrated near the ground-truth trajectory. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
+            <figcaption class="results-table-caption" id="deterministic-table-caption"><strong>Table 1. Deterministic forecasting.</strong> CRPS scores the predicted distribution at each time; RMSE and MAE measure error in the ensemble mean. VSF has the lowest reported mean error on all three systems. Runtime (RT) is measured in seconds and averaged across tasks. Lower values are better.</figcaption>
 
           <section class="forecast-table-block forecast-table-block--first" aria-labelledby="deterministic-results-heading">
             <h4 id="deterministic-results-heading" class="sr-only">Complete deterministic results</h4>
@@ -843,7 +858,7 @@
             <div class="forecast-gallery__header">
               <div>
                 <p class="figure-kicker">Qualitative comparison</p>
-                <h4>Deterministic systems</h4>
+                <h4>How forecast errors develop</h4>
               </div>
               <div class="forecast-gallery__controls">
                 <div class="dataset-jump-list" role="tablist" aria-label="Select a deterministic dataset">
@@ -855,6 +870,12 @@
               </div>
             </div>
 
+            <div class="reading-guide">
+              <p>The tabs show two examples from the double-pendulum benchmark, followed by Rössler and Lorenz. Chaotic motion can amplify small state errors, so different trajectories can pose different forecasting challenges. Compare the two pendulum examples to see how agreement between methods changes over the shown interval.</p>
+              <p>The reference panel shows the complete path; forecast paths unfold over time. Each sample panel contains ten trajectories, which may overlap almost completely. The VSF ensemble mean averages them at each time, so inspect the individual samples as well as their mean.</p>
+            </div>
+
+            <p class="table-scroll-hint">Scroll horizontally to compare all methods.</p>
             <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Selected deterministic trajectory comparison">
               <div class="deterministic-comparison-matrix">
                 <div class="forecast-method-header" aria-hidden="true">
@@ -865,7 +886,7 @@
                   <span>Block diffusion</span>
                 </div>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel data-caption="Double pendulum 1 is the less chaotic case: VSF, Standard SF and block diffusion both track the ground truth well.">
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-one" id="deterministic-pendulum-one" role="tabpanel" aria-labelledby="deterministic-pendulum-one-tab" data-deterministic-panel data-caption="In the first pendulum example, VSF, Standard SF, and block diffusion all follow the reference motion closely. The VSF samples form a tight bundle and their mean follows the same path. This is the desired behavior here: the system has one correct future, so additional sample spread would represent forecasting error.">
                   <h5 id="deterministic-pendulum-one-label">Double pendulum 1</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum-1/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for double pendulum instance 1." width="306" height="270" loading="lazy"></div></div>
@@ -876,8 +897,8 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel data-caption="Double pendulum 2 is more chaotic. Standard SF accumulates error and drifts substantially, whereas VSF samples and their ensemble mean stay close to the ground truth." hidden>
-                  <h5 id="deterministic-pendulum-two-label">Double pendulum 2 <span>chaotic</span></h5>
+                <section class="forecast-dataset-row forecast-dataset-row--pendulum-two" id="deterministic-pendulum-two" role="tabpanel" aria-labelledby="deterministic-pendulum-two-tab" data-deterministic-panel data-caption="The second pendulum example is harder for the displayed forecasts. Standard SF gradually departs from the reference motion as errors accumulate. VSF's individual samples and their mean remain closer to the reference over the shown interval. Together, the two examples show why sustained agreement matters beyond the first few forecast steps." hidden>
+                  <h5 id="deterministic-pendulum-two-label">Double pendulum 2</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectory for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/double-pendulum/vsf-samples.gif" data-forecast-media="animated" alt="Ten VSF forecast samples for chaotic double pendulum instance 2." width="306" height="270" loading="lazy"></div></div>
@@ -887,7 +908,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel data-caption="VSF and SF preserve the Rössler attractor geometry, while block diffusion introduces visible small-scale deviations." hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--rossler" id="deterministic-rossler" role="tabpanel" aria-labelledby="deterministic-rossler-tab" data-deterministic-panel data-caption="Rössler traces a spiral in state space. VSF and Standard SF both preserve its overall geometry in this example, while block diffusion introduces small deviations along the path. Inspect the shape of the loops as the animation advances. The errors in Table 1 also account for timing: a similar-looking curve can still be traversed at the wrong pace." hidden>
                   <h5 id="deterministic-rossler-label">Rössler</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Rössler trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -898,7 +919,7 @@
                   </div>
                 </section>
 
-                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel data-caption="VSF and block diffusion follow the ground truth Lorenz attractor with concentrated samples. Standard SF accumulates phase error and makes extra rotations around the lobe." hidden>
+                <section class="forecast-dataset-row forecast-dataset-row--lorenz" id="deterministic-lorenz" role="tabpanel" aria-labelledby="deterministic-lorenz-tab" data-deterministic-panel data-caption="For this Lorenz example, VSF and block diffusion produce concentrated forecasts close to the reference path. Standard SF makes extra rotations around the lobe. This is a timing error: the forecast moves out of step with the reference even while remaining in a similar part of state space. An accurate continuation must capture both where the system goes and when it gets there." hidden>
                   <h5 id="deterministic-lorenz-label">Lorenz</h5>
                   <div class="forecast-comparison-strip forecast-comparison-strip--deterministic">
                     <div class="forecast-panel"><div class="forecast-panel__image"><img src="assets/figures/forecasting/deterministic/lorenz/gt.png?v=forecast-gifs-2" alt="Ground-truth deterministic Lorenz trajectory." width="306" height="270" loading="lazy"></div></div>
@@ -910,19 +931,21 @@
                 </section>
               </div>
             </div>
-            <figcaption><span data-deterministic-caption aria-live="polite">Double pendulum 1 is the less chaotic case: Standard SF and block diffusion both track the ground truth reasonably well, while VSF samples and their ensemble mean remain tightly aligned with it.</span> Each sample panel contains <span class="math-inline" data-tex="N=10">N = 10</span> trajectories; the VSF ensemble column shows their predictive mean.</figcaption>
+            <figcaption><span data-deterministic-caption aria-live="polite">In the first pendulum example, VSF, Standard SF, and block diffusion all follow the reference motion closely. The VSF samples form a tight bundle and their mean follows the same path. This is the desired behavior here: the system has one correct future, so additional sample spread would represent forecasting error.</span></figcaption>
           </figure>
         </section>
 
         <section class="forecast-subsection" aria-labelledby="stochastic-forecasting-heading">
           <header class="forecast-subsection__heading">
             <p class="subsection-number">5.2</p>
-            <h3 id="stochastic-forecasting-heading">Stochastic forecasting</h3>
-            <p>Rössler and Lorenz are partially observed parameter-mixture systems. We evaluate the conditional distribution of complete future trajectories.</p>
+            <h3 id="stochastic-forecasting-heading">Forecasting several possible futures</h3>
+            <p>We now hide one dynamical parameter of the Rössler or Lorenz system. The parameter is drawn once for each trajectory and stays fixed during its evolution. Different values can produce closely aligned observed histories followed by different futures. The forecaster must account for this unresolved information.</p>
           </header>
 
+          <p class="section-transition section-transition--lead">The target is a distribution of complete future paths. Samples should cover the variation in the reference trajectories while following the system's dynamics. Too little variation misses possible outcomes; variation that carries trajectories away from the system is also an error.</p>
+
           <figure class="results-panel results-table-figure" aria-labelledby="stochastic-table-caption">
-            <figcaption class="results-table-caption" id="stochastic-table-caption"><strong>Table 2, stochastic systems.</strong> Distributional forecasting error over a 1,000-step rollout. CME and CSE measure errors in the conditional mean and spread, while Wasserstein and energy distances compare complete trajectory distributions. VSF achieves the lowest value for every metric on both Rössler and Lorenz, showing the best recovery of the distribution of plausible futures. Runtime (RT), in seconds, is averaged across tasks; lower is better.</figcaption>
+            <figcaption class="results-table-caption" id="stochastic-table-caption"><strong>Table 2. Forecasting with a hidden parameter.</strong> CME and CSE measure errors in the conditional mean and standard deviation. Wasserstein distance (W1) and energy distance (ED) compare distributions of complete 1,000-step trajectories. VSF has the lowest reported mean error for each metric on both systems. Runtime (RT) is in seconds, averaged across tasks; lower values are better.</figcaption>
 
           <section class="forecast-table-block forecast-table-block--first" aria-labelledby="stochastic-results-heading">
             <h4 id="stochastic-results-heading" class="sr-only">Complete stochastic results</h4>
@@ -966,6 +989,8 @@
             <p class="results-table-note">Values are mean ± population standard deviation across three seeds.</p>
           </figure>
 
+          <p class="reading-guide">Each generated trajectory is a possible continuation of the observed history. Compare the range and shape of paths across methods; individual samples are not paired with particular reference draws. These galleries show a small selection, while Table 2 evaluates distributions across the test data.</p>
+
           <figure class="forecast-gallery">
             <div class="forecast-gallery__header">
               <div>
@@ -973,6 +998,7 @@
                 <h4>Rössler</h4>
               </div>
             </div>
+            <p class="table-scroll-hint">Scroll horizontally to compare all methods.</p>
             <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Stochastic Rössler trajectory comparison">
               <div class="forecast-comparison-strip forecast-comparison-strip--stochastic">
                 <div class="forecast-panel"><p>Ground truth</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/gt.png?v=forecast-gifs-2" alt="Ground-truth trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
@@ -982,7 +1008,7 @@
                 <div class="forecast-panel"><p>AR diffusion</p><div class="forecast-panel__image"><img src="assets/figures/forecasting/stochastic/rossler/ar-diffusion.gif" alt="Autoregressive diffusion trajectories for partially observed Rössler." width="306" height="270" loading="lazy"></div></div>
               </div>
             </div>
-            <figcaption>Ten trajectories are shown per method. VSF preserves the ground-truth Rössler geometry while capturing plausible variation. Standard SF produces one deterministic future, block diffusion generates less diverse samples, and AR diffusion is prone to rollout drift.</figcaption>
+            <figcaption>Ten trajectories are overlaid in each panel. The reference bundle shows variation caused by the hidden parameter; compare its spread and shape with the generated samples. VSF captures a range of paths around the reference spiral. Standard SF produces a single continuation, and block diffusion shows a narrower range in this example. AR diffusion produces variation but also drifts away from the reference dynamics.</figcaption>
           </figure>
 
           <figure class="forecast-gallery lorenz-sample-gallery" data-lorenz-sample-gallery data-forecast-animation-gallery>
@@ -1006,6 +1032,7 @@
                 </div>
               </div>
             </div>
+            <p class="table-scroll-hint">Scroll horizontally to compare all methods.</p>
             <div class="forecast-comparison-scroll" tabindex="0" role="region" aria-label="Five stochastic Lorenz trajectory comparisons">
               <div class="lorenz-comparison-matrix">
                 <div class="forecast-method-header" aria-hidden="true">
@@ -1072,7 +1099,7 @@
                 </section>
               </div>
             </div>
-            <figcaption>Each panel shows one sampled trajectory from the same observed history. VSF retains the characteristic Lorenz geometry and continues to traverse both lobes. Standard SF produces one deterministic continuation. Block diffusion is underdispersed and covers only part of the dynamics. AR diffusion generates diverse trajectories that can drift away from the system. Choose <strong>See all</strong> to compare five draws.</figcaption>
+            <figcaption>Use the selector to inspect five examples, or choose See all to compare them together. Each panel contains one trajectory. Across these draws, VSF captures motion around and between the two Lorenz lobes. Standard SF repeats one deterministic continuation; block diffusion covers a smaller range of behavior, while some AR diffusion samples drift away from the reference geometry. Draw numbers organize the display and do not imply a pointwise match between neighboring samples.</figcaption>
           </figure>
         </section>
       </div>
@@ -1082,21 +1109,25 @@
       <div class="container article-container">
         <header class="section-heading article-heading results-heading">
           <p class="section-number">6 · World-model planning</p>
-          <h2>World-model prediction</h2>
-          <p>Forecast quality matters for control when a planner uses imagined trajectories to compare actions. We next test VSF inside a JEPA-based world model. We replace its deterministic autoregressive predictor with action-conditioned VSF while keeping the pretrained JEPA representation fixed. For each candidate action sequence, the Cross-Entropy Method (CEM) evaluates the predicted physical-time trajectory and selects the plan whose terminal state best matches the encoded goal.</p>
+          <h2>Planning with predicted futures</h2>
+          <p>Forecasts matter when a planner acts on them. To move an object to a target, it must predict what different actions will do before choosing one. Prediction errors can make an ineffective action look promising, and the cost of forecasting matters when the planner evaluates many candidates.</p>
         </header>
+
+        <div class="section-copy world-model-introduction">
+          <p>We test VSF inside LeWM, a world model built on a joint-embedding predictive architecture (JEPA). An encoder represents the current and goal images as compact visual features. The predictor forecasts how those features will change under a candidate action sequence. The Cross-Entropy Method (CEM) planner searches for a sequence whose predicted endpoint is close to the goal. We compare the original autoregressive (AR) predictor with SF and VSF while keeping the encoder, planner, and planning budget fixed.</p>
+        </div>
 
         <figure class="paper-figure wide-figure world-model-figure">
           <img src="assets/figures/vsf-world-model.png" alt="Action-conditioned VSF world-model pipeline, from CEM candidate actions and encoded observations through the VSF predictor to a latent goal cost." width="1592" height="549" loading="lazy">
-          <figcaption>Action-conditioned VSF plugs into the existing JEPA encoder and CEM planner while retaining one velocity-field evaluation per imagined transition.</figcaption>
+          <figcaption>VSF predicts a sequence of visual state representations, with one field evaluation per imagined transition. These states change as the forecast advances. A separate uncertainty code, z, stays fixed within each rollout and conditions its evolution. The planner scores the predicted endpoint against the encoded goal, executes the chosen actions, and replans from a new observation when needed.</figcaption>
         </figure>
 
         <figure class="results-panel results-table-figure world-model-results" aria-labelledby="world-model-table-caption">
-          <figcaption class="results-table-caption" id="world-model-table-caption"><strong>Table 3 · World-model predictor.</strong> As a world-model predictor, VSF achieves the highest planning success on all four tasks and the lowest predictor RMSE on three of four tasks. RMSE is measured between predicted and ground-truth latent trajectories along the CEM-selected action sequence.</figcaption>
+          <figcaption class="results-table-caption" id="world-model-table-caption"><strong>Table 3. Planning success and prediction error.</strong> VSF has the highest mean success rate on all four tasks, with an average gain of about 7.3 percentage points over the AR predictor. It also has the lowest RMSE on three tasks. On Cube, SF has slightly lower RMSE, while VSF reaches more goals. Forecast error and task success provide complementary views of the predictor.</figcaption>
           <div class="forecast-table-block forecast-table-block--first">
             <p class="table-scroll-hint">Scroll horizontally to see every task and metric.</p>
             <div class="table-scroll" tabindex="0" role="region" aria-label="World-model predictor results across four planning tasks">
-              <table class="forecast-table world-model-results-table" aria-describedby="world-model-table-caption">
+              <table class="forecast-table world-model-results-table" aria-describedby="world-model-table-caption world-model-table-note">
                 <caption>Planning success and latent-trajectory RMSE for AR, SF, and VSF predictors on PushT, Cube, TwoRoom, and Reacher.</caption>
                 <colgroup><col></colgroup>
                 <colgroup span="2"></colgroup>
@@ -1112,13 +1143,13 @@
                     <th class="system-header world-model-task-header" scope="colgroup" colspan="2">Reacher</th>
                   </tr>
                   <tr>
-                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th class="metric-group-start" scope="col">Success (%) ↑</th>
                     <th scope="col">RMSE ↓</th>
-                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th class="metric-group-start" scope="col">Success (%) ↑</th>
                     <th scope="col">RMSE ↓</th>
-                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th class="metric-group-start" scope="col">Success (%) ↑</th>
                     <th scope="col">RMSE ↓</th>
-                    <th class="metric-group-start" scope="col">Success ↑</th>
+                    <th class="metric-group-start" scope="col">Success (%) ↑</th>
                     <th scope="col">RMSE ↓</th>
                   </tr>
                 </thead>
@@ -1150,16 +1181,18 @@
           </div>
         </figure>
 
+        <p class="results-table-note world-model-table-note" id="world-model-table-note">Values are mean ± population standard deviation over three seeds, with 50 goals per seed. Success is the percentage of goals reached within a 50-step execution budget. RMSE measures error in the predicted visual state representations along the action sequence selected by CEM. Higher success and lower RMSE are better.</p>
+
         <section class="world-model-rollouts" aria-labelledby="world-model-rollouts-heading">
           <header class="forecast-subsection__heading">
             <!-- <p class="subsection-number">6.1 · Rollout visualizations</p> -->
-            <h3 id="world-model-rollouts-heading">World model visualizations</h3>
-            <p class="world-model-plan-intro">Plan 1 and Plan 2 are two successive planning rounds toward the same goal.</p>
+            <h3 id="world-model-rollouts-heading">From prediction to action</h3>
+            <p class="world-model-plan-intro">Each clip pairs the executed task with a plot of predicted and observed visual states. Solid curves show predictions; dashed curves show states encoded from the actual observations. A two-dimensional projection (PCA) makes these feature trajectories visible. The plot axes describe the learned representation, rather than positions in the room or robot workspace.</p>
             <ol class="world-model-plan-list">
-              <li><strong>Plan 1 (blue): initial planning.</strong> CEM uses the world-model predictor to choose an action sequence from the initial observation, then the agent executes it for 25 time steps.</li>
-              <li><strong>Plan 2 (red): replanning.</strong> If the goal remains unreached, CEM uses the same predictor to choose a new action sequence from the latest observation.</li>
+              <li>Plan 1 (blue) starts from the initial observation. The agent executes the chosen actions for 25 environment steps.</li>
+              <li>Plan 2 (red) starts from the new observation if the goal has not yet been reached. The planner chooses another action sequence toward the same goal.</li>
             </ol>
-            <p class="world-model-plan-takeaway"><strong>Predictions that stay close to the dashed ground-truth latent trajectory help CEM rank candidate action sequences more accurately.</strong> In the examples below, the AR prediction diverges and the rollout fails, whereas VSF tracks the ground truth more closely and succeeds.</p>
+            <p class="world-model-plan-takeaway">Compare each prediction with its dashed reference, then check whether the executed task reaches the goal. These selected examples pair an AR forecast that departs from the observed evolution and ends in failure with a closer VSF forecast that ends in success. Table 3 reports performance across all evaluated goals.</p>
             <!-- <p>Each example places the AR and VSF predictors side by side. The clips begin playing automatically without sound, and the playback controls remain available.</p> -->
           </header>
 
@@ -1167,7 +1200,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>PushT</h4>
-                <p>Push the T-shaped block to the demonstrated goal configuration; both the point pusher and block poses define the goal.</p>
+                <p>The goal specifies both the T-shaped block's pose and the pusher's position. The predictor must account for how contact with the pusher changes the block's motion.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1190,7 +1223,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>Cube</h4>
-                <p>Use the UR5e gripper to pick up the cube and place its center at the target location.</p>
+                <p>The arm must grasp the cube and place its center at the target. Compare the imagined motion with the executed grasp and placement to see whether the predicted outcome is realized.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1213,7 +1246,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>TwoRoom</h4>
-                <p>Guide the red point agent from one room to a target in the other through the single doorway.</p>
+                <p>The red agent must pass through the doorway to reach a target in the other room. The forecast needs to respect this route as the planner chooses actions toward the goal.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1236,7 +1269,7 @@
             <article class="rollout-comparison">
               <header class="rollout-comparison__header">
                 <h4>Reacher</h4>
-                <p>Move the planar two-link arm to match the complete target joint configuration.</p>
+                <p>Both joints of the two-link arm must reach the target configuration. Follow the arm's motion and compare its final pose with the goal.</p>
               </header>
               <div class="rollout-comparison__grid">
                 <figure class="rollout-video-card">
@@ -1257,6 +1290,20 @@
             </article>
           </div>
         </section>
+      </div>
+    </section>
+
+    <section class="section section-outlook" id="outlook" aria-labelledby="outlook-heading">
+      <div class="container article-container">
+        <header class="section-heading article-heading">
+          <p class="section-number">7 · Next steps</p>
+          <h2 id="outlook-heading">What comes next</h2>
+        </header>
+        <div class="section-copy outlook-copy">
+          <p>Contact can change motion abruptly. VSF learns local motion from adjacent observations, which can be difficult to resolve near an impact or when observations are noisy. A model that combines continuous evolution with explicit jumps could extend this approach to such events. Higher-order or adaptive integration could reduce integration error at the cost of additional field evaluations.</p>
+          <p>A persistent latent code is useful when uncertainty affects an entire continuation, as in the hidden-parameter experiments. Other settings also contain disturbances that arrive during a forecast. Combining a persistent code with new sources of randomness, and updating uncertainty as observations arrive, could help model both kinds of variation.</p>
+          <p>Planning offers a further direction. Evaluating several predicted futures for each candidate action sequence would let a planner assess how reliably that action reaches the goal. A useful next experiment would test whether this improves decisions when outcomes vary, especially when some failures are much more costly than others.</p>
+        </div>
       </div>
     </section>
 
