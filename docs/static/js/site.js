@@ -1046,12 +1046,12 @@
       boundPlot.replaceChildren();
       const distance = halfEnergyDistance(alpha);
       const reconstruction = expectedGeneralizedEnergyReconstruction(alpha);
-      add(boundPlot, "title", { id: "energy-bound-title" }, "Prediction–truth mismatch and training reconstruction loss");
+      add(boundPlot, "title", { id: "energy-bound-title" }, "Prediction–truth mismatch and population reconstruction term");
       add(
         boundPlot,
         "desc",
         { id: "energy-bound-desc" },
-        `True velocities are minus and plus one, while the selected predictions are ${model.predictionLow} and ${model.predictionHigh}. At alpha ${alpha.toFixed(3)}, the prediction–truth mismatch is ${formatMetric(distance)} and the training reconstruction loss L E S is ${formatMetric(reconstruction)}.`,
+        `True velocities are minus and plus one, while the selected predictions are ${model.predictionLow} and ${model.predictionHigh}. At alpha ${alpha.toFixed(3)}, the prediction–truth mismatch is ${formatMetric(distance)} and the population reconstruction term is ${formatMetric(reconstruction)}.`,
       );
 
       const x = (value) => 120 + ((value + 1.25) / 2.5) * 420;
@@ -1133,7 +1133,7 @@
         });
       }
       const lossLabel = add(boundPlot, "text", { x: meterX, y: 250, class: "energy-bound-value" });
-      add(lossLabel, "tspan", {}, "Training reconstruction loss ");
+      add(lossLabel, "tspan", {}, "Population reconstruction term ");
       add(lossLabel, "tspan", { "font-style": "italic" }, "ℒ");
       add(lossLabel, "tspan", {
         class: "energy-bound-loss-subscript",
@@ -1453,10 +1453,10 @@
     };
 
     const regimeFor = (alpha, isFailure) => {
-      if (isFailure) return "At α = 2, every prediction with the correct mean is a minimum.";
-      if (alpha < 0.9995) return "For 0 < α < 1, the loss is nonconvex but has a unique minimum at the truth.";
-      if (alpha < 1.0005) return "At α = 1, the loss uses unsquared distances.";
-      return "For 1 < α < 2, the loss has a unique minimum at the truth.";
+      if (isFailure) return "At α = 2, every prediction with the correct mean has zero mismatch.";
+      if (alpha < 0.9995) return "For 0 < α < 1, the mismatch is nonconvex and vanishes only at the true distribution.";
+      if (alpha < 1.0005) return "At α = 1, the mismatch uses unsquared distances.";
+      return "For 1 < α < 2, the mismatch vanishes only at the true distribution.";
     };
 
     const updateAlpha = (announce = false, redrawLandscape = true) => {
